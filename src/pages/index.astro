@@ -1,163 +1,48 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
+const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
-<Layout title="Grandevity | Interactive Studio & Digital Solutions" lang="en">
-  <main>
-    <header class="hero">
-      <h1>Engineering <span class="text-gradient">Digital Worlds</span></h1>
-      <p>Grandevity is a multi-disciplinary studio building original interactive experiences and providing elite digital, financial, and strategic consulting for modern businesses.</p>
+<Layout title="Insights & Updates | Grandevity" lang="en">
+  <main class="blog-container">
+    <header class="blog-header">
+      <h1>Grandevity <span class="text-gradient">Insights</span></h1>
+      <p>Thoughts on business architecture, AI solutions, game development, and the humanities.</p>
     </header>
 
-    <section id="games" class="section-container">
-      <h2>In-House IP</h2>
-      <div class="card-grid single">
-        <div class="card game-card">
-          <div class="game-image-placeholder">
-            <span>[ Classified Concept Art ]</span>
-          </div>
-          <div class="card-content">
-            <h3>Project: Kiwi <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Working Title)</span></h3>
-            <span class="badge">In Active Development</span>
-            <p>An unannounced, original web game project exploring a unique Kiwi theme. Currently in the engineering and prototyping phase. More details to come as development progresses.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="services" class="section-container">
-      <h2>Studio Services</h2>
-      <p class="section-subtitle">Fueling our creative engines through high-level B2B partnerships.</p>
-      
-      <div class="card-grid">
-        <div class="card">
-          <h3>Digital & Web Services</h3>
-          <p>Development, maintenance, and hosting of robust digital storefronts, web tools, and content platforms.</p>
-        </div>
-        <div class="card">
-          <h3>Business Consulting</h3>
-          <p>Strategic advisory and process consulting to help independent businesses optimize their operational workflows.</p>
-        </div>
-        <div class="card">
-          <h3>Financial Bookkeeping</h3>
-          <p>Preparation of financial records and ledger reconciliation, ensuring absolute precision and compliance.</p>
-        </div>
-        <div class="card">
-          <h3>Systems & ERP Architecture</h3>
-          <p>Custom ERP solution design and implementation, bridging the gap between financial data and operational tech.</p>
-        </div>
-      </div>
-    </section>
+    <div class="articles-grid">
+      {sortedPosts.length === 0 ? (
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 4rem 0;">No articles published yet. Stay tuned.</div>
+      ) : (
+        sortedPosts.map((post) => (
+          <a href={`/blog/${post.id.replace('en/', '')}`} class="article-card">
+            <span class="category-badge">{post.data.category}</span>
+            <h2>{post.data.title}</h2>
+            <p class="description">{post.data.description}</p>
+            <div class="meta">
+              <time>{post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+            </div>
+          </a>
+        ))
+      )}
+    </div>
   </main>
 </Layout>
 
 <style>
-  main {
-    padding: 0 5%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .hero {
-    text-align: center;
-    padding: 6rem 0;
-  }
-
-  h1 {
-    font-size: 4rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    line-height: 1.1;
-  }
-
-  .text-gradient {
-    background-image: linear-gradient(45deg, #38bdf8, #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 400%;
-    background-position: 0%;
-  }
-
-  .hero p {
-    font-size: 1.2rem;
-    color: #94a3b8;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-
-  .section-container {
-    padding: 4rem 0;
-  }
-
-  h2 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .section-subtitle {
-    color: #94a3b8;
-    margin-bottom: 3rem;
-  }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-
-  .card-grid.single {
-    grid-template-columns: 1fr;
-    max-width: 800px;
-  }
-
-  .card {
-    background: var(--card-bg);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(56, 189, 248, 0.5);
-  }
-
-  .card-content {
-    padding: 2rem;
-  }
-
-  .card h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.5rem;
-  }
-
-  .card p {
-    color: #94a3b8;
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  .game-image-placeholder {
-    width: 100%;
-    height: 300px;
-    background: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #475569;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-
-  .badge {
-    display: inline-block;
-    background: rgba(56, 189, 248, 0.1);
-    color: #38bdf8;
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+  .blog-container { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; min-height: 70vh; }
+  .blog-header { text-align: center; margin-bottom: 4rem; }
+  .blog-header h1 { font-size: 3.5rem; margin-bottom: 1rem; color: #f8fafc; }
+  .text-gradient { background-image: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 400%; background-position: 0%; }
+  .blog-header p { color: #94a3b8; font-size: 1.2rem; }
+  .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+  .article-card { display: flex; flex-direction: column; background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; }
+  .article-card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.5); }
+  .category-badge { align-self: flex-start; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+  .article-card h2 { font-size: 1.4rem; margin: 0 0 1rem 0; color: #f8fafc; line-height: 1.4; }
+  .description { color: #94a3b8; margin: 0 0 1.5rem 0; line-height: 1.6; flex-grow: 1; }
+  .meta { font-size: 0.85rem; color: #64748b; margin-top: auto; }
 </style>

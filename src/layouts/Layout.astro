@@ -1,9 +1,14 @@
 ---
-const { title } = Astro.props;
+// 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
+const { title, lang = 'en' } = Astro.props;
+
+// 判断当前语言，设定切换按钮的跳转目标和显示文字
+const switchUrl = lang === 'en' ? '/zh/' : '/';
+const switchText = lang === 'en' ? '中文' : 'EN';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -13,12 +18,14 @@ const { title } = Astro.props;
   </head>
   <body>
     <nav>
-      <a href="/" class="logo-link">
+      <a href={lang === 'en' ? '/' : '/zh/'} class="logo-link">
         <img src="/logo.png" alt="Grandevity Logo" class="nav-logo" />
       </a>
       <div class="links">
-        <a href="#games">Games</a>
-        <a href="#services">Services</a>
+        <a href="#games">{lang === 'en' ? 'Games' : '游戏'}</a>
+        <a href="#services">{lang === 'en' ? 'Services' : '服务'}</a>
+        <div class="nav-divider"></div>
+        <a href={switchUrl} class="lang-switch">{switchText}</a>
       </div>
     </nav>
     <slot />
@@ -26,22 +33,24 @@ const { title } = Astro.props;
       <div class="footer-content">
         <div class="footer-brand">
           <span class="logo-text">Grandevity</span>
-          <p class="tagline">Engineering Digital Worlds.</p>
+          <p class="tagline">{lang === 'en' ? 'Engineering Digital Worlds.' : '构建数字世界。'}</p>
           <div class="philosophy">
-            "The majestic serenity arising from immense strength and established wisdom."
+            {lang === 'en' 
+              ? '"The majestic serenity arising from immense strength and established wisdom."'
+              : '“源于雄厚实力与既成智慧的庄严宁静。”'}
           </div>
         </div>
         
         <div class="footer-contact">
-          <h4>Get in Touch</h4>
+          <h4>{lang === 'en' ? 'Get in Touch' : '联系我们'}</h4>
           <div class="contact-links">
-            <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a>
-            <a href="tel:+64000000000">+64 20 4006 4937</a>
+            <a href="mailto:hello@grandevity.co.nz">hello@grandevity.co.nz</a>
+            <a href="tel:+64000000000">[Insert Phone Number]</a>
           </div>
         </div>
 
         <div class="footer-location">
-          <h4>Registered Office</h4>
+          <h4>{lang === 'en' ? 'Registered Office' : '注册办公室'}</h4>
           <p>9 Huron Street<br />
              Takapuna<br />
              Auckland 0622<br />
@@ -50,14 +59,15 @@ const { title } = Astro.props;
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Grandevity Limited. Proudly incorporated in New Zealand.</p>
-        <p class="nzbn-text">NZBN: 9429053472120</p>
+        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '于新西兰注册成立。'}</p>
+        <p class="nzbn-text">NZBN: [Insert Your NZBN Here]</p>
       </div>
     </footer>
   </body>
 </html>
 
 <style is:global>
+  /* 基础 CSS 保持不变 */
   :root {
     --bg-dark: #0f172a;
     --text-light: #f8fafc;
@@ -93,132 +103,48 @@ const { title } = Astro.props;
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
-  .logo-link {
-    display: flex;
-    align-items: center;
-  }
-
+  .logo-link { display: flex; align-items: center; }
   .nav-logo {
-    height: 40px;
-    width: auto;
-    filter: brightness(0) invert(1); /* Change/remove if using a transparent logo */
+    height: 40px; width: auto;
+    filter: brightness(0) invert(1);
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
+  .nav-logo:hover { opacity: 0.8; transform: scale(1.02); }
 
-  .nav-logo:hover {
-    opacity: 0.8;
-    transform: scale(1.02);
-  }
-
+  .links { display: flex; align-items: center; }
   .links a {
-    color: var(--text-light);
-    text-decoration: none;
+    color: var(--text-light); text-decoration: none;
+    margin-left: 2rem; font-size: 0.9rem; transition: color 0.2s;
+  }
+  .links a:hover { color: var(--accent-glow); }
+
+  /* 新增语言切换按钮样式 */
+  .nav-divider {
+    width: 1px; height: 16px; background: rgba(255,255,255,0.2);
     margin-left: 2rem;
-    font-size: 0.9rem;
-    transition: color 0.2s;
   }
-
-  .links a:hover {
-    color: var(--accent-glow);
-  }
-
-  /* --- FOOTER STYLES --- */
-  footer {
-    margin-top: auto;
-    padding: 4rem 5% 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 3rem;
-    max-width: 1200px;
-    margin: 0 auto 3rem;
-  }
-
-  .footer-brand .logo-text {
-    font-weight: 800;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .footer-brand .tagline {
-    color: #f8fafc;
-    font-size: 0.95rem;
-    margin-top: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .footer-brand .philosophy {
-    font-style: italic;
-    color: #94a3b8;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    padding-left: 1rem;
-    border-left: 2px solid rgba(56, 189, 248, 0.5); /* Subtle blue glow border */
-  }
-
-  .footer-contact h4, .footer-location h4 {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    color: #f8fafc;
-    text-transform: uppercase;
+  .lang-switch {
+    background: rgba(255,255,255,0.1);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
     letter-spacing: 1px;
   }
+  .lang-switch:hover { background: rgba(56, 189, 248, 0.2); }
 
-  .contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .contact-links a {
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-  }
-
-  .contact-links a:hover {
-    color: var(--accent-glow);
-  }
-
-  .footer-location p {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-bottom p {
-    margin: 0 0 0.5rem 0;
-    font-size: 0.8rem;
-    color: #64748b;
-  }
-
-  .nzbn-text {
-    font-family: monospace;
-    letter-spacing: 0.5px;
-  }
-
-  /* Responsive tweak for smaller screens */
-  @media (max-width: 768px) {
-    .footer-content {
-      gap: 2rem;
-    }
-  }
+  /* 底部 Footer 样式保持不变 */
+  footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }
+  .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; max-width: 1200px; margin: 0 auto 3rem; }
+  .footer-brand .logo-text { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
+  .footer-brand .tagline { color: #f8fafc; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+  .footer-brand .philosophy { font-style: italic; color: #94a3b8; font-size: 0.85rem; line-height: 1.5; padding-left: 1rem; border-left: 2px solid rgba(56, 189, 248, 0.5); }
+  .footer-contact h4, .footer-location h4 { margin: 0 0 1rem 0; font-size: 0.9rem; color: #f8fafc; text-transform: uppercase; letter-spacing: 1px; }
+  .contact-links { display: flex; flex-direction: column; gap: 0.75rem; }
+  .contact-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  .contact-links a:hover { color: var(--accent-glow); }
+  .footer-location p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
+  .nzbn-text { font-family: monospace; letter-spacing: 0.5px; }
+  @media (max-width: 768px) { .footer-content { gap: 2rem; } }
 </style>

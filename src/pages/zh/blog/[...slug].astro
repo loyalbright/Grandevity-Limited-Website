@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog', ({ id }) => {
+    return id.startsWith('zh/');
+  });
+  
+  return blogEntries.map(entry => ({
+    params: { slug: entry.id.replace('zh/', '') }, 
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render(); 
+---
+
+<Layout title={`${entry.data.title} | Grandevity`} lang="zh">
+  <main class="article-container">
+    <article>
+      <header class="article-header">
+        <h1>{entry.data.title}</h1>
+        <div class="meta">
+          <span>作者：{entry.data.author}</span> • 
+          <time>{entry.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+        </div>
+      </header>
+      
+      <div class="markdown-content">
+        <Content /> 
+      </div>
+    </article>
+  </main>
+</Layout>
+
+<style is:global>
+  .article-container { max-width: 800px; margin: 0 auto; padding: 4rem 5%; min-height: 60vh; }
+  .article-header { margin-bottom: 3rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; }
+  .article-header h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #f8fafc; line-height: 1.3; }
+  .meta { color: #94a3b8; font-size: 0.9rem; }
+  .markdown-content { color: #cbd5e1; line-height: 1.8; font-size: 1.1rem; }
+  .markdown-content h1, .markdown-content h2, .markdown-content h3 { color: #f8fafc; margin-top: 2.5rem; margin-bottom: 1rem; }
+  .markdown-content a { color: #38bdf8; text-decoration: none; }
+  .markdown-content a:hover { text-decoration: underline; }
+  .markdown-content p { margin-bottom: 1.5rem; }
+</style>

@@ -57,16 +57,37 @@ import Layout from '../layouts/Layout.astro';
   h1 { font-size: 4rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.1; }
   .text-gradient { background-image: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 400%; background-position: 0%; }
   .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-  .section-container { padding: 4rem 0; }
+  
+  /* --- 修复重心偏移 --- */
+  /* 让区块的标题统一居中，与顶部 Hero 保持视觉连贯 */
+  .section-container { padding: 4rem 0; text-align: center; }
   h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .section-subtitle { color: #94a3b8; margin-bottom: 3rem; }
-  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-  .card-grid.single { grid-template-columns: 1fr; max-width: 800px; }
+  
+  /* --- 修复网格错位 --- */
+  /* 把 300px 改成 450px，强制在电脑端形成完美的 2x2 对称网格。
+     同时让卡片内部的文字依然保持靠左，方便阅读 */
+  .card-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+    gap: 2rem; 
+    text-align: left; 
+  }
+  
+  /* 强制居中 Kiwi 游戏的单张卡片 */
+  .card-grid.single { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
+  
+  /* 卡片基础样式保持不变 */
   .card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
   .card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.5); }
   .card-content { padding: 2rem; }
-  .card h3 { margin: 0 0 1rem 0; font-size: 1.5rem; }
+  .card h3 { margin: 0 0 1rem 0; font-size: 1.5rem; color: #f8fafc; }
   .card p { color: #94a3b8; line-height: 1.5; margin: 0; }
   .game-image-placeholder { width: 100%; height: 300px; background: #0f172a; display: flex; align-items: center; justify-content: center; color: #475569; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .badge { display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+
+  /* 移动端适配：手机上自动变成单列排版 */
+  @media (max-width: 768px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
 </style>

@@ -1,17 +1,19 @@
 import { z, defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders'; // 新增：引入官方的 glob 加载器
 
-// 定义博客文章的数据结构
 const blogCollection = defineCollection({
-  type: 'content',
+  // 移除旧版的 type: 'content'，换成全新的 loader
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
     date: z.date(),
     description: z.string().optional(),
     author: z.string().default('Grandevity Team'),
+    category: z.string().default('General'),
+    tags: z.array(z.string()).optional(),
   }),
 });
 
-// 导出集合，Astro 会自动识别
 export const collections = {
   'blog': blogCollection,
 };

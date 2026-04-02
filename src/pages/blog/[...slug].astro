@@ -44,4 +44,13 @@ const { Content } = await render(entry);
   .markdown-content h1, .markdown-content h2, .markdown-content h3 { color: #f8fafc; margin-top: 2.5rem; margin-bottom: 1rem; }
   .markdown-content a { color: #38bdf8; text-decoration: none; }
   .markdown-content a:hover { text-decoration: underline; }
+  /* --- 控制文章内的图片排版 --- */
+  .markdown-content img {
+    max-width: 100%;       /* 绝对不超过文章容器的宽度 */
+    height: auto;          /* 自动按比例缩放高度，防止变形 */
+    display: block;        /* 独立占一行 */
+    margin: 2.5rem auto;   /* 上下留出优雅的空白，左右居中 */
+    border-radius: 8px;    /* 加上微微的圆角，更有高级感 */
+    border: 1px solid rgba(255,255,255,0.05); /* 加一层极淡的边框融入暗黑主题 */
+  }
 </style>

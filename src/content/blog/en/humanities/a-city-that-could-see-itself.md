@@ -31,3 +31,7 @@ What emerges, then, is not a story about premature modernity—no ancient analog
 The achievement of the series lies not in technological speculation, but in conceptual clarity.  It offers a city that watches itself—not perfectly, not completely, but systematically.  We tend to think of such capacities as recent. Yet the underlying wager is older.  To see sooner is to act sooner; to act sooner is, perhaps, to control.  Fourteen centuries later, the materials have changed. Signals move through fiber and spectrum rather than smoke and fabric.  But the ambition remains intact—the belief that if the present can be rendered quickly enough, clearly enough, it might also be mastered.  
 
 Stand, for a moment, in that imagined Chang’an at dusk. The gates are closing. The lanterns rise.  Somewhere above you, someone has already seen what you have not.  And by the time you notice, it may already be too late to matter. 
+---
+
+**Image Credits**
+Some images are used for illustrative purposes under fair use. All rights belong to their respective owners.

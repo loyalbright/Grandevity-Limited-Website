@@ -66,4 +66,4 @@ And by the time you notice, it may already be too late to matter.
 ---
 
 **Image Credits**
-Some images are used for illustrative purposes under fair use. All rights belong to their respective owners.
+All images are used for illustrative purposes under fair use. All rights belong to their respective owners.

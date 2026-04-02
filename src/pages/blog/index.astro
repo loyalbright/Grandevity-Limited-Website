@@ -23,7 +23,7 @@ const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.
             <h2>{post.data.title}</h2>
             <p class="description">{post.data.description}</p>
             <div class="meta">
-              <time>{post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+              <time>{post.data.date.toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
             </div>
           </a>
         ))

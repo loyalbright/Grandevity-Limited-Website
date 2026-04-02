@@ -28,7 +28,7 @@ const { Content } = await render(entry);
         
         <div class="meta">
           <span>By {entry.data.author}</span> • 
-          <time>{entry.data.date.toLocaleDateString('en-US')}</time>
+          <time>{entry.data.date.toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
         </div>
 
         {/* 如果有标签，就在这里循环渲染出来 */}

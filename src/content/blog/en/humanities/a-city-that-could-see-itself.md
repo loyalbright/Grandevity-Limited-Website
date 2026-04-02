@@ -17,6 +17,7 @@ Not because it anticipates modern technology in any literal sense, but because i
 
 ![Chang’an as a designed system: visibility was not incidental, but engineered.](/images/blog/changan-1.png)
 *Chang’an as a designed system: visibility was not incidental, but engineered.* 
+**Source:** Image from POLARIS Workshop.
 
 The series imagines a bureau—Jing’an Si—tasked with holding the city in view. No such institution existed in this form.  Control in Tang Chang’an was neither singular nor hidden; it was distributed across systems: ward administration, curfew enforcement, and elite units such as the Jinwu Guards.  Surveillance was not centralized. It was ambient.  
 
@@ -30,6 +31,7 @@ Meaning, in other words, was disciplined.
 
 ![Predefined signals reduced ambiguity, allowing action without interpretation.](/images/blog/changan-2.png)
 *Predefined signals reduced ambiguity, allowing action without interpretation.* 
+**Source:** Screenshot from *The Longest Day in Chang’an*.
 
 The series folds this frontier logic inward, into the dense grid of the capital.  Its visual language—panels flipping, signals cascading—invites comparison to digital systems.  It is tempting to describe it as binary, to imagine each movement as a unit of encoded data.  But that analogy belongs to us. Tang engineers were not digitizing information; they were eliminating ambiguity.  A signal, once seen, required no interpretation—only response.  
 
@@ -43,6 +45,7 @@ Comparisons to Manhattan are often made, if only as shorthand.  More revealing, 
 
 ![Order and legibility: Chang’an’s grid alongside more organic urban forms.](/images/blog/changan-3.png)
 *Order and legibility: Chang’an’s grid alongside more organic urban forms.* 
+**Source:** Screenshot from *The Longest Day in Chang’an*.
 
 What emerges, then, is not a story about premature modernity—no ancient analogue to digital networks—but about an enduring administrative instinct: to shorten the distance between event and awareness.  
 

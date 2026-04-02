@@ -69,13 +69,17 @@ const { Content } = await render(entry);
     border-radius: 8px;    /* 加上微微的圆角，更有高级感 */
     border: 1px solid rgba(255,255,255,0.05); /* 加一层极淡的边框融入暗黑主题 */
   }
-  /* --- 极致优雅的图片注释 (Caption) 排版 --- */
-  .markdown-content p:has(img) + p {
+  /* --- Precise Image Caption Styling --- */
+  .markdown-content p img {
+    margin-bottom: 0.5rem; /* Reduce gap between image and caption */
+  }
+  
+  .markdown-content p img + em {
+    display: block;
     text-align: center;
     font-size: 0.9rem;
     color: #94a3b8;
-    margin-top: -1.5rem; /* 向上拉近，吸附在图片底部 */
-    margin-bottom: 3rem; /* 和下一段正文拉开距离 */
     line-height: 1.5;
+    margin-bottom: 2.5rem; /* Push the next paragraph down */
   }
 </style>

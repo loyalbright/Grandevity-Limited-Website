@@ -72,7 +72,7 @@ const { Content } = await render(entry);
   .markdown-content p img {
     margin-bottom: 0.5rem; /* Reduce gap between image and caption */
   }
-  
+
     .markdown-content p img + em {
     display: block;
     text-align: center;
@@ -80,5 +80,13 @@ const { Content } = await render(entry);
     color: #94a3b8;
     line-height: 1.5;
     margin-bottom: 2.5rem; /* Push the next paragraph down */
+  }
+  /* --- 独立的图片来源 (Source) 排版 --- */
+  .markdown-content .image-source {
+    text-align: center;
+    font-size: 0.85rem;      /* 比 caption 再稍微小一丁点，建立完美的视觉层级 */
+    color: #64748b;          /* 颜色再稍微深沉一点，不抢夺正文注意力 */
+    margin-top: -2rem;       /* 核心魔法：用负边距把它强行往上拉，紧紧贴在 Caption 下面 */
+    margin-bottom: 2.5rem;   /* 和下一段正文保持距离 */
   }
 </style>

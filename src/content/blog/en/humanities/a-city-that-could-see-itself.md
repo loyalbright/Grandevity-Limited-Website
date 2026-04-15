@@ -4,7 +4,7 @@ date: 2026-04-02
 description: "How Tang Dynasty Chang’an Engineered Visibility, Control, and a Pre-Modern Logic of Systems Thinking"
 author: "Grandevity Studio"
 category: "Humanities"
-tags: ["History", "Urban Planning", "Systems Thinking", "China", "The Longest Day in Chang’an"]
+tags: ["History", "Technology", "Systems Thinking", "Culture", "The Longest Day in Chang’an"]
 ---
 
 In the opening minutes of The Longest Day in Chang’an, a man runs—and the city runs ahead of him.  

@@ -4,7 +4,7 @@ description: "How Chang’an Measured Order, One Drop at a Time"
 date: 2026-04-15
 author: "Grandevity Studio"
 category: "Humanities"
-tags: ["History", "Urban Planning", "Systems Thinking", "China", "The Longest Day in Chang'an"]
+tags: ["History", "Technology", "Systems Thinking", "Culture", "The Longest Day in Chang’an"]
 ---
 
 In the opening minutes of *The Longest Day in Chang’an*, something begins to measure the city—quietly, and without interruption. 

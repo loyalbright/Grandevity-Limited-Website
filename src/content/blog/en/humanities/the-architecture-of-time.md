@@ -49,6 +49,7 @@ The city, so legible by day, begins to lose its clarity.
 
 ![The panoramic view of the city at dusk.](/images/blog/changan-dusk.jpg)
 *The System Shutdown: As the final interval closes and night descends, the city’s legible order begins to fade, shifting from high-visibility governance to the shadows of the curfew.*
+<p class="image-source"><strong>Source:</strong> Screenshot from <em>The Longest Day in Chang'an</em>.</p>
 
 It is tempting to see in this a distant precursor to our own world of real-time systems, where information moves at the speed of light and delay is measured in fractions of a second. But the resemblance is not technological. It is conceptual. 
 

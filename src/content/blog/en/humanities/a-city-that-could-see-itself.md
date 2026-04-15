@@ -67,3 +67,5 @@ And by the time you notice, it may already be too late to matter.
 
 **Image Credits**  
 All images are used for illustrative purposes under fair use. All rights belong to their respective owners.
+
+**Support Independent Research** If you enjoyed this analysis of Tang Dynasty systems, consider supporting Grandevity Studio. Your contributions fuel our independent research [Support via Ko-fi](https://ko-fi.com/grandevitystudio).

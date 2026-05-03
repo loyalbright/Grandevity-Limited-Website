@@ -324,8 +324,17 @@
 
     canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
     canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); triggerAttack(); }, { passive: false });
-    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); 
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+        triggerAttack();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
 
     const keys = {};
     window.addEventListener('keydown', e => { 
@@ -359,8 +368,8 @@
     const shooterImg = new Image(); shooterImg.src = 'zogon_shooter.webp'; 
     const scoutImg = new Image(); scoutImg.src = 'zogon_scout.webp'; 
     const flyerImg = new Image(); flyerImg.src = 'zogon_flyer.webp'; 
-    const devImg = new Image(); devImg.src = 'zogon_blocker_monster.webp'; 
     const aaGunImg = new Image(); aaGunImg.src = 'aa_gun.webp';
+
     const basicImg = new Image(); basicImg.src = 'novice_bird.webp'; 
     const shieldImg = new Image(); shieldImg.src = 'shield_bird.webp'; 
     const sniperImg = new Image(); sniperImg.src = 'sniper_bird.webp'; 
@@ -402,9 +411,13 @@
         const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3', 'laser': 'sniper.mp3' };
         if (soundMap[type]) { 
             let sound = new Audio(soundMap[type]); 
-            if (type === 'gun') sound.volume = 0.1;  
-            else if (type === 'sniper' || type === 'hit') sound.volume = 0.3;  
-            else sound.volume = 0.5;  
+            if (type === 'gun') {
+                sound.volume = 0.1;  
+            } else if (type === 'sniper' || type === 'hit') {
+                sound.volume = 0.3;  
+            } else {
+                sound.volume = 0.5;  
+            }
             sound.play().catch(e => {}); 
         }
     }
@@ -561,6 +574,7 @@
                 bullets.push({ x: startX, y: startY, w: 24, h: 6, color: '#00e5ff', dx: Math.cos(angle) * w.speed, dy: Math.sin(angle) * w.speed, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: true, angle: angle });
             } else {
                 let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
+                // 🛑 FIXED: Set `isAA: false` here so Kevin's bow explicitly ignores flying enemies!
                 bullets.push({ x: startX, y: GROUND_Y - 30, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
             }
         }
@@ -579,7 +593,9 @@
 
     function equipWeapon(btn, id) { 
         const dict = i18n[currentLang];
-        ui.wBtns.forEach(b => { if(b.id !== 'armor-btn') { b.classList.remove('active'); if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; } }); btn.classList.add('active'); btn.querySelector('.price').innerText = dict.equipped; kevin.weapon = id; 
+        ui.wBtns.forEach(b => { if(b.id !== 'armor-btn') { b.classList.remove('active'); if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; } }); 
+        btn.classList.add('active'); btn.querySelector('.price').innerText = dict.equipped; 
+        kevin.weapon = id; 
     }
     
     ui.sBtns.forEach(btn => btn.addEventListener('click', (e) => { e.currentTarget.blur(); let type = btn.dataset.type; let price = parseInt(btn.dataset.price); if (gold >= price && !kevin.isDead) { gold -= price; let ally = { x: hq.x + hq.w, attackTimer: 0, hitTimer: 0, type: type }; if (type === 'basic') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8bc34a', hp: 100, maxHp: 100, speed: 2.5, range: 20, damage: 20 }); if (type === 'shield') Object.assign(ally, { w: 55, h: 65, y: GROUND_Y - 65, color: '#795548', hp: 450, maxHp: 450, speed: 1.2, range: 20, damage: 10 }); if (type === 'sniper') Object.assign(ally, { w: 65, h: 65, y: GROUND_Y - 65, color: '#2e7d32', hp: 80, maxHp: 80, speed: 1.8, range: 350, damage: 60 }); if (type === 'healer') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#ff9ecd', hp: 120, maxHp: 120, speed: 2, range: 150, damage: -40 }); allies.push(ally); } }));
@@ -651,7 +667,7 @@
         let currentInterval = Math.max(45, baseInterval - (pushProgress * 25)); 
         
         if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
-            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0 }; 
+            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0 }; 
             
             if (currentWave >= 4 && rand < Math.min(0.12, 0.02 + currentWave * 0.01)) { 
                 Object.assign(enemy, { w: 180, h: 180, y: GROUND_Y - 180, color: '#c23616', hp: 600, maxHp: 600, speed: 0.3, range: 40, damage: 100, reward: 150, xpReward: 30, type: 'devastator' }); 
@@ -660,7 +676,7 @@
             else if (rand < 0.40 + (pushProgress * 0.2)) { Object.assign(enemy, { w: 50, h: 40, y: GROUND_Y - 160, color: '#8e44ad', hp: 90, maxHp: 90, speed: 2.2, range: 20, damage: 30, reward: 30, xpReward: 4, type: 'flyer', isFlying: true }); }
             else if (rand < 0.60) { Object.assign(enemy, { w: 35, h: 45, y: GROUND_Y - 45, color: '#00ced1', hp: 60, maxHp: 60, speed: 1.5, range: 450, damage: 25, reward: 25, xpReward: 3, type: 'shooter' }); } 
             else if (rand < 0.80) { Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#e67e22', hp: 70, maxHp: 70, speed: 4.5, range: 15, damage: 15, reward: 20, xpReward: 2, type: 'scout' }); } 
-            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#6ab04c', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 15, xpReward: 1, type: 'grunt' }); } 
+            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8e44ad', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 15, xpReward: 1, type: 'grunt' }); } 
             enemies.push(enemy); 
         }
 
@@ -674,12 +690,16 @@
             let shouldDestroy = false; 
             let isPenetrating = false; 
             let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
-            
-            let projHitBox = b;
-            if (b.isRanged && !b.isAA) projHitBox = {x: b.x, y: 0, w: b.w, h: canvas.height}; 
+            let projHitBox = {x: b.x, y: b.y, w: b.w, h: b.h}; 
 
             for (let t of targetList) { 
                 if (!b.hitTargets) b.hitTargets = new Set();
+                
+                // 🛑 修复核心：确保横向发射的子弹 (如弓箭) 无法击中飞行动物
+                if (b.isPlayer && b.isAA === false && t.isFlying) {
+                    continue; 
+                }
+
                 if (!shouldDestroy && checkCol(projHitBox, t) && !b.hitTargets.has(t)) { 
                     let dmg = b.damage; 
                     if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
@@ -706,7 +726,9 @@
                         if (b.isRanged) spawnSparks(b.x + b.w, b.y + b.h/2, b.color || '#fff');
                     }
                     
-                    if (!isPenetrating) shouldDestroy = true; 
+                    if (!isPenetrating) {
+                        shouldDestroy = true; 
+                    }
                 } 
             } 
             
@@ -921,16 +943,16 @@
             let scaleFactor = hq.h / hqImg.naturalHeight; 
             ctx.drawImage(hqImg, hq.x - (hqImg.naturalWidth*scaleFactor - hq.w)/2, hqVisY, hqImg.naturalWidth * scaleFactor, hq.h); 
         } else { 
-            ctx.fillStyle = '#2c3e50'; ctx.fillRect(hq.x + 30, hqVisY, hq.w - 60, hq.h); 
-        }
+            ctx.fillStyle = '#f5f6fa'; ctx.fillRect(hq.x, hqVisY, hq.w, hq.h); 
+            ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(hq.x + hq.w/2, hqVisY, hq.w/2, Math.PI, 0); ctx.fill(); 
+        } 
         ctx.restore();
-
-        ctx.save();
-        let baseUiY = ship.y; let hqHpPct = Math.max(0, hq.hp / hq.maxHp);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 100, baseUiY - 60, 200, 30); 
-        ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.fillText('EAST CAPE LIGHTHOUSE', hq.x + hq.w/2, baseUiY - 40); 
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 60, baseUiY - 20, 120, 10);
-        ctx.fillStyle = hqHpPct > 0.6 ? '#f1c40f' : (hqHpPct > 0.3 ? '#e67e22' : '#e74c3c'); ctx.fillRect(hq.x + hq.w/2 - 60, baseUiY - 20, 120 * hqHpPct, 10);
+        
+        ctx.save(); let hqVisUiY = getVisualY(hq.x, hq.y); let hqHpPct = Math.max(0, hq.hp / hq.maxHp); 
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 100, hqVisUiY - 50, 200, 30); 
+        ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.fillText('EAST CAPE LIGHTHOUSE', hq.x + hq.w/2, hqVisUiY - 40); 
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 20, 120, 10);
+        ctx.fillStyle = hqHpPct > 0.6 ? '#f1c40f' : (hqHpPct > 0.3 ? '#e67e22' : '#e74c3c'); ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 20, 120 * hqHpPct, 10);
         ctx.restore();
 
         let shipVisY = ship.y; let hover = Math.sin(frameCount * 0.05) * 15;
@@ -992,7 +1014,25 @@
             let visY = getVisualY(kevin.x, kevin.y); let animProgress = (30 - kevin.attackAnim) / 30; 
             ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
             if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
-            else { let wImg = weapons[kevin.weapon].img; if (wImg && wImg.complete && wImg.naturalHeight > 0) { if (kevin.weapon === 'sword') { ctx.rotate(-Math.PI / 3 + (Math.PI / 1.5) * Math.sin(animProgress * Math.PI)); ctx.drawImage(wImg, 10, -30, 60, 60); } else if (kevin.weapon === 'spear') { let maxThrust = 60; let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6)); ctx.translate(25 + currentThrust, -5); ctx.rotate(Math.PI / 4); ctx.drawImage(wImg, -30, -30, 60, 60); } else if (kevin.weapon === 'bow') { ctx.drawImage(wImg, 10 - Math.sin(animProgress * Math.PI)*5, -30, 60, 60); } } }
+            else { 
+                let wImg = weapons[kevin.weapon].img; 
+                if (wImg && wImg.complete && wImg.naturalHeight > 0) { 
+                    if (kevin.weapon === 'sword') { 
+                        ctx.rotate(-Math.PI / 3 + (Math.PI / 1.5) * Math.sin(animProgress * Math.PI)); 
+                        ctx.drawImage(wImg, 10, -30, 60, 60); 
+                    } else if (kevin.weapon === 'spear') { 
+                        let maxThrust = 60; 
+                        let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6)); 
+                        ctx.save(); 
+                        ctx.translate(25 + currentThrust, -5); 
+                        ctx.rotate(Math.PI / 4); 
+                        ctx.drawImage(wImg, -30, -30, 60, 60); 
+                        ctx.restore(); 
+                    } else if (kevin.weapon === 'bow') { 
+                        ctx.drawImage(wImg, 10 - Math.sin(animProgress * Math.PI)*5, -30, 60, 60); 
+                    } 
+                } 
+            }
             ctx.restore();
         }
         
@@ -1051,7 +1091,7 @@
         
         let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
     }
-
+    
     function updateUI() { 
         const dict = i18n[currentLang];
         ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; ui.wave.innerText = currentWave; 
@@ -1070,7 +1110,7 @@
     
     function endGame(isVictory) { 
         bgm.pause();
-	CG_Manager.stopGameplay();
+	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
         const dict = i18n[currentLang];
         isRunning = false; 
         isGameOver = true; 

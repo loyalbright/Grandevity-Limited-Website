@@ -10,16 +10,37 @@ import Layout from '../layouts/Layout.astro';
     </header>
 
     <section id="games" class="section-container">
-      <h2>In-House IP (In Development)</h2>
+      <h2>In-House IP</h2>
       <div class="card-grid single">
         <div class="card game-card">
-          <div class="game-image-placeholder">
-            <span>[ Confidential Concept Art ]</span>
-          </div>
+          <a href="/games/kiwi-defenders/" target="_blank" style="text-decoration: none;">
+            <div class="game-image-placeholder">
+              <span style="background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 4px; color: #38bdf8; font-weight: bold; font-size: 1.2rem;">▶ Click to Play Demo</span>
+            </div>
+          </a>
           <div class="card-content">
-            <h3>Project: Kiwi <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Working Title)</span></h3>
-            <span class="badge">Active Development</span>
-            <p>An unannounced original web-based title exploring a unique Kiwi-themed universe. Currently in core engineering and prototyping phases. More details will be revealed as development progresses.</p>
+            <h3>Kiwi Defenders</h3>
+            <!-- 绿色的上线徽章 -->
+            <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">Playable Demo</span>
+            <p>A strategic HTML5 tower defense experience. Command your defenses across a unique Kiwi-themed campaign map. Play the pure, SDK-free version directly in your browser.</p>
+            <a href="/games/kiwi-defenders/" class="cta-button" target="_blank">Play Now ➔</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="insights" class="section-container">
+      <h2>Latest Insights</h2>
+      <p class="section-subtitle">Deep dives into history, systems, and digital architecture.</p>
+      
+      <div class="card-grid single">
+        <div class="card">
+          <div class="card-content">
+            <h3>The Architecture of Time</h3>
+            <!-- 紫色的人文徽章 -->
+            <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">Humanities</span>
+            <p>How Chang’an Measured Order, One Drop at a Time. An exploration of historical urban planning and systemic timekeeping in the Tang Dynasty.</p>
+            <a href="/blog/humanities/the-architecture-of-time" class="cta-button">Read Article ➔</a>
           </div>
         </div>
       </div>
@@ -89,5 +110,23 @@ import Layout from '../layouts/Layout.astro';
   /* 移动端适配：手机上自动变成单列排版 */
   @media (max-width: 768px) {
     .card-grid { grid-template-columns: 1fr; }
+  }
+
+  /* --- 新增：行为召唤按钮样式 --- */
+  .cta-button { 
+    display: inline-block; 
+    margin-top: 1.5rem; 
+    padding: 0.5rem 1.5rem; 
+    background: rgba(56, 189, 248, 0.1); 
+    color: #38bdf8; 
+    text-decoration: none; 
+    border-radius: 999px; 
+    font-weight: bold; 
+    transition: all 0.2s ease;
+    border: 1px solid #38bdf8;
+  }
+  .cta-button:hover { 
+    background: #38bdf8; 
+    color: #0f172a; 
   }
 </style>

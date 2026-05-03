@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiwi Defenders - Level 10: Tasman Golden Bay</title>
+    <style>
+        /* 增加 width: 100vw，防止出现滚动条 */
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        
+        /* 🔧 核心修复：固定原生设计尺寸 1280x870 */
+        #game-container { 
+            position: relative; 
+            width: 1280px; 
+            height: 870px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 0 40px rgba(52, 152, 219, 0.15); 
+            background: #000; 
+            transform-origin: center center; 
+        }
+        
+        canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
+        
+        #ui-panel { width: 1280px; height: 150px; background: rgba(10, 15, 25, 0.95); border-top: 3px solid #2980b9; display: flex; padding: 8px; box-sizing: border-box; gap: 10px; padding-bottom: 15px;}
+        .ui-box { flex: 1; background: rgba(0, 0, 0, 0.5); border: 1px solid #3498db; border-radius: 8px; padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-between; }
+        .ui-box h3 { margin: 0 0 4px 0; font-size: 13px; color: #3498db; text-align: center; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; flex-grow: 1; }
+        .btn-grid.three-cols { grid-template-columns: 1fr 1fr 1fr; }
+        
+        .btn { background: #2c3e50; color: white; border: 1px solid #7f8c8d; border-radius: 4px; cursor: pointer; font-size: 11px; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px; outline: none; }
+        .btn:hover:not(:disabled) { background: #34495e; transform: scale(1.02); z-index: 2; position: relative;}
+        .btn:disabled { background: #1a252f; color: #555; cursor: not-allowed; border-color: #2c3e50; }
+        .btn.active { background: #27ae60; border-color: #2ecc71; font-weight: bold; }
+        .price { color: #f1c40f; font-weight: bold; margin-top: 1px; }
+        
+        .ult-btn { font-size: 11px; padding: 4px 1px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
+        .ult-owl { background: linear-gradient(135deg, #a4b0be, #00ced1); color: #333; text-shadow: none;}
+        .ult-fox { background: linear-gradient(135deg, #8e44ad, #2980b9); color: white;}
+        .ult-devil { background: linear-gradient(135deg, #e67e22, #c0392b); color: white;}
+        .ult-turtle { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;}
+        
+        #top-bar { position: absolute; top: 10px; left: 20px; right: 20px; display: flex; justify-content: space-between; pointer-events: none; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px #000; z-index: 10; }
+        #top-bar div { font-size: 24px !important; }
+        .gold { color: #f1c40f; }
+        .xp-text { color: #9b59b6; text-shadow: 0 0 10px #9b59b6; }
+        .wave-text { color: #e74c3c; text-shadow: 0 0 10px #e74c3c; }
+        
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
+        #start-screen h1 { color: #3498db; font-size: 60px; text-shadow: 0 0 20px #3498db; margin-bottom: 10px; }
+        .action-btn { padding: 15px 50px; font-size: 24px; font-weight: bold; color: white; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-top: 20px; outline: none; }
+        #start-btn { background: #2980b9; box-shadow: 0 5px 15px rgba(41,128,185,0.5); }
+        #restart-btn { background: #27ae60; box-shadow: 0 5px 15px rgba(39,174,96,0.5); display: none; }
+        .action-btn:hover:not(:disabled) { transform: scale(1.05); }
+        .action-btn:disabled { background: #555; box-shadow: none; cursor: not-allowed; }
+
+        #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
+        #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
+
+        /* 🎵 声音控制栏 */
+        #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #3498db; color: #3498db; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn:hover { background: #3498db; color: #000; }
+        .ctrl-btn.on { background: #3498db; color: #000; box-shadow: 0 0 10px #3498db; }
+
+        /* --- 📱 移动端摇杆与提示 --- */
+        #mobile-controls {
+            display: none; 
+            position: absolute;
+            bottom: 170px; 
+            left: 30px;
+            gap: 40px;
+            z-index: 100;
+        }
+        #mobile-controls button {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white; font-size: 36px;
+            backdrop-filter: blur(4px);
+            touch-action: none;
+            outline: none;
+        }
+
+        @media (max-width: 1000px) {
+            #mobile-controls { display: flex; }
+        }
+
+        @media (orientation: portrait) {
+            body::after {
+                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
+                white-space: pre-wrap;
+                box-sizing: border-box;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: #050510; color: #1abc9c; display: flex; 
+                justify-content: center; align-items: center;
+                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
+                line-height: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="level-controls">
+            <!-- 默认开启 -->
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+        </div>
+
+        <div id="start-screen" class="overlay">
+            <h1 data-i18n="lvlTitle">Level 10: Tasman Golden Bay</h1>
+            <p style="font-size: 20px; color: #ccc; margin-bottom: 10px;">A/D: Move | Mouse: Aim | Click: Shoot</p>
+            <p style="font-size: 18px; color: #3498db; font-weight: bold; margin-bottom: 5px;" data-i18n="startTip">🌊 BATTLEFRONT: Tasman, the final showdown at the iconic Wharariki Beach arch!</p>
+            <button id="start-btn" class="action-btn" data-i18n="startBtn">DEFEND THE GOLDEN COAST</button>
+        </div>
+
+        <div id="respawn-screen" class="overlay">
+            <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
+            <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
+            <h1 id="game-over-title" style="font-size: 50px;">BASE HAS FALLEN</h1>
+            <p id="game-over-msg" style="font-size: 24px; color: #ccc;">Coastal base destroyed. Tasman has fallen!</p>
+            <p id="session-xp-msg" style="font-size: 28px; color: #9b59b6; font-weight: bold; margin-top: 10px;">XP EARNED: +0 XP</p>
+            <button id="restart-btn" class="action-btn">RESTART</button>
+        </div>
+
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+        <div id="mobile-controls">
+            <button id="btn-left">◀</button>
+            <button id="btn-right">▶</button>
+        </div>
+        
+        <div id="top-bar">
+            <div style="color: #3498db;"><span data-i18n="baseTasman">🏛️ BASE TASMAN:</span> <span id="baseHpText">9000</span></div>
+            <div class="gold"><span data-i18n="goldLabel">💰 GOLD:</span> <span id="goldText">1000</span></div>
+            <div class="wave-text"><span data-i18n="waveLabel">🌊 WAVE:</span> <span id="waveText">1</span></div>
+            <div class="xp-text"><span data-i18n="xpLabel">🌟 TOTAL XP:</span> <span id="globalXpText">0</span></div>
+            <div style="color: #e94560;"><span data-i18n="zogonPod">🛸 ZOGON POD:</span> <span id="shipHpText">30000</span></div>
+        </div>
+
+        <div id="ui-panel">
+            <div class="ui-box" style="flex: 1.5;">
+                <h3 data-i18n="armory">🗡️ ARMORY</h3>
+                <div class="btn-grid three-cols">
+                    <button class="btn w-btn active" data-id="kick" data-price="0"><span data-i18n="wUnarmed">🥋 UNARMED</span> <span class="price">EQUIPPED</span></button>
+                    <button class="btn w-btn" data-id="sword" data-price="100"><span data-i18n="wSword">🗡️ SWORD</span> <span class="price">100</span></button>
+                    <button class="btn w-btn" data-id="bow" data-price="300"><span data-i18n="wBow">🏹 COMP. BOW</span> <span class="price">300</span></button>
+                    <button class="btn w-btn" data-id="spear" data-price="500"><span data-i18n="wSpear">🔱 SPEAR</span> <span class="price">500</span></button>
+                    <button class="btn w-btn" data-id="gun" data-price="800" style="background: #c0392b;"><span data-i18n="wAA">🔫 AA GUN</span> <span class="price">800</span></button>
+                    <button class="btn" id="armor-btn" data-price="100" style="background: #34495e;"><span data-i18n="wArmor">🦺 ARMOR</span> <span class="price">100</span></button>
+                </div>
+            </div>
+
+            <div class="ui-box" style="flex: 1.0;">
+                <h3 data-i18n="summon">🐤 SUMMON</h3>
+                <div class="btn-grid">
+                    <button class="btn s-btn" data-type="basic" data-price="100"><span data-i18n="sBasic">🐤 RECRUIT</span> <span class="price">100</span></button>
+                    <button class="btn s-btn" data-type="shield" data-price="250"><span data-i18n="sShield">🛡️ SHIELD</span> <span class="price">250</span></button>
+                    <button class="btn s-btn" data-type="sniper" data-price="500"><span data-i18n="sSniper">🔫 SNIPER</span> <span class="price">500</span></button>
+                    <button class="btn s-btn" data-type="healer" data-price="600"><span data-i18n="sHealer">🥝 MEDIC</span> <span class="price">600</span></button>
+                </div>
+            </div>
+
+            <div class="ui-box" style="flex: 1.8;">
+                <h3 data-i18n="reinforcements">🌏 TASMAN REINFORCEMENTS</h3>
+                <div class="btn-grid" style="grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;">
+                    <button class="btn ult-btn ult-owl" data-type="owl" disabled data-i18n="uOwl">JP Kiyosato - Owl</button>
+                    <button class="btn ult-btn ult-fox" data-type="fox" disabled data-i18n="uFox2">JP Fujimi - Fox</button>
+                    <button class="btn ult-btn ult-devil" data-type="devil" disabled data-i18n="uDevil">AU Tasmania - Devil</button>
+                    <button class="btn ult-btn ult-turtle" data-type="turtle" disabled data-i18n="uTurtle">NL Grootegast - Turtle</button>
+                </div>
+                <div id="ult-timer-text" style="font-size: 13px; color: #ccc; text-align: center; margin-top: 4px; font-weight: bold;">⏳ READYING... (0/60)</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// --- 🎮 纯净版管理器 (SDK 已剥离) ---
+    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    const CG_Manager = {
+        isPaused: false, 
+
+        init: async function() {
+            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
+        },
+
+        startGameplay: function() {},
+        stopGameplay: function() {},
+
+        playAd: function(type = 'midgame') {
+            console.log("Demo Mode: Ad skipped.");
+            this.resumeGame();
+        },
+
+        pauseGame: function() {
+            this.isPaused = true;
+            if (typeof bgm !== 'undefined' && !bgm.paused) {
+                bgm.pause();
+            }
+        },
+
+        resumeGame: function() {
+            this.isPaused = false;
+            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
+                bgm.play().catch(e => {});
+            }
+        }
+    };
+
+    // 默认开启音频的破冰策略
+    function tryAutoplay() {
+        if (musicPlaying) {
+            let playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    const startOnInteraction = () => {
+                        if (musicPlaying) bgm.play().catch(e => {});
+                        document.removeEventListener('click', startOnInteraction);
+                        document.removeEventListener('touchstart', startOnInteraction);
+                    };
+                    document.addEventListener('click', startOnInteraction);
+                    document.addEventListener('touchstart', startOnInteraction);
+                });
+            }
+        }
+    }
+
+
+    // --- 📐 全局等比例缩放自适应逻辑 ---
+    function resizeGame() {
+        const container = document.getElementById('game-container');
+        const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
+        container.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', resizeGame);
+    resizeGame();
+
+    // --- 🌐 多语言架构 ---
+    const i18n = {
+        en: {
+            lvlTitle: "Level 10: Tasman Golden Bay", startTip: "🌊 BATTLEFRONT: Tasman, the final showdown at the iconic Wharariki Beach arch!", startBtn: "DEFEND THE GOLDEN COAST",
+            respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)",
+            baseTasman: "🏛️ BASE TASMAN:", goldLabel: "💰 GOLD:", waveLabel: "🌊 WAVE:", xpLabel: "🌟 TOTAL XP:", zogonPod: "🛸 ZOGON POD:",
+            armory: "🗡️ ARMORY", summon: "🐤 SUMMON", reinforcements: "🌏 TASMAN REINFORCEMENTS",
+            wUnarmed: "🥋 UNARMED", wSword: "🗡️ SWORD", wBow: "🏹 COMP. BOW", wSpear: "🔱 SPEAR", wAA: "🔫 AA GUN", wArmor: "🦺 ARMOR",
+            sBasic: "🐤 RECRUIT", sShield: "🛡️ SHIELD", sSniper: "🔫 SNIPER", sHealer: "🥝 MEDIC",
+            uOwl: "JP Kiyosato - Owl", uFox2: "JP Fujimi - Fox", uDevil: "AU Tasmania - Devil", uTurtle: "NL Grootegast - Turtle",
+            musicOn: "AUDIO: ON", musicOff: "AUDIO: OFF",
+            equipped: "EQUIPPED", owned: "OWNED",
+            readying: "⏳ READYING... ({n}/60)", ready: "🔥 READY FOR STRIKE!",
+            xpEarned: "XP EARNED: +{n}", defenseFailed: "DEFENSE FAILED",
+            baseFallen: "BASE HAS FALLEN", baseFallenMsg: "Coastal base destroyed. Tasman has fallen!",
+            victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
+            backToMap: "BACK TO MAP", restart: "RESTART",
+            waveInbound: "🌊 WAVE {n} INBOUND!"
+        },
+        zh: {
+            lvlTitle: "第十关：塔斯曼黄金湾", startTip: "🌊 战线：塔斯曼，在标志性的华拉里基海滩拱门下展开最终对决！", startBtn: "保卫黄金海岸",
+            respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)",
+            baseTasman: "🏛️ 塔斯曼基地:", goldLabel: "💰 资金:", waveLabel: "🌊 波次:", xpLabel: "🌟 总经验:", zogonPod: "🛸 敌军母舰:",
+            armory: "🗡️ 武器库", summon: "🐤 召唤兵种", reinforcements: "🌏 塔斯曼增援",
+            wUnarmed: "🥋 空手", wSword: "🗡️ 长剑", wBow: "🏹 复合弓", wSpear: "🔱 长矛", wAA: "🔫 防空机枪", wArmor: "🦺 防弹衣",
+            sBasic: "🐤 新兵", sShield: "🛡️ 盾兵", sSniper: "🔫 狙击手", sHealer: "🥝 医疗兵",
+            uOwl: "JP 清里 - 猫头鹰", uFox2: "JP 富士见 - 狐狸", uDevil: "AU 塔斯马尼亚 - 恶魔", uTurtle: "NL 格罗特加斯特 - 海龟",
+            musicOn: "声音: 开", musicOff: "声音: 关",
+            equipped: "已装备", owned: "已拥有",
+            readying: "⏳ 充能中... ({n}/60)", ready: "🔥 准备打击！",
+            xpEarned: "获得经验: +{n}", defenseFailed: "防守失败",
+            baseFallen: "基地沦陷", baseFallenMsg: "海岸基地被毁。塔斯曼失守！",
+            victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
+            backToMap: "返回地图", restart: "重新开始",
+            waveInbound: "🌊 第 {n} 波敌军来袭！"
+        },
+        ja: {
+            lvlTitle: "ステージ 10：タスマン・ゴールデンベイ", startTip: "🌊 前線：タスマン、象徴的なワラリキビーチのアーチでの最終決戦！", startBtn: "黄金の海岸を防衛",
+            respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)",
+            baseTasman: "🏛️ タスマン基地:", goldLabel: "💰 資金:", waveLabel: "🌊 ウェーブ:", xpLabel: "🌟 合計XP:", zogonPod: "🛸 ゾゴン・ポッド:",
+            armory: "🗡️ 武器庫", summon: "🐤 召喚", reinforcements: "🌏 タスマン増援",
+            wUnarmed: "🥋 素手", wSword: "🗡️ 剣", wBow: "🏹 コンパウンドボウ", wSpear: "🔱 槍", wAA: "🔫 対空砲", wArmor: "🦺 アーマー",
+            sBasic: "🐤 新兵", sShield: "🛡️ シールド兵", sSniper: "🔫 スナイパー", sHealer: "🥝 衛生兵",
+            uOwl: "JP 清里 - フクロウ", uFox2: "JP 富士見 - キツネ", uDevil: "AU タスマニア - デビル", uTurtle: "NL フローテハスト - カメ",
+            musicOn: "音声: オン", musicOff: "音声: オフ",
+            equipped: "装備中", owned: "所持",
+            readying: "⏳ チャージ中... ({n}/60)", ready: "🔥 攻撃準備完了！",
+            xpEarned: "獲得XP: +{n}", defenseFailed: "防衛失敗",
+            baseFallen: "基地陥落", baseFallenMsg: "沿岸基地が破壊された。タスマン陥落！",
+            victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
+            backToMap: "マップに戻る", restart: "再試行",
+            waveInbound: "🌊 ウェーブ {n} 開始！"
+        },
+        es: {
+            lvlTitle: "Nivel 10: Bahía Dorada de Tasman", startTip: "🌊 FRENTE DE BATALLA: Tasman, ¡el enfrentamiento final en el icónico arco de Wharariki Beach!", startBtn: "DEFENDER LA COSTA DORADA",
+            respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)",
+            baseTasman: "🏛️ BASE TASMAN:", goldLabel: "💰 ORO:", waveLabel: "🌊 OLEADA:", xpLabel: "🌟 XP TOTAL:", zogonPod: "🛸 NAVE ZOGON:",
+            armory: "🗡️ ARMERÍA", summon: "🐤 INVOCAR", reinforcements: "🌏 REFUERZOS DE TASMAN",
+            wUnarmed: "🥋 DESARMADO", wSword: "🗡️ ESPADA", wBow: "🏹 ARCO COMP.", wSpear: "🔱 LANZA", wAA: "🔫 CAÑÓN AA", wArmor: "🦺 ARMADURA",
+            sBasic: "🐤 RECLUTA", sShield: "🛡️ ESCUDO", sSniper: "🔫 FRANCOTIRADOR", sHealer: "🥝 MÉDICO",
+            uOwl: "JP Kiyosato - Búho", uFox2: "JP Fujimi - Zorro", uDevil: "AU Tasmania - Demonio", uTurtle: "NL Grootegast - Tortuga",
+            musicOn: "AUDIO: ON", musicOff: "AUDIO: OFF",
+            equipped: "EQUIPADO", owned: "EN POSECIÓN",
+            readying: "⏳ CARGANDO... ({n}/60)", ready: "🔥 ¡LISTO PARA ATACAR!",
+            xpEarned: "XP GANADA: +{n}", defenseFailed: "DEFENSA FALLIDA",
+            baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "¡Base costera destruida. Tasman ha caído!",
+            victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
+            backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
+            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!"
+        }
+    };
+
+    let currentLang = localStorage.getItem('kiwiLang') || 'en';
+    function applyTranslation() {
+        const dict = i18n[currentLang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+        const musicBtnSpan = document.querySelector('#music-toggle span');
+        if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
+        
+        if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
+            ui.armorBtn.querySelector('.price').innerText = dict.equipped;
+        }
+        ui.wBtns.forEach(btn => {
+            if (btn.classList.contains('active')) {
+                btn.querySelector('.price').innerText = dict.equipped;
+            } else if (btn.dataset.bought) {
+                btn.querySelector('.price').innerText = dict.owned;
+            }
+        });
+        
+        if (kevin && kevin.isDead) {
+            ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
+        }
+    }
+    
+    // 初始化 SDK 与尝试启动音频
+    window.addEventListener('DOMContentLoaded', () => {
+        applyTranslation();
+        CG_Manager.init();
+        tryAutoplay();
+    });
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
+    
+    function updateAim(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = (clientX - rect.left) / rect.width * canvas.width;
+        mouseY = (clientY - rect.top) / rect.height * canvas.height;
+    }
+
+    canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
+    canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); 
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+        triggerAttack();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    const keys = {};
+    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    if (btnLeft && btnRight) {
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys['KeyA'] = true; });
+        btnLeft.addEventListener('mousedown', (e) => { e.preventDefault(); keys['KeyA'] = true; });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys['KeyA'] = false; });
+        btnLeft.addEventListener('mouseup', (e) => { e.preventDefault(); keys['KeyA'] = false; });
+        
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys['KeyD'] = true; });
+        btnRight.addEventListener('mousedown', (e) => { e.preventDefault(); keys['KeyD'] = true; });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys['KeyD'] = false; });
+        btnRight.addEventListener('mouseup', (e) => { e.preventDefault(); keys['KeyD'] = false; });
+    }
+    
+    const bgImg = new Image(); bgImg.src = 'bg_level10.webp'; 
+    const hqImg = new Image(); hqImg.src = 'base_tasman.webp'; 
+    
+    const shipImg = new Image(); shipImg.src = 'zogon_ship.webp'; 
+    const kevinImg = new Image(); kevinImg.src = 'kevin_side.webp'; 
+    const armorImg = new Image(); armorImg.src = 'armor.webp'; 
+    const gruntImg = new Image(); gruntImg.src = 'zogon_grunt.webp'; 
+    const tankImg = new Image(); tankImg.src = 'zogon_tank.webp'; 
+    const shooterImg = new Image(); shooterImg.src = 'zogon_shooter.webp'; 
+    const scoutImg = new Image(); scoutImg.src = 'zogon_scout.webp'; 
+    const flyerImg = new Image(); flyerImg.src = 'zogon_flyer.webp'; 
+    const devImg = new Image(); devImg.src = 'zogon_blocker_monster.webp'; 
+    const aaGunImg = new Image(); aaGunImg.src = 'aa_gun.webp';
+
+    const bomberImg = new Image(); bomberImg.src = 'zogon_bomber.webp';
+    const enemyHealerImg = new Image(); enemyHealerImg.src = 'zogon_medic.webp';
+
+    const basicImg = new Image(); basicImg.src = 'novice_bird.webp'; 
+    const shieldImg = new Image(); shieldImg.src = 'shield_bird.webp'; 
+    const sniperImg = new Image(); sniperImg.src = 'sniper_bird.webp'; 
+    const healerImg = new Image(); healerImg.src = 'healer_bird.webp'; 
+    const swordImg = new Image(); swordImg.src = 'sword.webp';
+    const bowImg = new Image(); bowImg.src = 'bow.webp';
+    const spearImg = new Image(); spearImg.src = 'spear.webp';
+
+    const owlImg = new Image(); owlImg.src = 'kiyosato_owl.webp'; 
+    const foxImg = new Image(); foxImg.src = 'fujimi_fox.webp'; 
+    const devilImg = new Image(); devilImg.src = 'tasmania_devil.webp'; 
+    const turtleImg = new Image(); turtleImg.src = 'grootegast_turtle.webp'; 
+
+    const bgm = new Audio('bgm_level10.mp3'); bgm.loop = true; bgm.volume = 0.3;
+    let musicPlaying = false;
+
+    function toggleMusic(event) {
+        if (event) event.currentTarget.blur();
+        const dict = i18n[currentLang];
+        const btnSpan = document.querySelector('#music-toggle span');
+        const btn = document.getElementById('music-toggle');
+        if (!musicPlaying) {
+            bgm.play().catch(e => {});
+            btnSpan.innerText = dict.musicOn;
+            btn.classList.add('on');
+            musicPlaying = true;
+        } else {
+            bgm.pause();
+            btnSpan.innerText = dict.musicOff;
+            btn.classList.remove('on');
+            musicPlaying = false;
+        }
+    }
+
+    function playSfx(type) {
+        if (!musicPlaying) return; 
+        const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3', 'laser': 'sniper.mp3' };
+        if (soundMap[type]) { 
+            let sound = new Audio(soundMap[type]); 
+            if (type === 'gun') {
+                sound.volume = 0.1;  
+            } else if (type === 'sniper' || type === 'hit') {
+                sound.volume = 0.3;  
+            } else {
+                sound.volume = 0.5;  
+            }
+            sound.play().catch(e => {}); 
+        }
+    }
+
+    const ui = {
+        gold: document.getElementById('goldText'), baseHp: document.getElementById('baseHpText'), shipHp: document.getElementById('shipHpText'), globalXpText: document.getElementById('globalXpText'),
+        wave: document.getElementById('waveText'), 
+        ultBtns: document.querySelectorAll('.ult-btn'), ultTimerText: document.getElementById('ult-timer-text'),
+        wBtns: document.querySelectorAll('.w-btn'), sBtns: document.querySelectorAll('.s-btn'), armorBtn: document.getElementById('armor-btn'),
+        startScreen: document.getElementById('start-screen'), startBtn: document.getElementById('start-btn'),
+        gameOverScreen: document.getElementById('game-over-screen'), gameOverTitle: document.getElementById('game-over-title'), gameOverMsg: document.getElementById('game-over-msg'), sessionXpMsg: document.getElementById('session-xp-msg'), restartBtn: document.getElementById('restart-btn'),
+        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn')
+    };
+
+    let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
+    ui.globalXpText.innerText = globalXP;
+
+    let isRunning = false; let isGameOver = false; let frameCount = 0; let animationFrameId;
+    let gold = 1000; 
+    let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
+    let currentWave = 1; let waveTimer = 0; 
+    let groundDeathsForAntiAir = 0;
+    
+    let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
+    
+    const GROUND_Y = 615; 
+    
+    let hq, ship, kevin;
+    let allies = []; let enemies = []; let bullets = [];
+    let floatingTexts = []; let souls = []; let spawnEffects = []; 
+    let particles = []; let lightnings = [];
+
+    const weapons = {
+        kick:  { type: 'melee', damage: 25, range: 60, cooldown: 30 }, 
+        sword: { type: 'melee', damage: 50, range: 100, cooldown: 25, img: swordImg },
+        bow:   { type: 'ranged', damage: 40, speed: 20, cooldown: 40, img: bowImg },
+        spear: { type: 'melee', damage: 90, range: 150, cooldown: 45, img: spearImg },
+        gun:   { type: 'ranged', damage: 25, speed: 35, cooldown: 8, isAntiAir: true } 
+    };
+
+    function initGame() {
+        if (isRunning) return; 
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+        const dict = i18n[currentLang];
+        currentUpgrades = JSON.parse(localStorage.getItem('kiwiUpgrades')) || { gold: 0, hp: 0, spd: 0, dmg: 0 };
+        
+        let startGold = 1000 + (currentUpgrades.gold * 50);             
+        let baseMaxHp = 9000 * (1 + currentUpgrades.hp * 0.20);        
+        let kevinSpd = 6 + (currentUpgrades.spd * 0.4); 
+
+        hq = { x: 50, y: GROUND_Y - 360, w: 240, h: 360, hp: baseMaxHp, maxHp: baseMaxHp, color: '#3498db', hitTimer: 0 }; 
+        ship = { x: 980, y: GROUND_Y - 300, w: 280, h: 300, hp: 30000, maxHp: 30000, color: '#4a235a' }; 
+        kevin = { x: 300, y: GROUND_Y - 60, w: 60, h: 60, color: '#4caf50', hp: 500, maxHp: 500, speed: kevinSpd, weapon: 'kick', attackTimer: 0, isAttacking: false, attackAnim: 0, hitTimer: 0, isDead: false, isHidden: false, hasArmor: false, facing: 1, attackSpeedBuff: 0 };
+        
+        allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = []; particles = []; lightnings = [];
+        
+        gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; groundDeathsForAntiAir = 0;
+        currentWave = 1; waveTimer = 0;
+        
+        isGameOver = false; isRunning = true;
+        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
+        ui.wBtns.forEach(btn => { 
+            btn.classList.remove('active'); 
+            btn.dataset.bought = btn.dataset.id === 'kick' ? 'true' : ''; 
+            if (btn.dataset.id === 'kick') { 
+                btn.classList.add('active'); 
+                btn.querySelector('.price').innerText = dict.equipped; 
+            } else { 
+                btn.querySelector('.price').innerText = btn.dataset.price; 
+            } 
+        });
+        ui.armorBtn.classList.remove('active'); ui.armorBtn.dataset.bought = ''; ui.armorBtn.querySelector('.price').innerText = '100';
+        
+        applyTranslation();
+        spawnFloatingText(canvas.width/2, canvas.height/2, dict.waveInbound.replace('{n}', currentWave), '#e74c3c', 0);
+        animationFrameId = requestAnimationFrame(loop);
+    }
+
+    ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(!musicPlaying) toggleMusic(); initGame(); });
+    ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
+    ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
+    ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
+
+    function spawnSparks(x, y, color) {
+        for(let i=0; i<8; i++) {
+            particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 15, maxLife: 15, color: color });
+        }
+    }
+
+    function triggerAttack() {
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        let w = weapons[kevin.weapon];
+        kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
+        playSfx(kevin.weapon);
+
+        let boostedDamage = Math.floor(w.damage * (1 + currentUpgrades.dmg * 0.10));
+
+        if (w.type === 'melee') {
+            let hitbox = { x: kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - w.range, y: kevin.y - 30, w: w.range, h: kevin.h + 60 };
+            enemies.forEach(e => { 
+                if (e.isFlying) return; 
+                if (checkCol(hitbox, e)) { e.hp -= boostedDamage; e.x += 15 * kevin.facing; playSfx('hit'); spawnSparks(e.x + e.w/2, e.y + e.h/2, '#fff'); } 
+            }); 
+            if (checkCol(hitbox, ship)) ship.hp -= boostedDamage;
+        } else {
+            if (w.isAntiAir) {
+                let startX = kevin.x + kevin.w / 2; let startY = getVisualY(kevin.x, kevin.y) + kevin.h / 2;
+                let dx = mouseX - startX; let dy = Math.min(0, mouseY - startY);
+                if (dx === 0 && dy === 0) dx = kevin.facing; 
+                let angle = Math.atan2(dy, dx);
+                kevin.facing = dx >= 0 ? 1 : -1; 
+                bullets.push({ x: startX, y: startY, w: 24, h: 6, color: '#00e5ff', dx: Math.cos(angle) * w.speed, dy: Math.sin(angle) * w.speed, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: true, angle: angle });
+            } else {
+                let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
+                bullets.push({ x: startX, y: GROUND_Y - 30, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
+            }
+        }
+    }
+
+    ui.wBtns.forEach(btn => { 
+        if (btn.id === 'armor-btn') return; 
+        btn.addEventListener('click', (e) => { 
+            e.currentTarget.blur();
+            let id = btn.dataset.id; let price = parseInt(btn.dataset.price); 
+            if (btn.classList.contains('active') || kevin.isDead) return; 
+            if (!btn.dataset.bought && gold >= price) { gold -= price; btn.dataset.bought = 'true'; equipWeapon(btn, id); } 
+            else if (btn.dataset.bought) { equipWeapon(btn, id); } 
+        }); 
+    });
+
+    function equipWeapon(btn, id) { 
+        const dict = i18n[currentLang];
+        ui.wBtns.forEach(b => { if(b.id !== 'armor-btn') { b.classList.remove('active'); if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; } }); 
+        btn.classList.add('active'); btn.querySelector('.price').innerText = dict.equipped; 
+        kevin.weapon = id; 
+    }
+    
+    ui.sBtns.forEach(btn => btn.addEventListener('click', (e) => { e.currentTarget.blur(); let type = btn.dataset.type; let price = parseInt(btn.dataset.price); if (gold >= price && !kevin.isDead) { gold -= price; let ally = { x: hq.x + hq.w, attackTimer: 0, hitTimer: 0, type: type }; if (type === 'basic') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8bc34a', hp: 100, maxHp: 100, speed: 2.5, range: 20, damage: 20 }); if (type === 'shield') Object.assign(ally, { w: 55, h: 65, y: GROUND_Y - 65, color: '#795548', hp: 450, maxHp: 450, speed: 1.2, range: 20, damage: 10 }); if (type === 'sniper') Object.assign(ally, { w: 65, h: 65, y: GROUND_Y - 65, color: '#2e7d32', hp: 80, maxHp: 80, speed: 1.8, range: 350, damage: 60 }); if (type === 'healer') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#ff9ecd', hp: 120, maxHp: 120, speed: 2, range: 150, damage: -40 }); allies.push(ally); } }));
+    
+    ui.ultBtns.forEach(btn => btn.addEventListener('click', (e) => { 
+        e.currentTarget.blur();
+        if (ultTimer >= 3600 && !kevin.isDead) { 
+            ultTimer = 0; let type = btn.dataset.type; let ally = { x: hq.x + hq.w, hitTimer: 0, type: type, facing: 1, attackSpeedBuff: 0, bobbingLock: false }; 
+            
+            if (type === 'owl') { 
+                Object.assign(ally, { w: 100, h: 90, y: GROUND_Y - 260, hp: 1500, maxHp: 1500, speed: 2.5, range: 1000, damage: 50, attackTimer: 0, sprite: owlImg, isFlying: true, patrolDir: 1 }); 
+            } 
+            else if (type === 'fox') { 
+                Object.assign(ally, { w: 140, h: 90, y: GROUND_Y - 90, hp: 2500, maxHp: 2500, speed: 4.5, range: 250, damage: 300, attackTimer: 0, sprite: foxImg, isFlying: false });
+            } 
+            else if (type === 'devil') { 
+                Object.assign(ally, { w: 120, h: 100, y: GROUND_Y - 100, hp: 7000, maxHp: 7000, speed: 1.5, range: 40, damage: 150, attackTimer: 0, sprite: devilImg, isFlying: false }); 
+            } 
+            else if (type === 'turtle') { 
+                Object.assign(ally, { w: 200, h: 160, y: GROUND_Y - 160, hp: 12000, maxHp: 12000, speed: 0.6, range: 50, damage: 40, attackTimer: 0, sprite: turtleImg, isFlying: false, bobbingLock: true }); 
+            } 
+            allies.push(ally); 
+        } 
+    }));
+
+    function spawnSoul(entity, dir) { souls.push({ x: entity.x + entity.w / 2, y: entity.y, color: entity.color || '#fff', life: 60, maxLife: 60, dx: dir * 0.8, dy: -1.5 }); }
+    function spawnFloatingText(x, y, text, color, dir) { floatingTexts.push({ x: x, y: y, text: text, color: color, life: 40, maxLife: 40, dx: dir * 1.5, dy: -1.8 }); }
+    function getVisualY(x, physicalY) { return physicalY; } 
+
+    function update() {
+        const dict = i18n[currentLang];
+        frameCount++; updateUI();
+        if(hq.hitTimer > 0) hq.hitTimer--; 
+        
+        let enemyFrontLineX = ship.x; enemies.forEach(e => { if (e.x < enemyFrontLineX && !e.isFlying) enemyFrontLineX = e.x; });
+        let currentMod = 0.6; 
+
+        if (!kevin.isDead) { 
+            if (kevin.attackSpeedBuff && kevin.attackSpeedBuff > 0) {
+                kevin.attackSpeedBuff--;
+                if (kevin.attackTimer > 0) kevin.attackTimer--; 
+            }
+
+            if (kevin.weapon === 'gun' && !keys['KeyA'] && !keys['KeyD'] && !keys['ArrowLeft'] && !keys['ArrowRight']) {
+                let startX = kevin.x + kevin.w / 2; kevin.facing = mouseX >= startX ? 1 : -1;
+            }
+            if (keys['KeyA'] || keys['ArrowLeft']) { kevin.x -= kevin.speed * currentMod; kevin.facing = -1; } 
+            if (keys['KeyD'] || keys['ArrowRight']) { kevin.x += kevin.speed * currentMod; kevin.facing = 1; } 
+            kevin.x = Math.max(hq.x + 50, Math.min(kevin.x, enemyFrontLineX - kevin.w)); 
+            kevin.y = GROUND_Y - kevin.h; 
+            kevin.isHidden = (kevin.x < hq.x + hq.w - 10); 
+            if (kevin.isHidden && kevin.hp > 0 && kevin.hp < kevin.maxHp) { if (frameCount % 60 === 0) { kevin.hp = Math.min(kevin.maxHp, kevin.hp + 25); let vY = getVisualY(kevin.x, kevin.y); spawnFloatingText(kevin.x + 10, vY - 10, '+25', '#2ecc71', -0.5); } } 
+            if (kevin.attackTimer > 0) kevin.attackTimer--; 
+            if (kevin.hitTimer > 0) kevin.hitTimer--; 
+            if (kevin.isAttacking) { kevin.attackAnim -= 5; if (kevin.attackAnim <= 0) kevin.isAttacking = false; } 
+            if (kevin.hp <= 0) { let vY = getVisualY(kevin.x, kevin.y); spawnSoul({x: kevin.x, y: vY, w: kevin.w}, -1); kevin.isDead = true; if (hq.hp > 0) { ui.respawnScreen.style.display = 'flex'; ui.respawnBtn.disabled = globalXP < 100; ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp; } } 
+        }
+
+        particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life--; p.vy += 0.5; }); 
+        particles = particles.filter(p => p.life > 0);
+        
+        lightnings.forEach(l => l.life--); 
+        lightnings = lightnings.filter(l => l.life > 0);
+
+        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#3498db'; ui.ultBtns.forEach(b => b.disabled = false); }
+        floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
+        souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
+        spawnEffects.forEach(se => { se.life--; }); spawnEffects = spawnEffects.filter(se => se.life > 0);
+        allies.forEach(a => { if (a.type === 'healer' && frameCount % 45 === 0) { spawnFloatingText(a.x + Math.random() * a.w, getVisualY(a.x, a.y) - 10, '+', '#39ff14', 0); } });
+        
+        waveTimer++;
+        if (waveTimer >= 1800) { currentWave++; waveTimer = 0; spawnFloatingText(canvas.width/2, canvas.height/2 - 100, dict.waveInbound.replace('{n}', currentWave), '#e74c3c', 0); playSfx('hit'); }
+
+        let maxEnemies = Math.min(45, 20 + currentWave * 3); 
+        spawnTimer++; 
+        let frontLineX = kevin.isDead || kevin.isHidden ? hq.x + hq.w : kevin.x; allies.forEach(a => { if(a.x > frontLineX && !a.isFlying) frontLineX = a.x; }); 
+        let pushProgress = Math.max(0, Math.min(1, (frontLineX - (hq.x + hq.w)) / (ship.x - (hq.x + hq.w)))); 
+        
+        let baseInterval = Math.max(35, 150 - (currentWave * 10)); 
+        let currentInterval = Math.max(25, baseInterval - (pushProgress * 20)); 
+        
+        let owlActive = allies.some(a => a.type === 'owl'); 
+        if (owlActive && groundDeathsForAntiAir >= 8) {
+            groundDeathsForAntiAir = 0;
+            for(let i=0; i<3; i++) {
+                spawnEffects.push({ x: ship.x - 30 + i*30, w: 40, y: GROUND_Y, life: 20, maxLife: 20 });
+                enemies.push({ x: ship.x - 30 + i*30, attackTimer: 0, hitTimer: 0, stunTimer: 0, w: 50, h: 40, y: GROUND_Y - 260 + Math.random()*20, color: '#8e44ad', hp: 90, maxHp: 90, speed: 2.8, range: 20, damage: 30, reward: 30, xpReward: 4, type: 'flyer', isFlying: true });
+            }
+            spawnFloatingText(ship.x, GROUND_Y - 240, '⚠️ WASP SWARM!', '#8e44ad', -1);
+        }
+
+        let healerActive = enemies.some(e => e.type === 'enemy_healer');
+
+        if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
+            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0 }; 
+            
+            if (currentWave >= 3 && rand < 0.15 && !healerActive) {
+                Object.assign(enemy, { w: 45, h: 50, y: GROUND_Y - 50, color: '#fd79a8', hp: 200, maxHp: 200, speed: 1.2, range: 0, damage: 20, reward: 50, xpReward: 8, type: 'enemy_healer' }); 
+            }
+            else if (currentWave >= 2 && rand < 0.30) {
+                Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#ff5252', hp: 120, maxHp: 120, speed: 3.5, range: 15, damage: 350, reward: 20, xpReward: 5, type: 'bomber' }); 
+            }
+            else if (currentWave >= 4 && rand < Math.min(0.40, 0.30 + currentWave * 0.01)) { 
+                Object.assign(enemy, { w: 180, h: 180, y: GROUND_Y - 180, color: '#c23616', hp: 600, maxHp: 600, speed: 0.3, range: 40, damage: 100, reward: 150, xpReward: 30, type: 'devastator' }); 
+            }
+            else if (rand < 0.55 + (pushProgress * 0.15)) { Object.assign(enemy, { w: 135, h: 85, y: GROUND_Y - 85, color: '#c0392b', hp: 350, maxHp: 350, speed: 0.7, range: 25, damage: 35, reward: 40, xpReward: 6, type: 'tank' }); } 
+            else if (rand < 0.70 + (pushProgress * 0.2)) { 
+                Object.assign(enemy, { w: 50, h: 40, y: GROUND_Y - 200 - Math.random()*40, color: '#8e44ad', hp: 90, maxHp: 90, speed: 2.2, range: 20, damage: 30, reward: 30, xpReward: 4, type: 'flyer', isFlying: true }); 
+            }
+            else if (rand < 0.85) { Object.assign(enemy, { w: 35, h: 45, y: GROUND_Y - 45, color: '#00ced1', hp: 60, maxHp: 60, speed: 1.5, range: 450, damage: 25, reward: 25, xpReward: 3, type: 'shooter' }); } 
+            else if (rand < 0.95) { Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#e67e22', hp: 70, maxHp: 70, speed: 4.5, range: 15, damage: 15, reward: 20, xpReward: 2, type: 'scout' }); } 
+            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#6ab04c', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 15, xpReward: 1, type: 'grunt' }); } 
+            enemies.push(enemy); 
+        }
+
+        handleAlliesAI(); handleEnemiesAI();
+
+        for (let i = bullets.length - 1; i >= 0; i--) { 
+            let b = bullets[i]; 
+            b.x += b.dx !== undefined ? b.dx : (b.speed || 0); 
+            if (b.dy !== undefined) b.y += b.dy;        
+
+            let shouldDestroy = false; 
+            let isPenetrating = false; 
+            let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
+            let projHitBox = {x: b.x, y: b.y, w: b.w, h: b.h}; 
+
+            for (let t of targetList) { 
+                if (!b.hitTargets) b.hitTargets = new Set();
+                if (!shouldDestroy && checkCol(projHitBox, t) && !b.hitTargets.has(t)) { 
+                    
+                    let dmg = b.damage; 
+                    if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
+                    
+                    let isProtectedByStag = allies.some(a => a.type === 'stag' && Math.abs(a.x - (t.x + t.w/2)) < 250); 
+                    if (!b.isPlayer && isProtectedByStag) { dmg = Math.floor(dmg * 0.5); }
+
+                    if (b.type === 'hydro_pump') {
+                        enemies.forEach(e2 => {
+                            if (!e2.isFlying && !e2.isShip && Math.abs((e2.x + e2.w/2) - (t.x + t.w/2)) < 60) {
+                                e2.x += 10; 
+                                e2.slowTimer = 60; 
+                                if (e2 !== t) { e2.hp -= b.damage * 0.5; e2.hitTimer = 10; }
+                                spawnFloatingText(e2.x + e2.w/2, getVisualY(e2.x, e2.y), '💦SLOW', '#00ced1', 0);
+                            }
+                        });
+                        playSfx('hit');
+                        spawnSparks(b.x + b.w/2, b.y + b.h/2, '#00ced1');
+                        t.hp -= dmg; 
+                        t.hitTimer = 10; 
+                        b.hitTargets.add(t);
+                        isPenetrating = false; 
+                        shouldDestroy = true; 
+                        break; 
+                    }
+
+                    t.hp -= dmg; 
+                    t.hitTimer = 10; 
+                    b.hitTargets.add(t);
+                    
+                    if (b.type === 'blizzard') {
+                        t.slowTimer = 120; 
+                        isPenetrating = true;
+                    } else {
+                        playSfx('hit');
+                        if (b.isRanged) spawnSparks(b.x + b.w, b.y + b.h/2, b.color || '#fff');
+                    }
+                    
+                    if (!isPenetrating) shouldDestroy = true; 
+                } 
+            } 
+            
+            if (b.isPlayer && !shouldDestroy && checkCol(projHitBox, ship) && b.y < GROUND_Y - 80) { 
+                if (!b.hitTargets) b.hitTargets = new Set();
+                if (!b.hitTargets.has(ship)) {
+                    ship.hp -= b.damage; b.hitTargets.add(ship); playSfx('hit'); spawnSparks(b.x + b.w, b.y + b.h/2, '#ff4500');
+                }
+                shouldDestroy = true; 
+            } 
+            
+            if (!b.isPlayer && !shouldDestroy && checkCol(projHitBox, hq)) { 
+                if (!b.hitTargets) b.hitTargets = new Set();
+                if (!b.hitTargets.has(hq)) {
+                    let dmg = b.damage;
+                    let hqProtected = allies.some(a => a.type === 'stag' && Math.abs(a.x - hq.x) < 300);
+                    if (hqProtected) dmg = Math.floor(dmg * 0.5);
+
+                    hq.hp -= dmg; hq.hitTimer = 10; b.hitTargets.add(hq); playSfx('hit'); spawnSparks(b.x, b.y + b.h/2, '#ccc');
+                }
+                shouldDestroy = true; 
+            } 
+
+            if (shouldDestroy || b.x < 0 || b.x > canvas.width || b.y < -100 || b.y > canvas.height) {
+                bullets.splice(i, 1); 
+            } 
+        }
+        
+        allies = allies.filter(a => { if (a.hp <= 0) { spawnSoul({x: a.x, y: getVisualY(a.x, a.y), w: a.w, color: a.color}, -1); return false; } return true; });
+        enemies = enemies.filter(e => { 
+            if (e.hp <= 0) { 
+                let vY = getVisualY(e.x, e.y); 
+                spawnSoul({x: e.x, y: vY, w: e.w, color: e.color}, 1); 
+                gold += e.reward; 
+                sessionXP += e.xpReward; 
+                spawnFloatingText(e.x, vY - 10, `+${e.reward}`, '#f1c40f', 1); 
+                
+                if (!e.isFlying) { groundDeathsForAntiAir++; }
+                return false; 
+            } 
+            return true; 
+        });
+        
+        if (hq.hp <= 0) { bgm.pause(); endGame(false); } 
+        else if (ship.hp <= 0) { bgm.pause(); endGame(true); }
+    }
+
+    function handleAlliesAI() { 
+        allies.forEach(a => {
+            if (a.attackSpeedBuff && a.attackSpeedBuff > 0) {
+                a.attackSpeedBuff--;
+                if (a.attackTimer > 0) a.attackTimer--; 
+            }
+        });
+
+        let activeHealers = allies.filter(a => a.type === 'healer');
+        activeHealers.forEach(m => {
+            if (m.attackTimer > 0) m.attackTimer--; if (m.hitTimer > 0) m.hitTimer--; 
+            let healTarget = null; let lowestHp = 9999; let validTargets = allies.concat((kevin.isDead || kevin.isHidden) ? [] : [kevin]); 
+            validTargets.forEach(a => { if (a.hp < a.maxHp && a.hp < lowestHp && Math.abs(a.x - m.x) < m.range) { lowestHp = a.hp; healTarget = a; } }); 
+            
+            let frontX = hq.x + hq.w;
+            if (!kevin.isDead && !kevin.isHidden) frontX = Math.max(frontX, kevin.x);
+            allies.forEach(a => { if (a !== m && a.x > frontX && !a.isFlying && a.type !== 'healer') frontX = a.x; });
+            
+            let targetX = Math.max(hq.x + hq.w, frontX - 60);
+
+            if (healTarget) { 
+                if (m.attackTimer === 0) { healTarget.hp = Math.min(healTarget.maxHp, healTarget.hp - m.damage); healTarget.hitTimer = 10; m.attackTimer = 60; } 
+            } 
+            if (m.x < targetX - 5) m.x += m.speed;
+            else if (m.x > targetX + 5) m.x -= m.speed; 
+        });
+
+        allies.forEach(m => { 
+            if (m.type === 'healer') return; 
+            if (m.attackTimer > 0) m.attackTimer--; if (m.hitTimer > 0) m.hitTimer--; 
+            
+            if (m.type === 'owl') {
+                m.facing = m.patrolDir;
+                m.x += m.speed * m.patrolDir;
+
+                if (m.x > ship.x - 150) m.patrolDir = -1;
+                if (m.x < hq.x + hq.w + 50) m.patrolDir = 1;
+
+                if (m.attackTimer === 0) {
+                    spawnFloatingText(canvas.width/2, canvas.height/2 - 150, '❄️ ABSOLUTE ZERO ❄️', '#00ced1', 0);
+                    playSfx('heavy');
+                    enemies.forEach(e => {
+                        e.stunTimer = 180; 
+                        for(let i=0; i<8; i++) spawnSparks(e.x + Math.random()*e.w, e.y + Math.random()*e.h, '#00ced1');
+                    });
+                    m.attackTimer = 400; 
+                }
+                return;
+            }
+
+            if (m.type === 'fox') {
+                m.facing = 1;
+                let targets = enemies.filter(e => !e.isFlying && e.x < m.x + m.range && e.x > m.x); 
+                
+                if (targets.length > 0) {
+                    if (m.attackTimer === 0) {
+                        let oldX = m.x;
+                        let newX = Math.min(m.x + 250, ship.x - m.w); 
+                        m.x = newX;
+                        
+                        enemies.forEach(e => {
+                            if (!e.isFlying && e.x >= oldX && e.x <= newX) {
+                                e.hp -= m.damage; e.hitTimer = 10;
+                                spawnSparks(e.x + e.w/2, e.y + e.h/2, '#8e44ad');
+                            }
+                        });
+                        spawnFloatingText(newX, getVisualY(newX, m.y) - 20, '⚡SLASH', '#8e44ad', 0);
+                        playSfx('sword'); m.attackTimer = 120; 
+                    }
+                } else if (checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) {
+                    if (m.attackTimer === 0) { ship.hp -= m.damage; playSfx('sword'); m.attackTimer = 120; }
+                } else { 
+                    m.x += m.speed; 
+                }
+                return;
+            }
+
+            if (m.type === 'devil') {
+                m.facing = 1;
+                let targets = enemies.filter(e => !e.isFlying && e.x < m.x + m.w + m.range && e.x > m.x - 20); 
+                if (targets.length > 0) {
+                    if (m.attackTimer === 0) {
+                        targets[0].hp -= m.damage; targets[0].hitTimer = 10;
+                        spawnSparks(m.x + m.w, m.y + m.h/2, '#e67e22');
+                        playSfx('heavy'); m.attackTimer = 60; 
+                    }
+                } else if (checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) {
+                    if (m.attackTimer === 0) { ship.hp -= m.damage; playSfx('heavy'); m.attackTimer = 60; }
+                } else { 
+                    m.x += m.speed; 
+                    if (frameCount % 20 === 0) {
+                        bullets.push({ x: m.x, y: m.y + m.h - 10, w: 80, h: 20, color: 'rgba(230, 126, 34, 0.5)', dx: 0, dy: 0, damage: 15, isPlayer: true, isRanged: false, type: 'fire_trail', life: 180, maxLife: 180 });
+                    }
+                }
+                return;
+            }
+
+            if (m.type === 'turtle') {
+                m.facing = 1;
+                let frontX = hq.x + hq.w; allies.forEach(a => { if(!a.isFlying && a.type !== 'turtle') frontX = Math.max(frontX, a.x); });
+                let targetX = Math.max(hq.x + hq.w + 100, frontX - 30);
+                
+                let hitSomething = false;
+                let targets = enemies.filter(e => !e.isFlying && e.x < m.x + m.w + m.range && e.x > m.x - 20);
+                if (targets.length > 0) {
+                    hitSomething = true;
+                    if (m.attackTimer === 0) {
+                        targets[0].hp -= m.damage; targets[0].hitTimer = 10;
+                        spawnSparks(m.x + m.w, m.y + m.h/2, '#3498db');
+                        playSfx('heavy'); m.attackTimer = 90;
+                    }
+                } else if (checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) {
+                    hitSomething = true;
+                    if (m.attackTimer === 0) { ship.hp -= m.damage; playSfx('heavy'); m.attackTimer = 90; }
+                }
+
+                if (!hitSomething && m.x < targetX - 5) m.x += m.speed; 
+                
+                if (frameCount % 60 === 0) {
+                    allies.forEach(a => {
+                        if (a !== m && Math.abs(a.x - m.x) < 150 && a.hp < a.maxHp) {
+                            a.hp = Math.min(a.maxHp, a.hp + 10);
+                            spawnSparks(a.x + a.w/2, a.y + a.h/2, '#3498db');
+                        }
+                    });
+                }
+                return; 
+            }
+
+            let targetInRange = false; 
+            enemies.forEach(t => { 
+                if (t.isFlying && m.range < 150) return; 
+                let dist = Math.abs(m.x - t.x); 
+                if (dist <= m.range + m.w && t.x > m.x) { 
+                    targetInRange = true; m.facing = 1;
+                    if (m.attackTimer === 0) { 
+                        if (m.range > 100) { 
+                            if (m.type === 'sniper') { bullets.push({ x: m.x + m.w, y: GROUND_Y - 35, w: 30, h: 10, color: '#ffea00', dx: 20, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); playSfx('sniper'); m.attackTimer = 90; } 
+                            else { bullets.push({ x: m.x + m.w, y: GROUND_Y - 25, w: 15, h: 5, color: m.color || '#fff', dx: 12, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); m.attackTimer = 60; } 
+                        } else { 
+                            t.hp -= m.damage; t.hitTimer = 10; t.x += 10; m.attackTimer = 60; 
+                        } 
+                    } 
+                } 
+            }); 
+            if (!targetInRange && checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) { 
+                targetInRange = true; if (m.attackTimer === 0) { ship.hp -= m.damage; m.attackTimer = 60; } 
+            } 
+            if (!targetInRange) { m.x += m.speed; m.facing = 1;} 
+        }); 
+    }
+
+    function handleEnemiesAI() { 
+        let validTargets = allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
+        enemies.forEach(m => { 
+            if (m.baseSpeed === undefined) m.baseSpeed = m.speed;
+            
+            let terrainMod = m.isFlying ? 1.0 : 0.6; 
+
+            if (m.stunTimer && m.stunTimer > 0) {
+                m.stunTimer--;
+                m.speed = 0; 
+                m.attackTimer = Math.max(m.attackTimer, 10); 
+            } else if (m.slowTimer && m.slowTimer > 0) {
+                m.slowTimer--;
+                m.speed = m.baseSpeed * 0.3 * terrainMod;
+            } else {
+                m.speed = m.baseSpeed * terrainMod;
+            }
+
+            if (m.attackTimer > 0) m.attackTimer--; if (m.hitTimer > 0) m.hitTimer--; 
+            let targetInRange = false; 
+            
+            let targetsToCheck; 
+            if (m.isFlying) { 
+                targetsToCheck = validTargets.filter(t => t.isFlying || t.type === 'devil' || t.type === 'turtle'); 
+            } else { 
+                targetsToCheck = validTargets.filter(t => !t.isFlying || m.range >= 150 || (t.isFlying && (t.y + t.h) >= GROUND_Y - 100)); 
+            }
+
+            if (m.type === 'enemy_healer') {
+                let frontEnemyX = ship.x;
+                enemies.forEach(e => {
+                    if (e !== m && !e.isFlying && e.type !== 'bomber' && e.x < frontEnemyX) {
+                        frontEnemyX = e.x;
+                    }
+                });
+                
+                let targetX = Math.min(ship.x - 80, frontEnemyX + 200);
+                
+                if (m.x > targetX + 5) m.x -= m.speed;
+                else if (m.x < targetX - 5) m.x += m.speed;
+                
+                if (frameCount % 60 === 0) {
+                    let healed = false;
+                    enemies.forEach(e => {
+                        if (e !== m && e.hp > 0 && e.hp < e.maxHp && Math.abs(e.x - m.x) < 350) {
+                            e.hp = Math.min(e.maxHp, e.hp + m.damage); 
+                            spawnFloatingText(e.x + e.w/2, getVisualY(e.x, e.y) - 10, '+'+m.damage, '#fd79a8', 0);
+                            healed = true;
+                        }
+                    });
+                    if(healed) {
+                        for(let i=0; i<10; i++) spawnSparks(m.x + m.w/2, m.y + m.h/2, '#fd79a8');
+                    }
+                }
+                return; 
+            }
+
+            if (m.type === 'bomber') {
+                let hitTarget = validTargets.find(t => Math.abs(m.x - t.x) <= m.range + m.w && t.x < m.x && !t.isFlying);
+                if (hitTarget || checkCol({x: m.x - m.range, y: m.y, w: m.w + m.range, h: m.h}, hq)) {
+                    m.hp = 0; 
+                } else {
+                    m.x -= m.speed; 
+                }
+                return;
+            }
+
+            targetsToCheck.forEach(t => { 
+                let dist = Math.abs(m.x - t.x); 
+                if (dist <= m.range + m.w && t.x < m.x) { 
+                    targetInRange = true; 
+                    if (m.attackTimer === 0) { 
+                        let dmg = m.damage;
+                        if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
+                        
+                        let stagProtected = allies.some(a => a.type === 'stag' && Math.abs(a.x - (t.x + t.w/2)) < 250);
+                        if (stagProtected) dmg = Math.floor(dmg * 0.5);
+
+                        if (m.type === 'shooter') { 
+                            let sX = m.x - 20; let sY = GROUND_Y - 30;
+                            let tX = t.x + t.w/2; let tY = t.y + t.h/2;
+                            let angle = Math.atan2(tY - sY, tX - sX);
+                            let speed = 10;
+                            bullets.push({ x: sX, y: sY, w: 15, h: 5, color: '#39ff14', dx: Math.cos(angle)*speed, dy: Math.sin(angle)*speed, damage: dmg, isPlayer: false, isRanged: true, isAA: t.isFlying, angle: angle }); 
+                            m.attackTimer = 80; 
+                        } 
+                        else if (m.type === 'devastator') { 
+                            t.hp -= dmg; t.hitTimer = 10; m.attackTimer = 120;
+                            playSfx('heavy'); spawnSparks(m.x, m.y + m.h/2, '#c23616');
+                        }
+                        else { t.hp -= dmg; t.hitTimer = 10; m.attackTimer = 60; } 
+                    } 
+                } 
+            }); 
+
+            if (!targetInRange && checkCol({x: m.x - m.range, y: m.y, w: m.w + m.range, h: m.h}, hq)) { 
+                targetInRange = true; 
+                if (m.attackTimer === 0) { 
+                    let dmg = m.damage;
+                    let hqProtected = allies.some(a => a.type === 'stag' && Math.abs(a.x - hq.x) < 300);
+                    if (hqProtected) dmg = Math.floor(dmg * 0.5);
+
+                    if (m.type === 'shooter') { bullets.push({ x: m.x - 20, y: GROUND_Y - 30, w: 15, h: 5, color: '#39ff14', dx: -10, dy: 0, damage: dmg, isPlayer: false, isRanged: true, isAA: false }); m.attackTimer = 80; } 
+                    else if (m.type === 'devastator') { hq.hp -= dmg; hq.hitTimer = 10; m.attackTimer = 120; playSfx('heavy'); }
+                    else { hq.hp -= dmg; hq.hitTimer = 10; m.attackTimer = 60; } 
+                } 
+            } 
+            if (!targetInRange) { m.x -= m.speed; } 
+        }); 
+    }
+
+    function checkCol(r1, r2) { return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y; }
+
+    function draw() {
+        if (bgImg.complete && bgImg.naturalHeight !== 0) { ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height); } else { ctx.fillStyle = '#0a101d'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        ctx.save();
+        let hqVisY = getVisualY(hq.x, hq.y); if (hq.hitTimer && hq.hitTimer > 0) ctx.filter = 'brightness(200%)'; 
+        if (hqImg.complete && hqImg.naturalHeight > 0) { 
+            let scaleFactor = hq.h / hqImg.naturalHeight; 
+            ctx.drawImage(hqImg, hq.x - (hqImg.naturalWidth*scaleFactor - hq.w)/2, hqVisY, hqImg.naturalWidth * scaleFactor, hq.h); 
+        } else { 
+            ctx.fillStyle = '#f5f6fa'; ctx.fillRect(hq.x, hqVisY, hq.w, hq.h); 
+            ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(hq.x + hq.w/2, hqVisY, hq.w/2, Math.PI, 0); ctx.fill();
+        }
+        ctx.restore();
+
+        ctx.save();
+        let hqVisUiY = getVisualY(hq.x, hq.y); let hqHpPct = Math.max(0, hq.hp / hq.maxHp);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 90, hqVisUiY - 50, 180, 30); 
+        ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
+        ctx.fillText('BASE WELLINGTON', hq.x + hq.w/2, hqVisUiY - 30); 
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120, 10);
+        ctx.fillStyle = hqHpPct > 0.6 ? '#f1c40f' : (hqHpPct > 0.3 ? '#e67e22' : '#e74c3c'); 
+        ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120 * hqHpPct, 10);
+        ctx.restore();
+
+        let shipVisY = ship.y; let hover = Math.sin(frameCount * 0.05) * 15;
+        if (shipImg.complete && shipImg.naturalHeight > 0) {
+            ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h);
+            
+            // 🔧 修复飞船顶部的血条和名称，对齐且不溢出
+            ctx.save();
+            let shipUiY = shipVisY + hover;
+            let shpPct = Math.max(0, ship.hp / ship.maxHp); 
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; 
+            ctx.fillRect(ship.x + ship.w/2 - 75, shipUiY - 50, 150, 30); 
+            ctx.fillStyle = '#e94560'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
+            ctx.fillText('ZOGON POD', ship.x + ship.w/2, shipUiY - 30); 
+            ctx.fillStyle = 'rgba(0,0,0,0.6)'; 
+            ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120, 10); 
+            ctx.fillStyle = '#e94560'; 
+            ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120 * shpPct, 10); 
+            ctx.restore();
+        } else {
+            ctx.fillStyle = ship.color; ctx.fillRect(ship.x, shipVisY, ship.w, ship.h);
+        }
+
+        let shipBottomY = shipVisY + hover + ship.h - 30; spawnEffects.forEach(se => { let visY = getVisualY(se.x, se.y); let progress = se.life / se.maxLife; ctx.globalAlpha = progress; let grad = ctx.createLinearGradient(0, shipBottomY, 0, visY); grad.addColorStop(0, '#39ff14'); grad.addColorStop(1, 'rgba(57, 255, 20, 0.1)'); ctx.fillStyle = grad; ctx.fillRect(se.x - 5, shipBottomY, se.w + 10, visY - shipBottomY); ctx.globalAlpha = 1.0; });
+        
+        allies.forEach(a => {
+            if (a.type === 'rabbit') {
+                let cx = a.x + a.w/2;
+                let cy = getVisualY(a.x, a.y) + a.h; 
+                ctx.save();
+                ctx.globalAlpha = 0.5 + Math.abs(Math.sin(frameCount * 0.05)) * 0.3;
+                ctx.translate(cx, cy);
+                ctx.scale(1, 0.3); 
+                ctx.strokeStyle = '#f1c40f';
+                ctx.lineWidth = 6;
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(0, 0, 300, 0, Math.PI * 2);
+                ctx.stroke();
+                let grad = ctx.createRadialGradient(0, 0, 50, 0, 0, 300);
+                grad.addColorStop(0, 'rgba(241, 196, 15, 0.4)');
+                grad.addColorStop(1, 'rgba(241, 196, 15, 0)');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.restore();
+            }
+        });
+
+        if (!kevin.isDead) drawEntity(kevin, true); allies.forEach(a => drawEntity(a, false)); enemies.forEach(e => drawEntity(e, false));
+
+        bullets.forEach(b => { 
+            ctx.save(); ctx.fillStyle = b.color || '#fff'; 
+            if (b.isAA) { 
+                ctx.shadowBlur = 10; ctx.shadowColor = b.color; ctx.translate(b.x, getVisualY(b.x, b.y)); ctx.rotate(b.angle || 0); ctx.beginPath(); ctx.ellipse(0, 0, b.w/2, b.h/2, 0, 0, Math.PI*2); ctx.fill(); 
+            } 
+            else if (b.type === 'wind_bomb') {
+                ctx.shadowBlur = 10; ctx.shadowColor = '#3498db'; ctx.globalAlpha = 0.9;
+                ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ecf0f1'; ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y)-5, b.w/3, 0, Math.PI*2); ctx.fill();
+            }
+            else if (b.color === '#ff4757') { 
+                ctx.shadowBlur = 15; ctx.shadowColor = '#ff4757'; ctx.beginPath(); ctx.arc(b.x + b.w/2, getVisualY(b.x, b.y) + b.h/2, b.w/2, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x + b.w/2, getVisualY(b.x, b.y) + b.h/2, b.w/4, 0, Math.PI*2); ctx.fill(); 
+            } 
+            else { 
+                // 🔧 修复巨型色块：强制分离视觉高度和Hitbox高度
+                let drawH = (b.h === 40 || b.h === 10) ? 3 : (b.h === 5 || b.h === 8 ? b.h : 3); 
+                ctx.fillRect(b.x, getVisualY(b.x, b.y), b.w, drawH); 
+            }
+            ctx.restore();
+        });
+
+        lightnings.forEach(l => {
+            ctx.save(); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 3; ctx.shadowBlur = 15; ctx.shadowColor = '#00e5ff';
+            ctx.beginPath(); ctx.moveTo(l.points[0].x, getVisualY(l.points[0].x, l.points[0].y));
+            for(let i=1; i<l.points.length; i++) {
+                let px = l.points[i].x + (Math.random()-0.5)*25; let py = getVisualY(l.points[i].x, l.points[i].y) + (Math.random()-0.5)*25;
+                ctx.lineTo(px, py);
+            }
+            ctx.stroke(); ctx.restore();
+        });
+
+        particles.forEach(p => { ctx.globalAlpha = p.life / p.maxLife; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 4, 4); ctx.globalAlpha = 1.0; });
+
+        if (kevin.weapon === 'gun' && !kevin.isDead) {
+            let startX = kevin.x + kevin.w / 2; let startY = getVisualY(kevin.x, kevin.y) + kevin.h / 2; let dx = mouseX - startX; let dy = mouseY - startY; dy = Math.min(0, dy); if (dx === 0 && dy === 0) dx = kevin.facing; let globalAngle = Math.atan2(dy, dx);
+            ctx.save(); ctx.strokeStyle = 'rgba(255, 87, 34, 0.6)'; ctx.lineWidth = 2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(startX + Math.cos(globalAngle)*2000, startY + Math.sin(globalAngle)*2000); ctx.stroke(); ctx.restore();
+            let localAngle = kevin.facing === 1 ? globalAngle : Math.PI - globalAngle;
+            ctx.save(); ctx.translate(startX, startY); ctx.scale(kevin.facing, 1); ctx.rotate(localAngle); 
+            if (aaGunImg.complete && aaGunImg.naturalHeight > 0) { ctx.drawImage(aaGunImg, 0, -15, 60, 35); } else { ctx.fillStyle = '#c0392b'; ctx.fillRect(0, -5, 50, 10); }
+            if (kevin.isAttacking) { let barrelX = 58; let barrelY = -3; ctx.fillStyle = 'rgba(255, 87, 34, 0.7)'; ctx.beginPath(); ctx.moveTo(barrelX, barrelY - 4); ctx.lineTo(barrelX + 15 + Math.random()*10, barrelY - 8 - Math.random()*5); ctx.lineTo(barrelX + 30 + Math.random()*20, barrelY); ctx.lineTo(barrelX + 15 + Math.random()*10, barrelY + 8 + Math.random()*5); ctx.lineTo(barrelX, barrelY + 4); ctx.fill(); ctx.fillStyle = '#00e5ff'; ctx.beginPath(); ctx.moveTo(barrelX, barrelY - 2); ctx.lineTo(barrelX + 10 + Math.random()*5, barrelY - 3); ctx.lineTo(barrelX + 20 + Math.random()*15, barrelY); ctx.lineTo(barrelX + 10 + Math.random()*5, barrelY + 3); ctx.lineTo(barrelX, barrelY + 2); ctx.fill(); }
+            ctx.restore();
+        } else if (!kevin.isDead && kevin.isAttacking) {
+            let visY = getVisualY(kevin.x, kevin.y); let animProgress = (30 - kevin.attackAnim) / 30; 
+            ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
+            if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
+            
+            // 🔧 修复：统一所有关卡的长矛物理刺击动画逻辑
+            else { 
+                let wImg = weapons[kevin.weapon].img; 
+                if (wImg && wImg.complete && wImg.naturalHeight > 0) { 
+                    if (kevin.weapon === 'sword') { 
+                        ctx.rotate(-Math.PI / 3 + (Math.PI / 1.5) * Math.sin(animProgress * Math.PI)); 
+                        ctx.drawImage(wImg, 10, -30, 60, 60); 
+                    } else if (kevin.weapon === 'spear') { 
+                        let maxThrust = 60; 
+                        let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6)); 
+                        ctx.save(); 
+                        ctx.translate(25 + currentThrust, -5); 
+                        ctx.rotate(Math.PI / 4); 
+                        ctx.drawImage(wImg, -30, -30, 60, 60); 
+                        ctx.restore(); 
+                    } else if (kevin.weapon === 'bow') { 
+                        ctx.drawImage(wImg, 10 - Math.sin(animProgress * Math.PI)*5, -30, 60, 60); 
+                    } 
+                } 
+            }
+            ctx.restore();
+        }
+        
+        souls.forEach(s => { ctx.globalAlpha = s.life / s.maxLife; ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.fillText('👼', s.x - 8, s.y - 10); ctx.globalAlpha = 1.0; }); 
+        floatingTexts.forEach(ft => { ctx.globalAlpha = ft.life / ft.maxLife; ctx.fillStyle = ft.color; ctx.font = 'bold 22px Arial'; ctx.fillText(ft.text, ft.x, ft.y); ctx.globalAlpha = 1.0; });
+    }
+
+    function drawEntity(e, isKevin) { 
+        let visualY = getVisualY(e.x, e.y); ctx.save();
+        if (isKevin && e.isHidden) { ctx.globalAlpha = 0.5; ctx.fillStyle = '#1abc9c'; ctx.font = '14px Arial'; ctx.fillText('SHIELDED', e.x - 10, visualY - 20); } 
+        if (e.hitTimer && e.hitTimer > 0) { ctx.filter = 'brightness(200%)'; } 
+        else if (e.stunTimer && e.stunTimer > 0) {
+            ctx.filter = 'drop-shadow(0 0 10px yellow) brightness(120%)';
+            ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 20px Arial'; ctx.fillText('💫', e.x + e.w/2 - 10, visualY - 15);
+        } else if (e.slowTimer && e.slowTimer > 0) {
+            ctx.filter = 'sepia(1) hue-rotate(180deg) saturate(200%) brightness(80%)';
+        } else if (e.attackSpeedBuff && e.attackSpeedBuff > 0) {
+            ctx.filter = 'drop-shadow(0 0 8px #e74c3c)';
+        }
+
+        let customBobbing = (e.hitTimer > 0 || (e.stunTimer && e.stunTimer > 0)) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
+        
+        if (e.type === 'fox' && e.attackTimer > 0) customBobbing = 0; 
+        if (e.type === 'rabbit') customBobbing = Math.abs(Math.sin(frameCount * 0.05)) * 5; 
+
+        if (isKevin) {
+            if (keys['KeyA'] || keys['KeyD']) { customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; }
+            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1);
+            let currentSprite = e.hasArmor ? armorImg : kevinImg;
+            if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); }
+        } else {
+            if (e.sprite && e.sprite.complete && e.sprite.naturalHeight > 0) {
+                ctx.translate(e.x + e.w / 2, visualY + e.h);
+                let bob = e.bobbingLock ? 0 : customBobbing;
+                
+                if (e.type === 'fox' && e.attackTimer > 100) {
+                    ctx.globalAlpha = 0.5;
+                    ctx.drawImage(e.sprite, -e.sprite.naturalWidth/2 - 20*e.facing, -e.sprite.naturalHeight, e.w, e.h);
+                    ctx.globalAlpha = 1.0;
+                }
+
+                let scaleFactor = e.h / e.sprite.naturalHeight;
+                ctx.scale(e.facing || 1, 1); 
+                ctx.scale(scaleFactor, scaleFactor);
+                ctx.drawImage(e.sprite, -e.sprite.naturalWidth / 2, -e.sprite.naturalHeight - bob/scaleFactor);
+            } else {
+                let imgToDraw = null;
+                if (e.type === 'bomber') imgToDraw = bomberImg; else if (e.type === 'enemy_healer') imgToDraw = enemyHealerImg; else if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; else if (e.type === 'flyer') imgToDraw = flyerImg; else if (e.type === 'devastator') imgToDraw = devImg;
+                
+                ctx.translate(e.x + e.w / 2, visualY + e.h); 
+                if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
+                    let scaleFactor = e.h / imgToDraw.naturalHeight; ctx.scale(e.facing || 1, 1); ctx.scale(scaleFactor, scaleFactor); ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor); 
+                } else { 
+                    ctx.fillStyle = e.color || '#fff'; 
+                    ctx.beginPath(); ctx.roundRect(-e.w / 2, -e.h - customBobbing, e.w, e.h, 10); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill();
+                }
+            }
+        }
+        ctx.restore();
+        let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
+    }
+    
+    function updateUI() { 
+        const dict = i18n[currentLang];
+        ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; ui.wave.innerText = currentWave; 
+        ui.wBtns.forEach(btn => { 
+            if(btn.id !== 'armor-btn') {
+                btn.disabled = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); 
+                if (btn.dataset.bought) {
+                    btn.querySelector('.price').innerText = btn.classList.contains('active') ? dict.equipped : dict.owned;
+                }
+            }
+        }); 
+        ui.sBtns.forEach(btn => btn.disabled = kevin.isDead || gold < parseInt(btn.dataset.price)); 
+        ui.armorBtn.disabled = kevin.isDead || kevin.hasArmor || gold < 100; 
+        if (kevin.hasArmor) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; }
+    }
+    
+    // 🔧 修复结局判断
+    function endGame(isVictory) { 
+        bgm.pause();
+	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
+        const dict = i18n[currentLang];
+        isRunning = false; 
+        isGameOver = true; 
+        
+        if (isVictory) {
+            let safeSessionXP = typeof sessionXP !== 'undefined' ? sessionXP : 0;
+            let currentGlobalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
+            let finalSessionXP = safeSessionXP + 500;
+            let newGlobalXP = currentGlobalXP + finalSessionXP;
+            
+            try {
+                localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
+                let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
+                // 🔧 修复：解锁下一关 (第10关)
+                if(currentUnlocked <= 9) {
+                    localStorage.setItem('kiwiUnlockedLevel', 10);
+                }
+            } catch(e) {
+                console.error("Local storage write failed:", e);
+            }
+            ui.sessionXpMsg.innerText = dict.xpEarned.replace('{n}', finalSessionXP); 
+        } else {
+            ui.sessionXpMsg.innerText = dict.defenseFailed; 
+        }
+        
+        ui.gameOverTitle.innerText = isVictory ? dict.victory : dict.baseFallen; 
+        ui.gameOverTitle.style.color = isVictory ? '#f1c40f' : '#e74c3c'; 
+        ui.gameOverMsg.innerText = isVictory ? dict.victoryMsg : dict.baseFallenMsg; 
+        ui.respawnScreen.style.display = 'none'; 
+        ui.gameOverScreen.style.display = 'flex'; 
+        ui.restartBtn.style.display = 'block'; 
+        
+        if (isVictory) {
+            ui.restartBtn.innerText = dict.backToMap; 
+            ui.restartBtn.onclick = () => { window.location.href = "index.html"; };
+        } else {
+            ui.restartBtn.innerText = dict.restart; 
+            ui.restartBtn.onclick = () => { window.location.reload(); };
+        }
+    }
+    
+    function loop() { 
+        if(isRunning && !isGameOver){ 
+            if (!CG_Manager.isPaused) update(); 
+            draw(); 
+        }
+        animationFrameId = requestAnimationFrame(loop); 
+    }
+</script>
+</body>
+</html>

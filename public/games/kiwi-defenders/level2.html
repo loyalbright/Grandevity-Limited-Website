@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiwi Defenders - Level 2: Waikato Twilight Cavern</title>
+    <style>
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        
+        #game-container { 
+            position: relative; 
+            width: 1280px; 
+            height: 870px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 0 40px rgba(0, 200, 255, 0.1); 
+            background: #000; 
+            transform-origin: center center; 
+        }
+        
+        canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
+        
+        #ui-panel { width: 1280px; height: 150px; background: rgba(10, 20, 30, 0.95); border-top: 3px solid #34495e; display: flex; padding: 8px; box-sizing: border-box; gap: 10px; padding-bottom: 15px;}
+        .ui-box { flex: 1; background: rgba(0, 0, 0, 0.5); border: 1px solid #2c3e50; border-radius: 8px; padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-between; }
+        .ui-box h3 { margin: 0 0 4px 0; font-size: 13px; color: #00d2ff; text-align: center; }
+        
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; flex-grow: 1; }
+        .btn-grid.three-cols { grid-template-columns: 1fr 1fr 1fr; }
+        
+        .btn { background: #2c3e50; color: white; border: 1px solid #7f8c8d; border-radius: 4px; cursor: pointer; font-size: 11px; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px; outline: none; }
+        .btn:hover:not(:disabled) { background: #34495e; transform: scale(1.02); z-index: 2; position: relative;}
+        .btn:disabled { background: #1a252f; color: #555; cursor: not-allowed; border-color: #2c3e50; }
+        .btn.active { background: #27ae60; border-color: #2ecc71; font-weight: bold; }
+        .price { color: #f1c40f; font-weight: bold; margin-top: 1px; }
+        
+        .ult-btn { font-size: 11px; padding: 4px 1px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
+        .ult-chengdu { background: linear-gradient(135deg, #2c3e50, #bdc3c7); color: white;}
+        .ult-saitama { background: linear-gradient(135deg, #c0392b, #e74c3c); color: white;}
+        .ult-sacra { background: linear-gradient(135deg, #d35400, #f39c12); color: white;}
+        .ult-ieper { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white;}
+        
+        #top-bar { position: absolute; top: 10px; left: 20px; right: 20px; display: flex; justify-content: space-between; pointer-events: none; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px #000; z-index: 10; }
+        #top-bar div { font-size: 24px !important; }
+        
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
+        #start-screen h1 { color: #1abc9c; font-size: 60px; text-shadow: 0 0 20px #1abc9c; margin-bottom: 10px; }
+        .action-btn { padding: 15px 50px; font-size: 24px; font-weight: bold; color: white; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; margin-top: 20px; outline: none; }
+        #start-btn { background: #e94560; box-shadow: 0 5px 15px rgba(233,69,96,0.5); }
+        #restart-btn { background: #27ae60; box-shadow: 0 5px 15px rgba(39,174,96,0.5); display: none; }
+        .action-btn:hover:not(:disabled) { transform: scale(1.05); }
+        .action-btn:disabled { background: #555; box-shadow: none; cursor: not-allowed; }
+
+        #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
+        #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
+
+        #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #00cec9; color: #00cec9; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn:hover { background: #00cec9; color: #000; }
+        .ctrl-btn.on { background: #00cec9; color: #000; box-shadow: 0 0 10px #00cec9; }
+
+        /* --- 📱 移动端摇杆与提示 --- */
+        #mobile-controls {
+            display: none; 
+            position: absolute;
+            bottom: 170px; 
+            left: 30px;
+            gap: 40px;
+            z-index: 100;
+        }
+        #mobile-controls button {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white; font-size: 36px;
+            backdrop-filter: blur(4px);
+            touch-action: none;
+            outline: none;
+        }
+
+        @media (max-width: 1000px) {
+            #mobile-controls { display: flex; }
+        }
+
+        @media (orientation: portrait) {
+            body::after {
+                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
+                white-space: pre-wrap;
+                box-sizing: border-box;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: #050510; color: #1abc9c; display: flex; 
+                justify-content: center; align-items: center;
+                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
+                line-height: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="level-controls">
+            <!-- 设置为默认开启 (带有 on class) -->
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+        </div>
+
+        <div id="start-screen" class="overlay">
+            <h1 data-i18n="lvlTitle">Level 2: Twilight Cavern</h1>
+            <p style="font-size: 20px; color: #ccc; margin-bottom: 10px;">A/D: Move | Mouse/Space: Attack</p>
+            <p style="font-size: 18px; color: #1abc9c; font-weight: bold; margin-bottom: 40px;" data-i18n="startTip">✨ Drive the Zogons out of Waikato!</p>
+            <button id="start-btn" class="action-btn" data-i18n="startBtn">ENTER CAVERN</button>
+        </div>
+
+        <div id="respawn-screen" class="overlay">
+            <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
+            <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
+            <h1 id="game-over-title" style="font-size: 50px;">BASE HAS FALLEN</h1>
+            <p id="game-over-msg" style="font-size: 24px; color: #ccc;">The cavern is lost. Waikato defense has collapsed!</p>
+            <p id="session-xp-msg" style="font-size: 28px; color: #9b59b6; font-weight: bold; margin-top: 10px;">XP EARNED: +0 XP</p>
+            <button id="restart-btn" class="action-btn">RESTART</button>
+        </div>
+
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+        <div id="mobile-controls">
+            <button id="btn-left">◀</button>
+            <button id="btn-right">▶</button>
+        </div>
+        
+        <div id="top-bar">
+            <div style="color: #1abc9c;"><span data-i18n="baseWaikato">🏙️ BASE WAIKATO:</span> <span id="baseHpText">1500</span></div>
+            <div class="gold"><span data-i18n="goldLabel">💰 GOLD:</span> <span id="goldText">300</span></div>
+            <div class="xp-text"><span data-i18n="xpLabel">🌟 TOTAL XP:</span> <span id="globalXpText">0</span></div>
+            <div style="color: #e94560;"><span data-i18n="zogonPod">🛸 ZOGON POD:</span> <span id="shipHpText">5000</span></div>
+        </div>
+
+        <div id="ui-panel">
+            <div class="ui-box" style="flex: 1.5;">
+                <h3 data-i18n="armory">🗡️ ARMORY</h3>
+                <div class="btn-grid three-cols">
+                    <button class="btn w-btn active" data-id="kick" data-price="0"><span data-i18n="wUnarmed">🥋 UNARMED</span> <span class="price">EQUIPPED</span></button>
+                    <button class="btn w-btn" data-id="sword" data-price="100"><span data-i18n="wSword">🗡️ SWORD</span> <span class="price">100</span></button>
+                    <button class="btn w-btn" data-id="bow" data-price="300"><span data-i18n="wBow">🏹 COMP. BOW</span> <span class="price">300</span></button>
+                    <button class="btn w-btn" data-id="spear" data-price="500"><span data-i18n="wSpear">🔱 SPEAR</span> <span class="price">500</span></button>
+                    <button class="btn" id="armor-btn" data-price="100" style="grid-column: span 2; background: #34495e;"><span data-i18n="wArmor">🦺 ARMOR (Half Damage)</span> <span class="price">100</span></button>
+                </div>
+            </div>
+
+            <div class="ui-box" style="flex: 1.2;">
+                <h3 data-i18n="summon">🐤 SUMMON</h3>
+                <div class="btn-grid">
+                    <button class="btn s-btn" data-type="basic" data-price="100"><span data-i18n="sBasic">🐤 RECRUIT</span> <span class="price">100</span></button>
+                    <button class="btn s-btn" data-type="shield" data-price="250"><span data-i18n="sShield">🛡️ SHIELD</span> <span class="price">250</span></button>
+                    <button class="btn s-btn" data-type="sniper" data-price="500"><span data-i18n="sSniper">🔫 SNIPER</span> <span class="price">500</span></button>
+                    <button class="btn s-btn" data-type="healer" data-price="600"><span data-i18n="sHealer">🥝 MEDIC</span> <span class="price">600</span></button>
+                </div>
+            </div>
+
+            <div class="ui-box" style="flex: 1.8;">
+                <h3 data-i18n="reinforcements">🌍 WAIKATO REINFORCEMENTS</h3>
+                <div class="btn-grid" style="grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;">
+                    <button class="btn ult-btn ult-chengdu" data-type="chengdu" disabled data-i18n="uChengdu">CN Chengdu - Panda</button>
+                    <button class="btn ult-btn ult-saitama" data-type="saitama" disabled data-i18n="uSaitama">JP Saitama - Dragon</button>
+                    <button class="btn ult-btn ult-sacra" data-type="sacramento" disabled data-i18n="uSacra">US Sacra. - Bear</button>
+                    <button class="btn ult-btn ult-ieper" data-type="ieper" disabled data-i18n="uIeper">BE Ieper - Cat</button>
+                </div>
+                <div id="ult-timer-text" style="font-size: 13px; color: #ccc; text-align: center; margin-top: 4px; font-weight: bold;">⏳ READYING... (0/60)</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// --- 🎮 纯净版管理器 (SDK 已剥离) ---
+    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    const CG_Manager = {
+        isPaused: false, 
+
+        init: async function() {
+            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
+        },
+
+        startGameplay: function() {},
+        stopGameplay: function() {},
+
+        playAd: function(type = 'midgame') {
+            console.log("Demo Mode: Ad skipped.");
+            this.resumeGame();
+        },
+
+        pauseGame: function() {
+            this.isPaused = true;
+            if (typeof bgm !== 'undefined' && !bgm.paused) {
+                bgm.pause();
+            }
+        },
+
+        resumeGame: function() {
+            this.isPaused = false;
+            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
+                bgm.play().catch(e => {});
+            }
+        }
+    };
+
+    // 默认开启音频的破冰策略
+    function tryAutoplay() {
+        if (musicPlaying) {
+            let playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    const startOnInteraction = () => {
+                        if (musicPlaying) bgm.play().catch(e => {});
+                        document.removeEventListener('click', startOnInteraction);
+                        document.removeEventListener('touchstart', startOnInteraction);
+                    };
+                    document.addEventListener('click', startOnInteraction);
+                    document.addEventListener('touchstart', startOnInteraction);
+                });
+            }
+        }
+    }
+
+    // --- 📐 全局等比例缩放自适应逻辑 ---
+    function resizeGame() {
+        const container = document.getElementById('game-container');
+        const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
+        container.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', resizeGame);
+    resizeGame();
+
+    // --- 🌐 多语言架构 ---
+    const i18n = {
+        en: {
+            lvlTitle: "Level 2: Twilight Cavern", startTip: "✨ Drive the Zogons out of Waikato!", startBtn: "ENTER CAVERN",
+            respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)",
+            baseWaikato: "🏙️ BASE WAIKATO:", goldLabel: "💰 GOLD:", xpLabel: "🌟 TOTAL XP:", zogonPod: "🛸 ZOGON POD:",
+            armory: "🗡️ ARMORY", summon: "🐤 SUMMON", reinforcements: "🌍 WAIKATO REINFORCEMENTS",
+            wUnarmed: "🥋 UNARMED", wSword: "🗡️ SWORD", wBow: "🏹 COMP. BOW", wSpear: "🔱 SPEAR", wArmor: "🦺 ARMOR (Half Damage)",
+            sBasic: "🐤 RECRUIT", sShield: "🛡️ SHIELD", sSniper: "🔫 SNIPER", sHealer: "🥝 MEDIC",
+            uChengdu: "CN Chengdu - Panda", uSaitama: "JP Saitama - Dragon", uSacra: "US Sacra. - Bear", uIeper: "BE Ieper - Cat",
+            musicOn: "AUDIO: ON", musicOff: "AUDIO: OFF",
+            equipped: "EQUIPPED", owned: "OWNED",
+            readying: "⏳ READYING... ({n}/60)", ready: "🔥 READY FOR STRIKE!",
+            xpEarned: "XP EARNED: +{n}", defenseFailed: "DEFENSE FAILED",
+            baseFallen: "BASE HAS FALLEN", baseFallenMsg: "The cavern is lost. Waikato defense has collapsed!",
+            victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
+            backToMap: "BACK TO MAP", restart: "RESTART"
+        },
+        zh: {
+            lvlTitle: "第二关：暮光之穴", startTip: "✨ 将左贡星人赶出怀卡托！", startBtn: "进入洞穴",
+            respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)",
+            baseWaikato: "🏙️ 怀卡托基地:", goldLabel: "💰 资金:", xpLabel: "🌟 总经验:", zogonPod: "🛸 敌军母舰:",
+            armory: "🗡️ 武器库", summon: "🐤 召唤兵种", reinforcements: "🌍 怀卡托增援",
+            wUnarmed: "🥋 空手", wSword: "🗡️ 长剑", wBow: "🏹 复合弓", wSpear: "🔱 长矛", wArmor: "🦺 防弹衣 (减伤一半)",
+            sBasic: "🐤 新兵", sShield: "🛡️ 盾兵", sSniper: "🔫 狙击手", sHealer: "🥝 医疗兵",
+            uChengdu: "CN 成都 - 熊猫", uSaitama: "JP 埼玉 - 神龙", uSacra: "US 萨克拉门托 - 熊", uIeper: "BE 伊普尔 - 猫",
+            musicOn: "声音: 开", musicOff: "声音: 关",
+            equipped: "已装备", owned: "已拥有",
+            readying: "⏳ 充能中... ({n}/60)", ready: "🔥 准备打击！",
+            xpEarned: "获得经验: +{n}", defenseFailed: "防守失败",
+            baseFallen: "基地沦陷", baseFallenMsg: "洞穴失守，怀卡托防线崩溃！",
+            victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
+            backToMap: "返回地图", restart: "重新开始"
+        },
+        ja: {
+            lvlTitle: "ステージ 2：トワイライト・ケイブ", startTip: "✨ ゾゴンをワイカトから追い出せ！", startBtn: "洞窟へ入る",
+            respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)",
+            baseWaikato: "🏙️ ワイカト基地:", goldLabel: "💰 資金:", xpLabel: "🌟 合計XP:", zogonPod: "🛸 ゾゴン・ポッド:",
+            armory: "🗡️ 武器庫", summon: "🐤 召喚", reinforcements: "🌍 ワイカト増援",
+            wUnarmed: "🥋 素手", wSword: "🗡️ 剣", wBow: "🏹 コンパウンドボウ", wSpear: "🔱 槍", wArmor: "🦺 アーマー (被ダメージ半減)",
+            sBasic: "🐤 新兵", sShield: "🛡️ シールド兵", sSniper: "🔫 スナイパー", sHealer: "🥝 衛生兵",
+            uChengdu: "CN 成都 - パンダ", uSaitama: "JP 埼玉 - ドラゴン", uSacra: "US サクラメント - ベア", uIeper: "BE イーペル - キャット",
+            musicOn: "音声: オン", musicOff: "音声: オフ",
+            equipped: "装備中", owned: "所持",
+            readying: "⏳ チャージ中... ({n}/60)", ready: "🔥 攻撃準備完了！",
+            xpEarned: "獲得XP: +{n}", defenseFailed: "防衛失敗",
+            baseFallen: "基地陥落", baseFallenMsg: "洞窟が失われた。防衛線崩壊！",
+            victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
+            backToMap: "マップに戻る", restart: "再試行"
+        },
+        es: {
+            lvlTitle: "Nivel 2: Caverna Crepuscular", startTip: "✨ ¡Expulsa a los Zogons de Waikato!", startBtn: "ENTRAR A LA CAVERNA",
+            respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)",
+            baseWaikato: "🏙️ BASE WAIKATO:", goldLabel: "💰 ORO:", xpLabel: "🌟 XP TOTAL:", zogonPod: "🛸 NAVE ZOGON:",
+            armory: "🗡️ ARMERÍA", summon: "🐤 INVOCAR", reinforcements: "🌍 REFUERZOS",
+            wUnarmed: "🥋 DESARMADO", wSword: "🗡️ ESPADA", wBow: "🏹 ARCO COMP.", wSpear: "🔱 LANZA", wArmor: "🦺 ARMADURA (Mitad Daño)",
+            sBasic: "🐤 RECLUTA", sShield: "🛡️ ESCUDO", sSniper: "🔫 FRANCOTIRADOR", sHealer: "🥝 MÉDICO",
+            uChengdu: "CN Chengdu - Panda", uSaitama: "JP Saitama - Dragón", uSacra: "US Sacra. - Oso", uIeper: "BE Ieper - Gato",
+            musicOn: "AUDIO: ON", musicOff: "AUDIO: OFF",
+            equipped: "EQUIPADO", owned: "EN POSECIÓN",
+            readying: "⏳ CARGANDO... ({n}/60)", ready: "🔥 ¡LISTO PARA ATACAR!",
+            xpEarned: "XP GANADA: +{n}", defenseFailed: "DEFENSA FALLIDA",
+            baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "La caverna se ha perdido. ¡La defensa colapsó!",
+            victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
+            backToMap: "VOLVER AL MAPA", restart: "REINTENTAR"
+        }
+    };
+
+    let currentLang = localStorage.getItem('kiwiLang') || 'en';
+    function applyTranslation() {
+        const dict = i18n[currentLang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+        const musicBtnSpan = document.querySelector('#music-toggle span');
+        if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
+        
+        if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
+            ui.armorBtn.querySelector('.price').innerText = dict.equipped;
+        }
+        ui.wBtns.forEach(btn => {
+            if (btn.classList.contains('active')) {
+                btn.querySelector('.price').innerText = dict.equipped;
+            } else if (btn.dataset.bought) {
+                btn.querySelector('.price').innerText = dict.owned;
+            }
+        });
+        
+        if (kevin && kevin.isDead) {
+            ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
+        }
+    }
+
+    // 初始化时启动 SDK 与音频拦截
+    window.addEventListener('DOMContentLoaded', () => {
+        applyTranslation();
+        CG_Manager.init();
+        tryAutoplay();
+    });
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const bgImg = new Image(); bgImg.src = 'bg_level2.webp'; 
+    const shipImg = new Image(); shipImg.src = 'zogon_ship.webp'; 
+    const kevinImg = new Image(); kevinImg.src = 'kevin_side.webp'; 
+    const armorImg = new Image(); armorImg.src = 'armor.webp'; 
+    const gruntImg = new Image(); gruntImg.src = 'zogon_grunt.webp'; 
+    const tankImg = new Image(); tankImg.src = 'zogon_tank.webp'; 
+    const shooterImg = new Image(); shooterImg.src = 'zogon_shooter.webp'; 
+    const scoutImg = new Image(); scoutImg.src = 'zogon_scout.webp'; 
+    const basicImg = new Image(); basicImg.src = 'novice_bird.webp'; 
+    const shieldImg = new Image(); shieldImg.src = 'shield_bird.webp'; 
+    const sniperImg = new Image(); sniperImg.src = 'sniper_bird.webp'; 
+    const healerImg = new Image(); healerImg.src = 'healer_bird.webp'; 
+    const chengduImg = new Image(); chengduImg.src = 'chengdu_panda.webp';
+    const saitamaImg = new Image(); saitamaImg.src = 'saitama_dragon.webp';
+    const sacraImg = new Image(); sacraImg.src = 'sacramento_bear.webp';
+    const ieperImg = new Image(); ieperImg.src = 'ieper_cat.webp';
+    const swordImg = new Image(); swordImg.src = 'sword.webp';
+    const bowImg = new Image(); bowImg.src = 'bow.webp';
+    const spearImg = new Image(); spearImg.src = 'spear.webp';
+
+    const bgm = new Audio('bgm_level2.mp3'); 
+    bgm.loop = true; 
+    bgm.volume = 0.3;
+    let musicPlaying = true; // 默认开启
+
+    function toggleMusic(event) {
+        if (event) event.currentTarget.blur();
+        const dict = i18n[currentLang];
+        const btnSpan = document.querySelector('#music-toggle span');
+        const btn = document.getElementById('music-toggle');
+        if (!musicPlaying) {
+            bgm.play().catch(e => {});
+            btnSpan.innerText = dict.musicOn;
+            btn.classList.add('on');
+            musicPlaying = true;
+        } else {
+            bgm.pause();
+            btnSpan.innerText = dict.musicOff;
+            btn.classList.remove('on');
+            musicPlaying = false;
+        }
+    }
+
+    function playSfx(type) {
+        if (!musicPlaying) return; 
+        const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3' };
+        if (soundMap[type]) { let sound = new Audio(soundMap[type]); sound.volume = 0.5; sound.play().catch(e => {}); }
+    }
+
+    const ui = {
+        gold: document.getElementById('goldText'), baseHp: document.getElementById('baseHpText'), shipHp: document.getElementById('shipHpText'), globalXpText: document.getElementById('globalXpText'),
+        ultBtns: document.querySelectorAll('.ult-btn'), ultTimerText: document.getElementById('ult-timer-text'),
+        wBtns: document.querySelectorAll('.w-btn'), sBtns: document.querySelectorAll('.s-btn'), armorBtn: document.getElementById('armor-btn'),
+        startScreen: document.getElementById('start-screen'), startBtn: document.getElementById('start-btn'),
+        gameOverScreen: document.getElementById('game-over-screen'), gameOverTitle: document.getElementById('game-over-title'), gameOverMsg: document.getElementById('game-over-msg'), sessionXpMsg: document.getElementById('session-xp-msg'), restartBtn: document.getElementById('restart-btn'),
+        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn')
+    };
+
+    let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
+    ui.globalXpText.innerText = globalXP;
+
+    let isRunning = false; let isGameOver = false; let frameCount = 0; let animationFrameId;
+    let gold = 300; let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
+    let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
+
+    const GROUND_Y = 520; 
+    let hq, ship, kevin;
+    let allies = []; let enemies = []; let bullets = [];
+    let floatingTexts = []; let souls = []; let spawnEffects = []; 
+
+    const SLOW_ZONE = { x: 800, w: 480 }; 
+    function getSpeedMod(x) {
+        if (x > SLOW_ZONE.x) { return 0.4; } 
+        return 1.0;
+    }
+
+    const weapons = {
+        kick:  { type: 'melee', damage: 25, range: 60, cooldown: 30 }, 
+        sword: { type: 'melee', damage: 50, range: 100, cooldown: 25, img: swordImg },
+        bow:   { type: 'ranged', damage: 40, speed: 20, cooldown: 40, img: bowImg },
+        spear: { type: 'melee', damage: 90, range: 150, cooldown: 45, img: spearImg }
+    };
+
+    function initGame() {
+        if (isRunning) return; 
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+        const dict = i18n[currentLang];
+        currentUpgrades = JSON.parse(localStorage.getItem('kiwiUpgrades')) || { gold: 0, hp: 0, spd: 0, dmg: 0 };
+        
+        let startGold = 300 + (currentUpgrades.gold * 50);             
+        let baseMaxHp = 1500 * (1 + currentUpgrades.hp * 0.20);        
+        let kevinSpd = 6 + (currentUpgrades.spd * 0.4);                
+
+        hq = { x: 80, y: GROUND_Y - 330, w: 180, h: 330, hp: baseMaxHp, maxHp: baseMaxHp, color: '#2c3e50' }; 
+        ship = { x: 980, y: GROUND_Y - 300, w: 280, h: 300, hp: 5000, maxHp: 5000, color: '#4a235a' }; 
+        kevin = { x: 250, y: GROUND_Y - 60, w: 60, h: 60, color: '#4caf50', hp: 500, maxHp: 500, speed: kevinSpd, weapon: 'kick', attackTimer: 0, isAttacking: false, attackAnim: 0, hitTimer: 0, isDead: false, isHidden: false, hasArmor: false, facing: 1 };
+        allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = [];
+        
+        gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0;
+
+	isGameOver = false; isRunning = true;
+        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
+        
+        ui.wBtns.forEach(btn => { 
+            btn.classList.remove('active'); 
+            btn.dataset.bought = btn.dataset.id === 'kick' ? 'true' : ''; 
+            if (btn.dataset.id === 'kick') { 
+                btn.classList.add('active'); 
+                btn.querySelector('.price').innerText = dict.equipped; 
+            } else { 
+                btn.querySelector('.price').innerText = btn.dataset.price; 
+            } 
+        });
+        ui.armorBtn.classList.remove('active'); ui.armorBtn.dataset.bought = ''; ui.armorBtn.querySelector('.price').innerText = '100';
+        applyTranslation();
+        animationFrameId = requestAnimationFrame(loop);
+    }
+
+    // --- 🖱️ & 👆 鼠标与触摸坐标更新 ---
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
+    
+    function updateAim(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = (clientX - rect.left) / rect.width * canvas.width;
+        mouseY = (clientY - rect.top) / rect.height * canvas.height;
+    }
+
+    canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
+    canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); 
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+        triggerAttack();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        updateAim(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    const keys = {};
+    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    if (btnLeft && btnRight) {
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keys['KeyA'] = true; });
+        btnLeft.addEventListener('mousedown', (e) => { e.preventDefault(); keys['KeyA'] = true; });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys['KeyA'] = false; });
+        btnLeft.addEventListener('mouseup', (e) => { e.preventDefault(); keys['KeyA'] = false; });
+        
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); keys['KeyD'] = true; });
+        btnRight.addEventListener('mousedown', (e) => { e.preventDefault(); keys['KeyD'] = true; });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); keys['KeyD'] = false; });
+        btnRight.addEventListener('mouseup', (e) => { e.preventDefault(); keys['KeyD'] = false; });
+    }
+    
+    ui.startBtn.addEventListener('click', (e) => { 
+        e.currentTarget.blur(); 
+        ui.startScreen.style.display = 'none'; 
+        if (musicPlaying) bgm.play().catch(e => {}); 
+        initGame(); 
+    });
+    
+    ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
+    ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
+    ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
+
+    function triggerAttack() {
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        let w = weapons[kevin.weapon];
+        kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
+        playSfx(kevin.weapon);
+
+        let boostedDamage = Math.floor(w.damage * (1 + currentUpgrades.dmg * 0.10));
+
+        if (w.type === 'melee') {
+            let hitbox = { x: kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - w.range, y: kevin.y - 30, w: w.range, h: kevin.h + 60 };
+            enemies.forEach(e => { 
+                if (checkCol(hitbox, e)) { e.hp -= boostedDamage; e.x += 15 * kevin.facing; playSfx('hit'); } 
+            }); 
+            if (checkCol(hitbox, ship)) ship.hp -= boostedDamage;
+        } else {
+            let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
+            bullets.push({ x: startX, y: GROUND_Y - 30, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
+        }
+    }
+
+    ui.wBtns.forEach(btn => { 
+        if (btn.id === 'armor-btn') return; 
+        btn.addEventListener('click', (e) => { 
+            e.currentTarget.blur();
+            let id = btn.dataset.id; let price = parseInt(btn.dataset.price); 
+            if (btn.classList.contains('active') || kevin.isDead) return; 
+            if (!btn.dataset.bought && gold >= price) { gold -= price; btn.dataset.bought = 'true'; equipWeapon(btn, id); } 
+            else if (btn.dataset.bought) { equipWeapon(btn, id); } 
+        }); 
+    });
+
+    function equipWeapon(btn, id) { 
+        const dict = i18n[currentLang];
+        ui.wBtns.forEach(b => { if(b.id !== 'armor-btn') { b.classList.remove('active'); if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; } }); 
+        btn.classList.add('active'); btn.querySelector('.price').innerText = dict.equipped; 
+        kevin.weapon = id; 
+    }
+    
+    ui.sBtns.forEach(btn => btn.addEventListener('click', (e) => { e.currentTarget.blur(); let type = btn.dataset.type; let price = parseInt(btn.dataset.price); if (gold >= price && !kevin.isDead) { gold -= price; let ally = { x: hq.x + hq.w, attackTimer: 0, hitTimer: 0, type: type }; if (type === 'basic') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8bc34a', hp: 100, maxHp: 100, speed: 2.5, range: 20, damage: 20 }); if (type === 'shield') Object.assign(ally, { w: 55, h: 65, y: GROUND_Y - 65, color: '#795548', hp: 450, maxHp: 450, speed: 1.2, range: 20, damage: 10 }); if (type === 'sniper') Object.assign(ally, { w: 65, h: 65, y: GROUND_Y - 65, color: '#2e7d32', hp: 80, maxHp: 80, speed: 1.8, range: 350, damage: 60 }); if (type === 'healer') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#ff9ecd', hp: 120, maxHp: 120, speed: 2, range: 150, damage: -40 }); allies.push(ally); } }));
+    
+    ui.ultBtns.forEach(btn => btn.addEventListener('click', (e) => { 
+        e.currentTarget.blur();
+        if (ultTimer >= 3600 && !kevin.isDead) { 
+            ultTimer = 0; let type = btn.dataset.type; 
+            let ally = { x: hq.x + hq.w, hitTimer: 0, type: type }; 
+            if (type === 'chengdu') { Object.assign(ally, { w: 140, h: 130, y: GROUND_Y - 130, color: '#ecf0f1', hp: 1800, maxHp: 1800, speed: 0.5, range: 45, damage: 60, attackTimer: 0, sprite: chengduImg }); 
+            } else if (type === 'saitama') { Object.assign(ally, { w: 100, h: 80, y: GROUND_Y - 80, color: '#1abc9c', hp: 600, maxHp: 600, speed: 3.2, range: 50, damage: 85, attackTimer: 0, sprite: saitamaImg }); 
+            } else if (type === 'sacramento') { Object.assign(ally, { w: 125, h: 115, y: GROUND_Y - 115, color: '#d35400', hp: 1100, maxHp: 1100, speed: 1.6, range: 50, damage: 90, attackTimer: 0, sprite: sacraImg });
+            } else if (type === 'ieper') { Object.assign(ally, { w: 65, h: 75, y: GROUND_Y - 75, color: '#34495e', hp: 400, maxHp: 400, speed: 2.8, range: 35, damage: 40, attackTimer: 0, sprite: ieperImg });
+            } allies.push(ally); 
+        } 
+    }));
+
+    function spawnSoul(entity, dir) { souls.push({ x: entity.x + entity.w / 2, y: entity.y, color: entity.color || '#fff', life: 60, maxLife: 60, dx: dir * 0.8, dy: -1.5 }); }
+    function spawnFloatingText(x, y, text, color, dir) { floatingTexts.push({ x: x, y: y, text: text, color: color, life: 40, maxLife: 40, dx: dir * 1.5, dy: -1.8 }); }
+    function getVisualY(x, physicalY) { return physicalY; } 
+
+    function update() {
+        frameCount++; updateUI();
+        
+        let enemyFrontLineX = ship.x; enemies.forEach(e => { if (e.x < enemyFrontLineX && !e.isFlying) enemyFrontLineX = e.x; });
+
+        if (!kevin.isDead) { 
+            let currentMod = getSpeedMod(kevin.x + kevin.w/2);
+            if (keys['KeyA'] || keys['ArrowLeft']) { kevin.x -= kevin.speed * currentMod; kevin.facing = -1; } 
+            if (keys['KeyD'] || keys['ArrowRight']) { kevin.x += kevin.speed * currentMod; kevin.facing = 1; } 
+            kevin.x = Math.max(hq.x + 50, Math.min(kevin.x, enemyFrontLineX - kevin.w)); 
+            kevin.y = GROUND_Y - kevin.h; 
+            kevin.isHidden = (kevin.x < hq.x + hq.w - 10); 
+            if (kevin.isHidden && kevin.hp > 0 && kevin.hp < kevin.maxHp) { if (frameCount % 60 === 0) { kevin.hp = Math.min(kevin.maxHp, kevin.hp + 25); let vY = getVisualY(kevin.x, kevin.y); spawnFloatingText(kevin.x + 10, vY - 10, '+25', '#2ecc71', -0.5); } } 
+            if (kevin.attackTimer > 0) kevin.attackTimer--; 
+            if (kevin.hitTimer > 0) kevin.hitTimer--; 
+            if (kevin.isAttacking) { kevin.attackAnim -= 5; if (kevin.attackAnim <= 0) kevin.isAttacking = false; } 
+            
+            if (kevin.hp <= 0) { 
+                let vY = getVisualY(kevin.x, kevin.y); 
+                spawnSoul({x: kevin.x, y: vY, w: kevin.w, color: kevin.color}, -1); 
+                kevin.isDead = true; 
+                if (hq.hp > 0) { 
+                    const dict = i18n[currentLang];
+                    ui.respawnScreen.style.display = 'flex'; 
+                    ui.respawnBtn.disabled = globalXP < 100; 
+                    ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp; 
+                } 
+            } 
+        }
+
+        const dict = i18n[currentLang];
+        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#2ecc71'; ui.ultBtns.forEach(b => b.disabled = false); }
+        floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
+        souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
+        spawnEffects.forEach(se => { se.life--; }); spawnEffects = spawnEffects.filter(se => se.life > 0);
+        allies.forEach(a => { if (a.type === 'healer' && frameCount % 45 === 0) { spawnFloatingText(a.x + Math.random() * a.w, getVisualY(a.x, a.y) - 10, '+', '#39ff14', 0); } });
+        
+        let maxEnemies = 25; spawnTimer++; 
+        let frontLineX = kevin.isDead || kevin.isHidden ? hq.x + hq.w : kevin.x; allies.forEach(a => { if(a.x > frontLineX && !a.isFlying) frontLineX = a.x; }); 
+        let pushProgress = Math.max(0, Math.min(1, (frontLineX - (hq.x + hq.w)) / (ship.x - (hq.x + hq.w)))); 
+        let baseInterval = Math.max(100, 220 - (frameCount / 200)); let currentInterval = Math.max(50, baseInterval - (pushProgress * 60)); 
+        
+        if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
+            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0 }; 
+            if (rand < 0.15 + (pushProgress * 0.2)) { 
+                Object.assign(enemy, { w: 135, h: 85, y: GROUND_Y - 85, color: '#c0392b', hp: 350, maxHp: 350, speed: 0.8, range: 25, damage: 30, reward: 30, xpReward: 5, type: 'tank' }); 
+            } 
+            else if (rand < 0.35 + (pushProgress * 0.1)) { Object.assign(enemy, { w: 35, h: 45, y: GROUND_Y - 45, color: '#00ced1', hp: 50, maxHp: 50, speed: 1.5, range: 450, damage: 20, reward: 20, xpReward: 3, type: 'shooter' }); } 
+            else if (rand < 0.6) { Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#e67e22', hp: 60, maxHp: 60, speed: 4.5, range: 15, damage: 15, reward: 15, xpReward: 2, type: 'scout' }); } 
+            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8e44ad', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 10, xpReward: 1, type: 'grunt' }); } 
+            enemies.push(enemy); 
+        }
+
+        handleAlliesAI(); handleEnemiesAI();
+
+        for (let i = bullets.length - 1; i >= 0; i--) { 
+            let b = bullets[i]; 
+            b.x += b.dx !== undefined ? b.dx : (b.speed || 0); 
+            if (b.dy !== undefined) b.y += b.dy;        
+
+            let shouldDestroy = false; 
+            let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
+            let projHitBox = {x: b.x, y: b.y, w: b.w, h: b.h}; 
+
+            for (let t of targetList) { 
+                if (!shouldDestroy && checkCol(projHitBox, t)) { 
+                    let dmg = b.damage; 
+                    if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
+                    t.hp -= dmg; 
+                    t.hitTimer = 10; 
+                    playSfx('hit'); 
+                    shouldDestroy = true; 
+                } 
+            } 
+            
+            if (b.isPlayer && !shouldDestroy && checkCol(projHitBox, ship)) { 
+                ship.hp -= b.damage; playSfx('hit'); 
+                shouldDestroy = true; 
+            } 
+            
+            if (!b.isPlayer && !shouldDestroy && checkCol(projHitBox, hq)) { 
+                hq.hp -= b.damage; hq.hitTimer = 10; playSfx('hit'); 
+                shouldDestroy = true; 
+            } 
+
+            if (shouldDestroy || b.x < 0 || b.x > canvas.width || b.y < -100 || b.y > canvas.height) { 
+                bullets.splice(i, 1); 
+            } 
+        }
+
+        allies = allies.filter(a => { if (a.hp <= 0) { spawnSoul({x: a.x, y: getVisualY(a.x, a.y), w: a.w, color: a.color}, -1); return false; } return true; });
+        enemies = enemies.filter(e => { if (e.hp <= 0) { let vY = getVisualY(e.x, e.y); spawnSoul({x: e.x, y: vY, w: e.w, color: e.color}, 1); gold += e.reward; sessionXP += e.xpReward; spawnFloatingText(e.x, vY - 10, `+${e.reward}`, '#f1c40f', 1); return false; } return true; });
+        
+        if (hq.hp <= 0) { bgm.pause(); endGame(false); } 
+        else if (ship.hp <= 0) { bgm.pause(); endGame(true); }
+    }
+
+    function handleAlliesAI() { 
+        allies.forEach(m => { 
+            if (m.attackTimer > 0) m.attackTimer--; 
+            if (m.hitTimer > 0) m.hitTimer--; 
+            if (m.type === 'healer') { let healTarget = null; let lowestHp = 9999; let validTargets = allies.concat(kevin.isDead ? [] : [kevin]); validTargets.forEach(a => { if (a.hp < a.maxHp && a.hp < lowestHp && Math.abs(a.x - m.x) < m.range) { lowestHp = a.hp; healTarget = a; } }); if (healTarget) { if (m.attackTimer === 0) { healTarget.hp = Math.min(healTarget.maxHp, healTarget.hp - m.damage); healTarget.hitTimer = 10; m.attackTimer = 60; } } else { m.x += m.speed * getSpeedMod(m.x + m.w/2); } return; } 
+            
+            let targetInRange = false; let closestDist = 9999; 
+            enemies.forEach(t => { 
+                let dist = Math.abs(m.x - t.x); 
+                if (dist < closestDist && t.x > m.x) { closestDist = dist; } 
+                if (dist <= m.range + m.w) { 
+                    targetInRange = true; m.facing = 1;
+                    if (m.attackTimer === 0) { 
+                        if (m.range > 100) { 
+                            if (m.type === 'sniper') { bullets.push({ x: m.x + m.w, y: m.y + 20, w: 30, h: 40, color: '#ffea00', dx: 20, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); playSfx('sniper'); } 
+                            else { bullets.push({ x: m.x + m.w, y: m.y + 10, w: 15, h: 5, color: m.color || '#fff', dx: 12, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); } 
+                        } else { 
+                            t.hp -= m.damage; t.hitTimer = 10; 
+                            if(m.type === 'ieper') { m.attackTimer = 15; t.x += 1; }
+                            else if(m.type === 'saitama') { m.attackTimer = 40; t.x += 25; } 
+                            else { t.x += 10; m.attackTimer = 60; } 
+                            playSfx('hit');
+                        } 
+                        if (m.type !== 'ieper' && m.type !== 'saitama') m.attackTimer = 60;
+                    } 
+                } 
+            }); 
+            if (!targetInRange && checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) { targetInRange = true; if (m.attackTimer === 0) { ship.hp -= m.damage; m.attackTimer = 60; playSfx('hit'); } } 
+            if (!targetInRange) { m.x += m.speed * getSpeedMod(m.x + m.w/2); } 
+        }); 
+    }
+
+    function handleEnemiesAI() { 
+        let validTargets = allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
+        enemies.forEach(m => { 
+            if (m.attackTimer > 0) m.attackTimer--; 
+            if (m.hitTimer > 0) m.hitTimer--; 
+            let targetInRange = false; let closestDist = 9999; 
+            validTargets.forEach(t => { 
+                let dist = Math.abs(m.x - t.x); 
+                if (dist < closestDist && t.x < m.x) { closestDist = dist; } 
+                if (dist <= m.range + m.w) { 
+                    targetInRange = true; 
+                    if (m.attackTimer === 0) { 
+                        if (m.type === 'shooter') { bullets.push({ x: m.x - 20, y: m.y + 15, w: 15, h: 5, color: '#39ff14', dx: -10, dy: 0, damage: m.damage, isPlayer: false, isRanged: true, isAA: false }); m.attackTimer = 80; } 
+                        else { let dmg = m.damage; if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); t.hp -= dmg; t.hitTimer = 10; m.attackTimer = 60; playSfx('hit'); } 
+                    } 
+                } 
+            }); 
+            if (!targetInRange && checkCol({x: m.x - m.range, y: m.y, w: m.w + m.range, h: m.h}, hq)) { 
+                targetInRange = true; 
+                if (m.attackTimer === 0) { 
+                    if (m.type === 'shooter') { bullets.push({ x: m.x - 20, y: m.y + 15, w: 15, h: 5, color: '#39ff14', dx: -10, dy: 0, damage: m.damage, isPlayer: false, isRanged: true, isAA: false }); m.attackTimer = 80; } 
+                    else { hq.hp -= m.damage; m.attackTimer = 60; playSfx('hit'); } 
+                } 
+            } 
+            if (!targetInRange) { m.x -= m.speed * getSpeedMod(m.x + m.w/2); } 
+        }); 
+    }
+
+    function checkCol(r1, r2) { return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y; }
+
+    function draw() {
+        if (bgImg.complete && bgImg.naturalHeight !== 0) { ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height); } else { ctx.fillStyle = '#0a101d'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(800, 0); 
+        ctx.bezierCurveTo(770, 100, 750, 280, 770, 380); 
+        ctx.quadraticCurveTo(780, 480, 800, GROUND_Y); 
+        ctx.lineTo(1280, GROUND_Y); 
+        ctx.lineTo(1280, 0); 
+        ctx.closePath();
+        ctx.clip(); 
+
+        ctx.fillStyle = 'rgba(0, 210, 255, 0.15)'; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height); 
+        
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.4)'; ctx.lineWidth = 1;
+        for(let i=0; i<13; i++) {
+            let tx = SLOW_ZONE.x - 10 + i * 38; 
+            let bob = Math.sin(frameCount * 0.05 + i) * 15;
+            ctx.beginPath(); ctx.moveTo(tx, 0); ctx.lineTo(tx, GROUND_Y - 120 + bob); ctx.stroke();
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.8)'; 
+            ctx.beginPath(); ctx.arc(tx, GROUND_Y - 120 + bob, 3, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.restore(); 
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; let hqVisY = getVisualY(hq.x, hq.y); ctx.fillRect(hq.x + 15, hqVisY + 10, 160, 40); 
+        ctx.fillStyle = '#1abc9c'; ctx.font = 'bold 18px Arial'; ctx.fillText('BASE WAIKATO', hq.x + 22, hqVisY + 38); 
+
+        let shipVisY = ship.y; let hover = 0;
+        if (shipImg.complete && shipImg.naturalHeight !== 0) {
+            hover = Math.sin(frameCount * 0.05) * 15; ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; ctx.fillRect(ship.x + ship.w/2 - 50, shipVisY + hover - 60, 100, 30); 
+            ctx.fillStyle = '#ff4500'; ctx.font = 'bold 20px Arial'; ctx.fillText('ZOGON POD', ship.x + ship.w/2 - 50, shipVisY + hover - 38); 
+            let shpPct = Math.max(0, ship.hp / ship.maxHp); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, ship.w - 80, 10); ctx.fillStyle = '#39ff14'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, (ship.w - 80) * shpPct, 10); 
+        } else {
+            ctx.fillStyle = ship.color; ctx.fillRect(ship.x, shipVisY, ship.w, ship.h);
+        }
+
+        let shipBottomY = shipVisY + hover + ship.h - 30; spawnEffects.forEach(se => { let visY = getVisualY(se.x, se.y); let progress = se.life / se.maxLife; ctx.globalAlpha = progress; let grad = ctx.createLinearGradient(0, shipBottomY, 0, visY); grad.addColorStop(0, '#39ff14'); grad.addColorStop(1, 'rgba(57, 255, 20, 0.1)'); ctx.fillStyle = grad; ctx.fillRect(se.x - 5, shipBottomY, se.w + 10, visY - shipBottomY); ctx.globalAlpha = 1.0; });
+        if (!kevin.isDead) drawEntity(kevin, true); allies.forEach(a => drawEntity(a, false)); enemies.forEach(e => drawEntity(e, false));
+        
+        bullets.forEach(b => { 
+            ctx.fillStyle = b.color; 
+            let drawH = (b.h === 40) ? 3 : (b.h === 5 ? 5 : 3); 
+            ctx.fillRect(b.x, getVisualY(b.x, b.y), b.w, drawH); 
+        });
+
+        if (!kevin.isDead && kevin.isAttacking) {
+            let visY = getVisualY(kevin.x, kevin.y); let weaponId = kevin.weapon; let animProgress = (30 - kevin.attackAnim) / 30; 
+            ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
+            if (weaponId === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); }
+            } else {
+                let wImg = weapons[weaponId].img;
+                if (wImg && wImg.complete && wImg.naturalHeight !== 0) {
+                    if (weaponId === 'sword') { let startAngle = -Math.PI / 3; let endAngle = Math.PI / 3; let currentAngle = startAngle + (endAngle - startAngle) * Math.sin(animProgress * Math.PI); ctx.rotate(currentAngle); ctx.drawImage(wImg, 10, -30, 60, 60); 
+                    } else if (weaponId === 'spear') {
+                        let maxThrust = 60; let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6));
+                        ctx.save(); ctx.translate(25 + currentThrust, -5); ctx.rotate(Math.PI / 4); ctx.drawImage(wImg, -30, -30, 60, 60); ctx.restore();
+                    } else if (weaponId === 'bow') { let recoil = Math.sin(animProgress * Math.PI) * 5; ctx.drawImage(wImg, 10 - recoil, -30, 60, 60); }
+                }
+            }
+            ctx.restore();
+        }
+        souls.forEach(s => { ctx.globalAlpha = s.life / s.maxLife; ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'white'; ctx.fillText('👼', s.x - 8, s.y - 10); ctx.globalAlpha = 1.0; }); 
+        floatingTexts.forEach(ft => { ctx.globalAlpha = ft.life / ft.maxLife; ctx.fillStyle = ft.color; ctx.font = 'bold 22px Arial'; ctx.fillText(ft.text, ft.x, ft.y); ctx.globalAlpha = 1.0; });
+    }
+
+    function drawEntity(e, isKevin) { 
+        let visualY = getVisualY(e.x, e.y); 
+        ctx.save();
+        if (isKevin && e.isHidden) { ctx.globalAlpha = 0.5; ctx.fillStyle = '#1abc9c'; ctx.font = '14px Arial'; ctx.fillText('SHIELDED', e.x - 10, visualY - 20); } 
+        if (e.hitTimer && e.hitTimer > 0) { ctx.filter = 'brightness(200%)'; } 
+        
+        let customBobbing = (e.hitTimer > 0) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
+
+        if (isKevin) {
+            if (keys['KeyA'] || keys['KeyD']) { customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; }
+            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1);
+            let currentSprite = e.hasArmor ? armorImg : kevinImg;
+            if (currentSprite.complete && currentSprite.naturalHeight !== 0) {
+                ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h);
+            } else {
+                ctx.fillStyle = e.color || '#4caf50'; 
+                ctx.beginPath(); ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill();
+            }
+        } else {
+            let imgToDraw = null;
+            if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; 
+            else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg;
+            else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg;
+            else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg;
+            else if (e.type === 'chengdu') imgToDraw = chengduImg; else if (e.type === 'saitama') imgToDraw = saitamaImg;
+            else if (e.type === 'sacramento') imgToDraw = sacraImg; else if (e.type === 'ieper') imgToDraw = ieperImg;
+            
+            ctx.translate(e.x + e.w / 2, visualY + e.h); 
+            if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight !== 0) {
+                let scaleFactor = e.h / imgToDraw.naturalHeight; 
+                ctx.scale(e.facing || 1, 1); 
+                ctx.scale(scaleFactor, scaleFactor); 
+                ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor);
+            } else {
+                ctx.fillStyle = e.color || '#fff'; 
+                ctx.fillRect(-e.w / 2, -e.h - customBobbing, e.w, e.h);
+            }
+        }
+        ctx.restore();
+        
+        let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); 
+        ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
+    }
+    
+    function updateUI() { 
+        const dict = i18n[currentLang];
+        ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; 
+        ui.wBtns.forEach(btn => { 
+            if(btn.id !== 'armor-btn') {
+                btn.disabled = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); 
+                if (btn.dataset.bought) {
+                    btn.querySelector('.price').innerText = btn.classList.contains('active') ? dict.equipped : dict.owned;
+                }
+            }
+        }); 
+        ui.sBtns.forEach(btn => btn.disabled = kevin.isDead || gold < parseInt(btn.dataset.price)); 
+        ui.armorBtn.disabled = kevin.isDead || kevin.hasArmor || gold < 100; 
+        if (kevin.hasArmor) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; }
+    }
+    
+    function endGame(isVictory) { 
+        bgm.pause();
+	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
+        const dict = i18n[currentLang];
+        isRunning = false; 
+        isGameOver = true; 
+        
+        if (isVictory) {
+            let safeSessionXP = typeof sessionXP !== 'undefined' ? sessionXP : 0;
+            let currentGlobalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
+            let finalSessionXP = safeSessionXP + 500;
+            let newGlobalXP = currentGlobalXP + finalSessionXP;
+            
+            try {
+                localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
+                let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
+                if(currentUnlocked <= 2) {
+                    localStorage.setItem('kiwiUnlockedLevel', 3);
+                }
+            } catch(e) {
+                console.error("Local storage write failed:", e);
+            }
+            ui.sessionXpMsg.innerText = dict.xpEarned.replace('{n}', finalSessionXP); 
+        } else {
+            ui.sessionXpMsg.innerText = dict.defenseFailed; 
+        }
+        
+        ui.gameOverTitle.innerText = isVictory ? dict.victory : dict.baseFallen; 
+        ui.gameOverTitle.style.color = isVictory ? '#f1c40f' : '#e74c3c'; 
+        ui.gameOverMsg.innerText = isVictory ? dict.victoryMsg : dict.baseFallenMsg; 
+        ui.respawnScreen.style.display = 'none'; 
+        ui.gameOverScreen.style.display = 'flex'; 
+        ui.restartBtn.style.display = 'block'; 
+        
+        if (isVictory) {
+            ui.restartBtn.innerText = dict.backToMap; 
+            ui.restartBtn.onclick = () => { window.location.href = "index.html"; };
+        } else {
+            ui.restartBtn.innerText = dict.restart; 
+            ui.restartBtn.onclick = () => { window.location.reload(); };
+        }
+    }
+    
+    function loop() { 
+        if(isRunning && !isGameOver){ 
+            if (!CG_Manager.isPaused) update(); 
+            draw(); 
+        }
+        animationFrameId = requestAnimationFrame(loop); 
+    }
+</script>
+</body>
+</html>

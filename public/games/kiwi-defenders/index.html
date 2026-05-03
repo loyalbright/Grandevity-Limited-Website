@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kiwi Defenders - Campaign Star Map</title>
+    <style>
+        /* 增加 width: 100vw，防止出现滚动条 */
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        
+        /* 🔧 修复：固定原生尺寸，确保电脑端不被拉伸 */
+        #map-container { 
+            position: relative; 
+            width: 1280px; 
+            height: 720px; 
+            box-shadow: 0 0 50px rgba(0, 206, 201, 0.3); 
+            background: #0a101d url('map_nz.webp') no-repeat center center; 
+            background-size: cover; 
+            overflow: hidden; 
+            border: 2px solid #00cec9; 
+            border-radius: 10px; 
+            transform-origin: center center; 
+        }
+        
+        #top-bar { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: rgba(10, 16, 29, 0.85); border-bottom: 2px solid #00cec9; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box; z-index: 10; backdrop-filter: blur(5px); }
+        .title { font-size: 28px; font-weight: bold; color: #00cec9; text-shadow: 0 0 15px #00cec9; text-transform: uppercase; letter-spacing: 2px; }
+        .xp-display { font-size: 24px; font-weight: bold; color: #9b59b6; text-shadow: 0 0 10px #9b59b6; }
+        
+        #path-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
+        .level-node { position: absolute; width: 40px; height: 40px; transform: translate(-50%, -50%); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; cursor: pointer; z-index: 2; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
+        
+        .locked { background: #2c3e50; border: 3px solid #7f8c8d; color: #7f8c8d; pointer-events: none; }
+        .unlocked { background: #0984e3; border: 3px solid #00cec9; color: white; text-shadow: 0 0 5px #fff; box-shadow: 0 0 20px #00cec9; }
+        .unlocked:hover { transform: translate(-50%, -50%) scale(1.2); background: #00cec9; border-color: #fff; }
+        
+        .current { animation: pulse 1.5s infinite; background: #e74c3c; border-color: #ff7675; box-shadow: 0 0 25px #e74c3c; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
+
+        #bottom-bar { position: absolute; bottom: 20px; right: 20px; z-index: 10; display: flex; gap: 10px;}
+        .tool-btn { background: #c0392b; color: white; border: none; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px #c0392b; }
+        .tool-btn:hover { background: #e74c3c; transform: scale(1.05); }
+
+        /* 🎵 音乐与语言切换按钮样式 */
+        .stats { display: flex; gap: 15px; align-items: center; }
+        .lang-select { background: rgba(0, 206, 201, 0.1); border: 1px solid #00cec9; color: #00cec9; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 14px; outline: none; transition: 0.2s;}
+        .lang-select option { background: #050510; color: white; }
+        .lang-select:hover { background: rgba(0, 206, 201, 0.3); }
+
+        #music-toggle { background: rgba(0, 206, 201, 0.2); border: 1px solid #00cec9; color: #00cec9; padding: 6px 15px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; font-weight: bold; transition: 0.2s; font-size: 16px; height: fit-content; }
+        #music-toggle:hover { background: #00cec9; color: #000; }
+        #music-toggle.on { background: #00cec9; color: #050510; box-shadow: 0 0 15px rgba(0, 206, 201, 0.5); }
+
+        /* 🧬 天赋升级系统 UI */
+        #upgrades-toggle { background: rgba(155, 89, 182, 0.2); border: 1px solid #9b59b6; color: #9b59b6; padding: 6px 15px; border-radius: 5px; cursor: pointer; font-family: 'Segoe UI', sans-serif; font-weight: bold; transition: 0.2s; font-size: 16px; height: fit-content; }
+        #upgrades-toggle:hover { background: #9b59b6; color: #fff; }
+
+        #upgrades-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 16, 0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .upgrade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 800px; margin-top: 20px; }
+        .upgrade-card { background: rgba(0, 206, 201, 0.05); border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
+        .upgrade-card:hover { border-color: #00cec9; background: rgba(0, 206, 201, 0.1); }
+        .up-info { display: flex; justify-content: space-between; font-weight: bold; }
+        .up-name { color: #00cec9; font-size: 18px; }
+        .up-level { color: #f1c40f; }
+        .up-desc { font-size: 13px; color: #ccc; }
+        .up-btn { background: #2c3e50; border: 1px solid #00cec9; color: white; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .up-btn:hover:not(:disabled) { background: #00cec9; color: #000; }
+        .up-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .up-cost { font-size: 12px; color: #9b59b6; text-align: center; }
+
+        /* --- 📱 移动端小屏幕专属调整 --- */
+        @media (max-width: 1000px) {
+            .upgrade-grid { width: 90%; }
+        }
+
+	    /* 强制竖屏用户旋转手机 */
+        @media (orientation: portrait) {
+            body::after {
+                content: "📱 Please rotate your device \A 请旋转手机体验完整地图";
+                white-space: pre-wrap;
+                box-sizing: border-box;
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: #050510; color: #f1c40f; display: flex; 
+                justify-content: center; align-items: center;
+                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
+                line-height: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map-container">
+        <div id="top-bar">
+            <div class="title" data-i18n="title">Kiwi Defenders: Campaign Map</div>
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="xp-display"><span data-i18n="reserveXp">RESERVE XP:</span> <span id="globalXpText">0</span></div>
+                <button id="upgrades-toggle" onclick="toggleUpgrades(true)" data-i18n="upgradesBtn">🧬 UPGRADES</button>
+            </div>
+
+            <div class="stats">
+                <select id="lang-switcher" class="lang-select" onchange="changeLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="zh">简体中文</option>
+                    <option value="ja">日本語</option>
+                    <option value="es">Español</option>
+                </select>
+                <!-- 预设音乐按钮为开启状态 -->
+                <button id="music-toggle" class="on" onclick="toggleMusic()">🎵 <span>MUSIC: ON</span></button> 
+            </div>
+        </div>
+
+        <svg id="path-layer"></svg>
+        <div id="nodes-container"></div>
+
+        <div id="bottom-bar">
+            <button class="tool-btn" onclick="resetProgress()" data-i18n="resetData">RESET DATA</button>
+            <button class="tool-btn" onclick="cheatUnlock()" style="background: #8e44ad; box-shadow: 0 0 10px #8e44ad;" data-i18n="unlockAll">UNLOCK ALL</button>
+        </div>
+
+        <div id="upgrades-overlay">
+            <h2 data-i18n="upTitle" style="color: #00cec9; font-size: 32px; text-shadow: 0 0 10px #00cec9; margin-bottom: 5px; margin-top: 0;">TACTICAL UPGRADES</h2>
+            <p style="color: #9b59b6; font-weight: bold; margin-bottom: 0;"><span data-i18n="upAvail">AVAILABLE XP:</span> <span id="upgradeXpDisp">0</span></p>
+            <div class="upgrade-grid" id="upgradeGrid"></div>
+            <button class="tool-btn" style="margin-top: 30px; padding: 12px 50px;" onclick="toggleUpgrades(false)" data-i18n="closeBtn">CLOSE</button>
+        </div>
+    </div>
+
+<script>
+// --- 🎮 纯净版管理器 (SDK 已剥离) ---
+    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    const CG_Manager = {
+        isPaused: false, 
+
+        init: async function() {
+            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
+        },
+
+        startGameplay: function() {},
+        stopGameplay: function() {},
+
+        playAd: function(type = 'midgame') {
+            console.log("Demo Mode: Ad skipped.");
+            this.resumeGame();
+        },
+
+        pauseGame: function() {
+            this.isPaused = true;
+            if (typeof bgm !== 'undefined' && !bgm.paused) {
+                bgm.pause();
+            }
+        },
+
+        resumeGame: function() {
+            this.isPaused = false;
+            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
+                bgm.play().catch(e => {});
+            }
+        }
+    };
+
+window.addEventListener('DOMContentLoaded', () => {
+    CG_Manager.init();
+    tryAutoplay(); // 尝试触发默认开启的音乐
+});
+
+    // --- 📐 等比例缩放逻辑 (仅针对小屏幕移动端生效) ---
+    function resizeMap() {
+        const container = document.getElementById('map-container');
+        
+        // 只有当屏幕宽度或高度小于地图原生尺寸(1280x720)时，才进行缩放
+        // 这样在电脑浏览器中就不会变成拉伸的全屏
+        if (window.innerWidth < 1280 || window.innerHeight < 720) {
+            const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+            container.style.transform = `scale(${scale})`;
+        } else {
+            container.style.transform = `scale(1)`;
+        }
+    }
+    window.addEventListener('resize', resizeMap);
+    resizeMap();
+
+    // 🌐 多语言核心字典
+    const i18n = {
+        en: {
+            title: "KIWI DEFENDERS: CAMPAIGN MAP",
+            reserveXp: "RESERVE XP:",
+            upgradesBtn: "🧬 UPGRADES",
+            musicOn: "MUSIC: ON",
+            musicOff: "MUSIC: OFF",
+            resetData: "RESET DATA",
+            unlockAll: "UNLOCK ALL",
+            upTitle: "TACTICAL UPGRADES",
+            upAvail: "AVAILABLE XP:",
+            closeBtn: "CLOSE",
+            up_btn: "UPGRADE",
+            up_cost: "COST:",
+            up_gold_name: "Starting Gold",
+            up_gold_desc: "Start each mission with more funds.",
+            up_hp_name: "Base Hull",
+            up_hp_desc: "Permanently increase Base health points.",
+            up_spd_name: "Kevin's Agility",
+            up_spd_desc: "Increase Kevin's tactical movement speed.",
+            up_dmg_name: "Weapon Tuning",
+            up_dmg_desc: "All weapons deal more damage per strike.",
+            levelTooltip: "Level"
+        },
+        zh: {
+            title: "新西兰捍卫者：星图战役",
+            reserveXp: "储备经验值:",
+            upgradesBtn: "🧬 科技天赋",
+            musicOn: "音乐: 开",
+            musicOff: "音乐: 关",
+            resetData: "重置数据",
+            unlockAll: "解锁全关卡",
+            upTitle: "战术天赋升级",
+            upAvail: "可用经验值:",
+            closeBtn: "关闭面板",
+            up_btn: "升级",
+            up_cost: "消耗:",
+            up_gold_name: "初始资金",
+            up_gold_desc: "每次任务开始时携带更多的战备资金。",
+            up_hp_name: "基地装甲",
+            up_hp_desc: "永久提升防守基地的最大生命值。",
+            up_spd_name: "凯文的敏捷",
+            up_spd_desc: "提升凯文在战场上的战术移动速度。",
+            up_dmg_name: "武器调校",
+            up_dmg_desc: "增强所有武器的破坏力，造成更高伤害。",
+            levelTooltip: "关卡"
+        },
+        ja: {
+            title: "キーウィ・ディフェンダーズ：星図キャンペーン",
+            reserveXp: "予備XP:",
+            upgradesBtn: "🧬 タレント",
+            musicOn: "音楽: オン",
+            musicOff: "音楽: オフ",
+            resetData: "データリセット",
+            unlockAll: "全ステージ解放",
+            upTitle: "戦術アップグレード",
+            upAvail: "利用可能なXP:",
+            closeBtn: "閉じる",
+            up_btn: "強化",
+            up_cost: "コスト:",
+            up_gold_name: "初期資金",
+            up_gold_desc: "各ミッションをより多くの資金で開始します。",
+            up_hp_name: "基地装甲",
+            up_hp_desc: "基地の最大HPを永久に増加させます。",
+            up_spd_name: "ケビンの敏捷性",
+            up_spd_desc: "ケビンの戦術的移動速度を上昇させます。",
+            up_dmg_name: "武器チューニング",
+            up_dmg_desc: "すべての武器のダメージが増加します。",
+            levelTooltip: "ステージ"
+        },
+        es: {
+            title: "KIWI DEFENDERS: MAPA DE CAMPAÑA",
+            reserveXp: "XP DE RESERVA:",
+            upgradesBtn: "🧬 MEJORAS",
+            musicOn: "MÚSICA: ENCENDIDA",
+            musicOff: "MÚSICA: APAGADA",
+            resetData: "RESETEAR DATOS",
+            unlockAll: "DESBLOQUEAR TODO",
+            upTitle: "MEJORAS TÁCTICAS",
+            upAvail: "XP DISPONIBLE:",
+            closeBtn: "CERRAR",
+            up_btn: "MEJORAR",
+            up_cost: "COSTO:",
+            up_gold_name: "Oro Inicial",
+            up_gold_desc: "Comienza cada misión con más fondos.",
+            up_hp_name: "Casco Base",
+            up_hp_desc: "Aumenta permanentemente los puntos de salud de la base.",
+            up_spd_name: "Agilidad de Kevin",
+            up_spd_desc: "Aumenta la velocidad de movimiento táctico de Kevin.",
+            up_dmg_name: "Ajuste de Armas",
+            up_dmg_desc: "Todas las armas infligen más daño por golpe.",
+            levelTooltip: "Nivel"
+        }
+    };
+
+    // 🌐 读取语言设置
+    let currentLang = localStorage.getItem('kiwiLang') || 'en';
+    document.getElementById('lang-switcher').value = currentLang;
+
+    // 🌐 渲染语言翻译
+    function applyTranslation() {
+        const dict = i18n[currentLang];
+        document.documentElement.lang = currentLang;
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+
+        const musicBtnSpan = document.querySelector('#music-toggle span');
+        if (musicBtnSpan) {
+            musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
+        }
+
+        document.querySelectorAll('.level-node').forEach(node => {
+            let id = parseInt(node.innerText);
+            let lvlData = levelData.find(l => l.id === id);
+            if(lvlData) node.title = `${dict.levelTooltip} ${lvlData.id}: ${lvlData.name}`;
+        });
+
+        if (document.getElementById('upgrades-overlay').style.display === 'flex') {
+            renderUpgrades();
+        }
+    }
+
+    function changeLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('kiwiLang', lang);
+        applyTranslation();
+    }
+
+	// 🎵 背景音乐控制逻辑 (默认开启)
+	const bgm = new Audio('bgm.mp3');
+	bgm.loop = true;
+	bgm.volume = 0.4;
+	let musicPlaying = true; // 设置为默认开启
+
+    // 尝试绕过浏览器的自动播放策略
+    function tryAutoplay() {
+        if (musicPlaying) {
+            let playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Browser blocked autoplay. Waiting for user interaction...");
+                    // 如果浏览器拦截了自动播放，监听玩家的第一次点击或触摸来启动音乐
+                    const startOnInteraction = () => {
+                        if (musicPlaying) bgm.play().catch(e => {});
+                        document.removeEventListener('click', startOnInteraction);
+                        document.removeEventListener('touchstart', startOnInteraction);
+                    };
+                    document.addEventListener('click', startOnInteraction);
+                    document.addEventListener('touchstart', startOnInteraction);
+                });
+            }
+        }
+    }
+
+	function toggleMusic() {
+        const dict = i18n[currentLang];
+        const btnSpan = document.querySelector('#music-toggle span');
+        const btn = document.getElementById('music-toggle');
+        
+        if (!musicPlaying) {
+            bgm.play().catch(e => console.log("Audio playback delayed until user interaction"));
+            btnSpan.innerText = dict.musicOn;
+            btn.classList.add('on');
+            musicPlaying = true;
+        } else {
+            bgm.pause();
+            btnSpan.innerText = dict.musicOff;
+            btn.classList.remove('on');
+            musicPlaying = false;
+        }
+    }
+
+    let unlockedLevel = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
+    let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
+    document.getElementById('globalXpText').innerText = globalXP;
+
+    let levelData = [
+        { id: 1, name: "Whangārei", x: 56.23, y: 17.75 },
+        { id: 2, name: "Hamilton", x: 59.66, y: 30.46 },
+        { id: 3, name: "Rotorua", x: 63.24, y: 33.49 },
+        { id: 4, name: "Auckland", x: 57.79, y: 24.24 },
+        { id: 5, name: "Gisborne", x: 68.54, y: 36.67 },
+        { id: 6, name: "Napier", x: 64.25, y: 43.02 },
+        { id: 7, name: "New Plymouth", x: 55.14, y: 40.26 },
+        { id: 8, name: "Palmerston North", x: 59.89, y: 46.89 },
+        { id: 9, name: "Wellington", x: 58.02, y: 53.8 },
+        { id: 10, name: "Tasman Golden Bay", x: 50.31, y: 48.41 },
+        { id: 11, name: "Nelson", x: 52.49, y: 54.21 },
+        { id: 12, name: "Marlborough Vineyards", x: 50.7, y: 60.15 },
+        { id: 13, name: "West Coast Glaciers", x: 41.74, y: 66.09 },
+        { id: 14, name: "Canterbury Dark Sky", x: 45.33, y: 68.3 },
+        { id: 15, name: "Otago Abyss", x: 38.63, y: 75.48 },
+        { id: 16, name: "Southland Finale", x: 35.2, y: 71.75 }
+    ];
+
+    const nodesContainer = document.getElementById('nodes-container');
+    const pathLayer = document.getElementById('path-layer');
+
+    function drawPaths() {
+        let svgHTML = '';
+        for (let i = 0; i < levelData.length - 1; i++) {
+            let start = levelData[i];
+            let end = levelData[i + 1];
+            let strokeColor = (unlockedLevel > i + 1) ? '#00cec9' : '#34495e';
+            let strokeWidth = (unlockedLevel > i + 1) ? 4 : 2;
+            let dash = (unlockedLevel > i + 1) ? '' : 'stroke-dasharray="5,5"';
+            svgHTML += `<line x1="${start.x}%" y1="${start.y}%" x2="${end.x}%" y2="${end.y}%" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${dash} />`;
+        }
+        pathLayer.innerHTML = svgHTML;
+    }
+
+    function drawNodes() {
+        nodesContainer.innerHTML = '';
+        levelData.forEach(level => {
+            let node = document.createElement('div');
+            node.className = 'level-node';
+            node.style.left = level.x + '%';
+            node.style.top = level.y + '%';
+            node.innerText = level.id;
+            
+            node.title = `Level ${level.id}: ${level.name}`;
+
+            if (level.id < unlockedLevel) {
+                node.classList.add('unlocked');
+            } else if (level.id === unlockedLevel) {
+                node.classList.add('unlocked', 'current');
+            } else {
+                node.classList.add('locked');
+            }
+
+            node.addEventListener('click', () => {
+                if (level.id <= unlockedLevel) {
+                    window.location.href = `level${level.id}.html`;
+                }
+            });
+
+            nodesContainer.appendChild(node);
+        });
+    }
+
+    function cheatUnlock() {
+        localStorage.setItem('kiwiUnlockedLevel', 16);
+        localStorage.setItem('kiwiGlobalXP', globalXP + 5000);
+        location.reload();
+    }
+
+    function resetProgress() {
+        if(confirm("Are you sure you want to reset all progress?")) {
+            localStorage.setItem('kiwiUnlockedLevel', 1);
+            localStorage.setItem('kiwiGlobalXP', 0);
+            localStorage.removeItem('kiwiUpgrades');
+            location.reload();
+        }
+    }
+
+    // 🧬 天赋系统逻辑
+    const UP_DEFS = {
+        gold: { base: 200, grow: 150, bonus: 50, unit: "G" },
+        hp: { base: 300, grow: 200, bonus: 20, unit: "%" },
+        spd: { base: 250, grow: 100, bonus: 0.4, unit: " Spd" },
+        dmg: { base: 400, grow: 300, bonus: 10, unit: "%" }
+    };
+
+    let upLevels = JSON.parse(localStorage.getItem('kiwiUpgrades')) || { gold: 0, hp: 0, spd: 0, dmg: 0 };
+
+    function toggleUpgrades(show) {
+        document.getElementById('upgrades-overlay').style.display = show ? 'flex' : 'none';
+        if (show) renderUpgrades();
+    }
+
+    // 🌐 动态渲染翻译后的天赋界面
+    function renderUpgrades() {
+        const grid = document.getElementById('upgradeGrid');
+        grid.innerHTML = '';
+        document.getElementById('upgradeXpDisp').innerText = globalXP;
+        const dict = i18n[currentLang];
+
+        Object.keys(UP_DEFS).forEach(id => {
+            const d = UP_DEFS[id];
+            const lv = upLevels[id];
+            const cost = d.base + (lv * d.grow);
+            const card = document.createElement('div');
+            card.className = 'upgrade-card';
+            
+            const locName = dict[`up_${id}_name`];
+            const locDesc = dict[`up_${id}_desc`];
+
+            card.innerHTML = `
+                <div class="up-info"><span class="up-name">${locName}</span><span class="up-level">Lv.${lv}</span></div>
+                <div class="up-desc">${locDesc}<br>Total: +${(lv * d.bonus).toFixed(1)}${d.unit}</div>
+                <button class="up-btn" onclick="buyUpgrade('${id}')" ${globalXP < cost ? 'disabled' : ''}>${dict.up_btn}</button>
+                <div class="up-cost">${dict.up_cost} ${cost} XP</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function buyUpgrade(id) {
+        const cost = UP_DEFS[id].base + (upLevels[id] * UP_DEFS[id].grow);
+        if (globalXP >= cost) {
+            globalXP -= cost;
+            upLevels[id]++;
+            localStorage.setItem('kiwiGlobalXP', globalXP);
+            localStorage.setItem('kiwiUpgrades', JSON.stringify(upLevels));
+            document.getElementById('globalXpText').innerText = globalXP;
+            renderUpgrades();
+        }
+    }
+
+    // 初始化渲染
+    drawPaths();
+    drawNodes();
+    
+    window.addEventListener('DOMContentLoaded', applyTranslation);
+
+</script>
+</body>
+</html>

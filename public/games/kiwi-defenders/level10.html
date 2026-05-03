@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kiwi Defenders - Level 10: Tasman Golden Bay</title>
+    <!-- iOS 全屏元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kiwi Defenders">
+    
     <style>
-        /* 增加 width: 100vw，防止出现滚动条 */
-        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; height: 100dvh; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
         
-        /* 🔧 核心修复：固定原生设计尺寸 1280x870 */
         #game-container { 
-            position: relative; 
-            width: 1280px; 
-            height: 870px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 0 40px rgba(52, 152, 219, 0.15); 
-            background: #000; 
-            transform-origin: center center; 
+            position: relative; width: 1280px; height: 870px; flex-shrink: 0; 
+            display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(52, 152, 219, 0.15); 
+            background: #000; transform-origin: center center; 
         }
         
         canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
@@ -58,56 +56,30 @@
         #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
         #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
 
-        /* 🎵 声音控制栏 */
         #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
-        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #3498db; color: #3498db; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #3498db; color: #3498db; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:hover { background: #3498db; color: #000; }
         .ctrl-btn.on { background: #3498db; color: #000; box-shadow: 0 0 10px #3498db; }
 
         /* --- 📱 移动端摇杆与提示 --- */
-        #mobile-controls {
-            display: none; 
-            position: absolute;
-            bottom: 170px; 
-            left: 30px;
-            gap: 40px;
-            z-index: 100;
-        }
-        #mobile-controls button {
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: white; font-size: 36px;
-            backdrop-filter: blur(4px);
-            touch-action: none;
-            outline: none;
-        }
+        #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
+        #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
 
-        @media (max-width: 1000px) {
-            #mobile-controls { display: flex; }
-        }
+        @media (max-width: 1000px) { #mobile-controls { display: flex; } }
 
         @media (orientation: portrait) {
-            body::after {
-                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
-                white-space: pre-wrap;
-                box-sizing: border-box;
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: #050510; color: #1abc9c; display: flex; 
-                justify-content: center; align-items: center;
-                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
-                line-height: 1.5;
-            }
+            body::after { content: "📱 Please rotate your device \A 请旋转手机至横屏游玩"; white-space: pre-wrap; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; color: #1abc9c; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5; }
         }
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <!-- 控制栏包含了暂停和全屏按钮 -->
         <div id="level-controls">
-            <!-- 默认开启 -->
-            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+            <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
+            <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -120,6 +92,13 @@
         <div id="respawn-screen" class="overlay">
             <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+        </div>
+
+        <!-- 暂停画面 -->
+        <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
+            <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
+            <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
+            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
         </div>
 
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
@@ -181,39 +160,17 @@
     </div>
 
 <script>
-// --- 🎮 纯净版管理器 (SDK 已剥离) ---
-    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    // --- 🎮 纯净版管理器 (SDK 已剥离) ---
     const CG_Manager = {
         isPaused: false, 
-
-        init: async function() {
-            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
-        },
-
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
         startGameplay: function() {},
         stopGameplay: function() {},
-
-        playAd: function(type = 'midgame') {
-            console.log("Demo Mode: Ad skipped.");
-            this.resumeGame();
-        },
-
-        pauseGame: function() {
-            this.isPaused = true;
-            if (typeof bgm !== 'undefined' && !bgm.paused) {
-                bgm.pause();
-            }
-        },
-
-        resumeGame: function() {
-            this.isPaused = false;
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
-                bgm.play().catch(e => {});
-            }
-        }
+        playAd: function(type = 'midgame') { console.log("Demo Mode: Ad skipped."); this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
 
-    // 默认开启音频的破冰策略
     function tryAutoplay() {
         if (musicPlaying) {
             let playPromise = bgm.play();
@@ -231,8 +188,6 @@
         }
     }
 
-
-    // --- 📐 全局等比例缩放自适应逻辑 ---
     function resizeGame() {
         const container = document.getElementById('game-container');
         const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
@@ -241,7 +196,7 @@
     window.addEventListener('resize', resizeGame);
     resizeGame();
 
-    // --- 🌐 多语言架构 ---
+    // 🌐 多语言架构
     const i18n = {
         en: {
             lvlTitle: "Level 10: Tasman Golden Bay", startTip: "🌊 BATTLEFRONT: Tasman, the final showdown at the iconic Wharariki Beach arch!", startBtn: "DEFEND THE GOLDEN COAST",
@@ -258,7 +213,8 @@
             baseFallen: "BASE HAS FALLEN", baseFallenMsg: "Coastal base destroyed. Tasman has fallen!",
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
             backToMap: "BACK TO MAP", restart: "RESTART",
-            waveInbound: "🌊 WAVE {n} INBOUND!"
+            waveInbound: "🌊 WAVE {n} INBOUND!",
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             lvlTitle: "第十关：塔斯曼黄金湾", startTip: "🌊 战线：塔斯曼，在标志性的华拉里基海滩拱门下展开最终对决！", startBtn: "保卫黄金海岸",
@@ -275,7 +231,8 @@
             baseFallen: "基地沦陷", baseFallenMsg: "海岸基地被毁。塔斯曼失守！",
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
             backToMap: "返回地图", restart: "重新开始",
-            waveInbound: "🌊 第 {n} 波敌军来袭！"
+            waveInbound: "🌊 第 {n} 波敌军来袭！",
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             lvlTitle: "ステージ 10：タスマン・ゴールデンベイ", startTip: "🌊 前線：タスマン、象徴的なワラリキビーチのアーチでの最終決戦！", startBtn: "黄金の海岸を防衛",
@@ -292,7 +249,8 @@
             baseFallen: "基地陥落", baseFallenMsg: "沿岸基地が破壊された。タスマン陥落！",
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
             backToMap: "マップに戻る", restart: "再試行",
-            waveInbound: "🌊 ウェーブ {n} 開始！"
+            waveInbound: "🌊 ウェーブ {n} 開始！",
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             lvlTitle: "Nivel 10: Bahía Dorada de Tasman", startTip: "🌊 FRENTE DE BATALLA: Tasman, ¡el enfrentamiento final en el icónico arco de Wharariki Beach!", startBtn: "DEFENDER LA COSTA DORADA",
@@ -309,7 +267,8 @@
             baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "¡Base costera destruida. Tasman ha caído!",
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
-            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!"
+            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!",
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -323,6 +282,12 @@
         const musicBtnSpan = document.querySelector('#music-toggle span');
         if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
         
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        if (fsTextSpan) {
+            const isFS = document.fullscreenElement || document.webkitFullscreenElement;
+            fsTextSpan.innerText = isFS ? dict.fs_exit : dict.fs_enter;
+        }
+
         if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
             ui.armorBtn.querySelector('.price').innerText = dict.equipped;
         }
@@ -360,20 +325,15 @@
 
     canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
     canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
-
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault(); 
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-        triggerAttack();
-    }, { passive: false });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: false });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); triggerAttack(); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keydown', e => { 
+        keys[e.code] = true; 
+        if(e.code==='Space') triggerAttack(); 
+        if(e.code==='Escape' || e.code==='KeyP') togglePlayerPause();
+    });
     window.addEventListener('keyup', e => keys[e.code] = false);
 
     const btnLeft = document.getElementById('btn-left');
@@ -420,8 +380,10 @@
     const devilImg = new Image(); devilImg.src = 'tasmania_devil.webp'; 
     const turtleImg = new Image(); turtleImg.src = 'grootegast_turtle.webp'; 
 
-    const bgm = new Audio('bgm_level10.mp3'); bgm.loop = true; bgm.volume = 0.3;
-    let musicPlaying = false;
+    const bgm = new Audio('bgm_level10.mp3'); 
+    bgm.loop = true; 
+    bgm.volume = 0.3;
+    let musicPlaying = true; 
 
     function toggleMusic(event) {
         if (event) event.currentTarget.blur();
@@ -475,6 +437,7 @@
     let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
     let currentWave = 1; let waveTimer = 0; 
     let groundDeathsForAntiAir = 0;
+    let isPlayerPaused = false;
     
     let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
     
@@ -511,10 +474,10 @@
         allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = []; particles = []; lightnings = [];
         
         gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; groundDeathsForAntiAir = 0;
-        currentWave = 1; waveTimer = 0;
+        currentWave = 1; waveTimer = 0; isPlayerPaused = false;
         
         isGameOver = false; isRunning = true;
-        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        CG_Manager.startGameplay(); 
         ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
         ui.wBtns.forEach(btn => { 
             btn.classList.remove('active'); 
@@ -533,7 +496,49 @@
         animationFrameId = requestAnimationFrame(loop);
     }
 
-    ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(!musicPlaying) toggleMusic(); initGame(); });
+    function togglePlayerPause(event) {
+        if (event) event.currentTarget.blur();
+        if (!isRunning || isGameOver) return;
+
+        isPlayerPaused = !isPlayerPaused;
+        const pauseScreen = document.getElementById('pause-screen');
+
+        if (isPlayerPaused) {
+            pauseScreen.style.display = 'flex';
+            if (musicPlaying) bgm.pause();
+        } else {
+            pauseScreen.style.display = 'none';
+            if (musicPlaying) bgm.play().catch(e => {});
+        }
+    }
+
+    function toggleFullscreen(event) {
+        if (event) event.currentTarget.blur();
+        const doc = document.documentElement; 
+        const dict = i18n[currentLang];
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (doc.requestFullscreen) { doc.requestFullscreen().catch(err => console.warn(err)); } 
+            else if (doc.webkitRequestFullscreen) { doc.webkitRequestFullscreen(); } 
+            else { alert(currentLang === 'zh' ? "您的手机浏览器不支持一键全屏。请轻扫页面隐藏地址栏。" : "Fullscreen API is not supported. Please swipe up to hide the address bar."); return; }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_exit;
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_enter;
+        }
+    }
+
+    document.addEventListener('fullscreenchange', applyTranslation);
+    document.addEventListener('webkitfullscreenchange', applyTranslation);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && isRunning && !isGameOver && !isPlayerPaused) togglePlayerPause();
+    });
+
+    ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(musicPlaying) bgm.play().catch(e=>{}); initGame(); });
     ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
     ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
     ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
@@ -545,7 +550,7 @@
     }
 
     function triggerAttack() {
-        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0 || isPlayerPaused) return;
         let w = weapons[kevin.weapon];
         kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
         playSfx(kevin.weapon);
@@ -1087,10 +1092,10 @@
         ctx.save();
         let hqVisUiY = getVisualY(hq.x, hq.y); let hqHpPct = Math.max(0, hq.hp / hq.maxHp);
         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 90, hqVisUiY - 50, 180, 30); 
-        ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
-        ctx.fillText('BASE WELLINGTON', hq.x + hq.w/2, hqVisUiY - 30); 
+        ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
+        ctx.fillText('BASE TASMAN', hq.x + hq.w/2, hqVisUiY - 30); 
         ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120, 10);
-        ctx.fillStyle = hqHpPct > 0.6 ? '#f1c40f' : (hqHpPct > 0.3 ? '#e67e22' : '#e74c3c'); 
+        ctx.fillStyle = hqHpPct > 0.6 ? '#3498db' : (hqHpPct > 0.3 ? '#f1c40f' : '#e74c3c'); 
         ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120 * hqHpPct, 10);
         ctx.restore();
 
@@ -1098,7 +1103,6 @@
         if (shipImg.complete && shipImg.naturalHeight > 0) {
             ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h);
             
-            // 🔧 修复飞船顶部的血条和名称，对齐且不溢出
             ctx.save();
             let shipUiY = shipVisY + hover;
             let shpPct = Math.max(0, ship.hp / ship.maxHp); 
@@ -1116,31 +1120,6 @@
         }
 
         let shipBottomY = shipVisY + hover + ship.h - 30; spawnEffects.forEach(se => { let visY = getVisualY(se.x, se.y); let progress = se.life / se.maxLife; ctx.globalAlpha = progress; let grad = ctx.createLinearGradient(0, shipBottomY, 0, visY); grad.addColorStop(0, '#39ff14'); grad.addColorStop(1, 'rgba(57, 255, 20, 0.1)'); ctx.fillStyle = grad; ctx.fillRect(se.x - 5, shipBottomY, se.w + 10, visY - shipBottomY); ctx.globalAlpha = 1.0; });
-        
-        allies.forEach(a => {
-            if (a.type === 'rabbit') {
-                let cx = a.x + a.w/2;
-                let cy = getVisualY(a.x, a.y) + a.h; 
-                ctx.save();
-                ctx.globalAlpha = 0.5 + Math.abs(Math.sin(frameCount * 0.05)) * 0.3;
-                ctx.translate(cx, cy);
-                ctx.scale(1, 0.3); 
-                ctx.strokeStyle = '#f1c40f';
-                ctx.lineWidth = 6;
-                ctx.shadowBlur = 30;
-                ctx.shadowColor = '#f1c40f';
-                ctx.beginPath();
-                ctx.arc(0, 0, 300, 0, Math.PI * 2);
-                ctx.stroke();
-                let grad = ctx.createRadialGradient(0, 0, 50, 0, 0, 300);
-                grad.addColorStop(0, 'rgba(241, 196, 15, 0.4)');
-                grad.addColorStop(1, 'rgba(241, 196, 15, 0)');
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.restore();
-            }
-        });
-
         if (!kevin.isDead) drawEntity(kevin, true); allies.forEach(a => drawEntity(a, false)); enemies.forEach(e => drawEntity(e, false));
 
         bullets.forEach(b => { 
@@ -1148,30 +1127,23 @@
             if (b.isAA) { 
                 ctx.shadowBlur = 10; ctx.shadowColor = b.color; ctx.translate(b.x, getVisualY(b.x, b.y)); ctx.rotate(b.angle || 0); ctx.beginPath(); ctx.ellipse(0, 0, b.w/2, b.h/2, 0, 0, Math.PI*2); ctx.fill(); 
             } 
-            else if (b.type === 'wind_bomb') {
-                ctx.shadowBlur = 10; ctx.shadowColor = '#3498db'; ctx.globalAlpha = 0.9;
+            else if (b.type === 'blizzard') { 
+                ctx.shadowBlur = 15; ctx.shadowColor = '#ecf0f1'; ctx.globalAlpha = 0.8;
                 ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/2, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#ecf0f1'; ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y)-5, b.w/3, 0, Math.PI*2); ctx.fill();
             }
             else if (b.color === '#ff4757') { 
                 ctx.shadowBlur = 15; ctx.shadowColor = '#ff4757'; ctx.beginPath(); ctx.arc(b.x + b.w/2, getVisualY(b.x, b.y) + b.h/2, b.w/2, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x + b.w/2, getVisualY(b.x, b.y) + b.h/2, b.w/4, 0, Math.PI*2); ctx.fill(); 
             } 
+            else if (b.type === 'fire_trail') {
+                ctx.shadowBlur = 20; ctx.shadowColor = '#e67e22'; ctx.globalAlpha = b.life / b.maxLife;
+                ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/4, 0, Math.PI*2); ctx.fill();
+            }
             else { 
-                // 🔧 修复巨型色块：强制分离视觉高度和Hitbox高度
                 let drawH = (b.h === 40 || b.h === 10) ? 3 : (b.h === 5 || b.h === 8 ? b.h : 3); 
                 ctx.fillRect(b.x, getVisualY(b.x, b.y), b.w, drawH); 
             }
             ctx.restore();
-        });
-
-        lightnings.forEach(l => {
-            ctx.save(); ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 3; ctx.shadowBlur = 15; ctx.shadowColor = '#00e5ff';
-            ctx.beginPath(); ctx.moveTo(l.points[0].x, getVisualY(l.points[0].x, l.points[0].y));
-            for(let i=1; i<l.points.length; i++) {
-                let px = l.points[i].x + (Math.random()-0.5)*25; let py = getVisualY(l.points[i].x, l.points[i].y) + (Math.random()-0.5)*25;
-                ctx.lineTo(px, py);
-            }
-            ctx.stroke(); ctx.restore();
         });
 
         particles.forEach(p => { ctx.globalAlpha = p.life / p.maxLife; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 4, 4); ctx.globalAlpha = 1.0; });
@@ -1188,8 +1160,6 @@
             let visY = getVisualY(kevin.x, kevin.y); let animProgress = (30 - kevin.attackAnim) / 30; 
             ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
             if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
-            
-            // 🔧 修复：统一所有关卡的长矛物理刺击动画逻辑
             else { 
                 let wImg = weapons[kevin.weapon].img; 
                 if (wImg && wImg.complete && wImg.naturalHeight > 0) { 
@@ -1288,10 +1258,9 @@
         if (kevin.hasArmor) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; }
     }
     
-    // 🔧 修复结局判断
     function endGame(isVictory) { 
         bgm.pause();
-	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
+	CG_Manager.stopGameplay();
         const dict = i18n[currentLang];
         isRunning = false; 
         isGameOver = true; 
@@ -1305,9 +1274,9 @@
             try {
                 localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
                 let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
-                // 🔧 修复：解锁下一关 (第10关)
-                if(currentUnlocked <= 9) {
-                    localStorage.setItem('kiwiUnlockedLevel', 10);
+                // 解锁下一关 (第11关)
+                if(currentUnlocked <= 10) {
+                    localStorage.setItem('kiwiUnlockedLevel', 11);
                 }
             } catch(e) {
                 console.error("Local storage write failed:", e);
@@ -1335,7 +1304,7 @@
     
     function loop() { 
         if(isRunning && !isGameOver){ 
-            if (!CG_Manager.isPaused) update(); 
+            if (!CG_Manager.isPaused && !isPlayerPaused) update(); 
             draw(); 
         }
         animationFrameId = requestAnimationFrame(loop); 

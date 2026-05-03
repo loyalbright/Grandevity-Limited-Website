@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kiwi Defenders - Level 14: Canterbury Dark Sky</title>
+    <!-- iOS 全屏元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kiwi Defenders">
+    
     <style>
-        /* 增加 width: 100vw，防止出现滚动条 */
-        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; height: 100dvh; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
         
-        /* 🔧 核心修复：固定原生设计尺寸 1280x870 */
         #game-container { 
-            position: relative; 
-            width: 1280px; 
-            height: 870px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 0 40px rgba(155, 89, 182, 0.2); 
-            background: #000; 
-            transform-origin: center center; 
+            position: relative; width: 1280px; height: 870px; flex-shrink: 0; 
+            display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(155, 89, 182, 0.2); 
+            background: #000; transform-origin: center center; 
         }
         
         canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
@@ -58,56 +56,30 @@
         #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
         #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
 
-        /* 🎵 声音控制栏 */
         #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
-        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #9b59b6; color: #9b59b6; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #9b59b6; color: #9b59b6; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:hover { background: #9b59b6; color: #000; }
         .ctrl-btn.on { background: #9b59b6; color: #000; box-shadow: 0 0 10px #9b59b6; }
 
         /* --- 📱 移动端摇杆与提示 --- */
-        #mobile-controls {
-            display: none; 
-            position: absolute;
-            bottom: 170px; 
-            left: 30px;
-            gap: 40px;
-            z-index: 100;
-        }
-        #mobile-controls button {
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: white; font-size: 36px;
-            backdrop-filter: blur(4px);
-            touch-action: none;
-            outline: none;
-        }
+        #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
+        #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
 
-        @media (max-width: 1000px) {
-            #mobile-controls { display: flex; }
-        }
+        @media (max-width: 1000px) { #mobile-controls { display: flex; } }
 
         @media (orientation: portrait) {
-            body::after {
-                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
-                white-space: pre-wrap;
-                box-sizing: border-box;
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: #050510; color: #1abc9c; display: flex; 
-                justify-content: center; align-items: center;
-                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
-                line-height: 1.5;
-            }
+            body::after { content: "📱 Please rotate your device \A 请旋转手机至横屏游玩"; white-space: pre-wrap; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; color: #1abc9c; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5; }
         }
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <!-- 控制栏包含了暂停和全屏按钮 -->
         <div id="level-controls">
-            <!-- 设置为默认开启 (带有 on class) -->
-            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+            <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
+            <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -121,6 +93,13 @@
         <div id="respawn-screen" class="overlay">
             <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+        </div>
+
+        <!-- 暂停画面 -->
+        <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
+            <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
+            <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
+            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
         </div>
 
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
@@ -182,39 +161,17 @@
     </div>
 
 <script>
-// --- 🎮 纯净版管理器 (SDK 已剥离) ---
-    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    // --- 🎮 纯净版管理器 (SDK 已剥离) ---
     const CG_Manager = {
         isPaused: false, 
-
-        init: async function() {
-            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
-        },
-
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
         startGameplay: function() {},
         stopGameplay: function() {},
-
-        playAd: function(type = 'midgame') {
-            console.log("Demo Mode: Ad skipped.");
-            this.resumeGame();
-        },
-
-        pauseGame: function() {
-            this.isPaused = true;
-            if (typeof bgm !== 'undefined' && !bgm.paused) {
-                bgm.pause();
-            }
-        },
-
-        resumeGame: function() {
-            this.isPaused = false;
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
-                bgm.play().catch(e => {});
-            }
-        }
+        playAd: function(type = 'midgame') { console.log("Demo Mode: Ad skipped."); this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
 
-    // 默认开启音频的破冰策略
     function tryAutoplay() {
         if (musicPlaying) {
             let playPromise = bgm.play();
@@ -232,8 +189,6 @@
         }
     }
 
-
-    // --- 📐 全局等比例缩放自适应逻辑 ---
     function resizeGame() {
         const container = document.getElementById('game-container');
         const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
@@ -242,7 +197,7 @@
     window.addEventListener('resize', resizeGame);
     resizeGame();
 
-    // --- 🌐 多语言架构 ---
+    // 🌐 多语言架构
     const i18n = {
         en: {
             lvlTitle: "Level 14: Canterbury Dark Sky", startTip: "🌌 BATTLEFRONT: Lake Tekapo & Good Shepherd Church, the vast dark sky reserve!", startWarn: "⚠️ STEALTH ALERT: New enemy 'Night Phantom'. Regular units cannot target them. Use heroes to reveal!", startBtn: "DEFEND THE DARK SKY",
@@ -259,7 +214,8 @@
             baseFallen: "BASE HAS FALLEN", baseFallenMsg: "Canterbury Observatory destroyed, the stars fall!",
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
             backToMap: "BACK TO MAP", restart: "RESTART",
-            waveInbound: "🌊 WAVE {n} INBOUND!"
+            waveInbound: "🌊 WAVE {n} INBOUND!",
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             lvlTitle: "第十四关：坎特伯雷暗空", startTip: "🌌 战线：蒂卡普湖与好牧羊人教堂，浩瀚的暗空保护区！", startWarn: "⚠️ 隐形警告：新敌人【夜行魅影】出现。普通单位无法锁定，使用英雄技能将其标记！", startBtn: "保卫暗空",
@@ -276,7 +232,8 @@
             baseFallen: "基地沦陷", baseFallenMsg: "天文台被毁，繁星陨落！",
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
             backToMap: "返回地图", restart: "重新开始",
-            waveInbound: "🌊 第 {n} 波敌军来袭！"
+            waveInbound: "🌊 第 {n} 波敌军来袭！",
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             lvlTitle: "ステージ 14：カンタベリーのダークスカイ", startTip: "🌌 前線：テカポ湖と善き羊飼いの教会、広大な星空保護区！", startWarn: "⚠️ ステルス警告：新敵「ナイトファントム」。通常ユニットは捕捉不可、ヒーローで暴き出せ！", startBtn: "星空を防衛",
@@ -293,7 +250,8 @@
             baseFallen: "基地陥落", baseFallenMsg: "カンタベリー天文台が破壊され、星が落ちた！",
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
             backToMap: "マップに戻る", restart: "再試行",
-            waveInbound: "🌊 ウェーブ {n} 開始！"
+            waveInbound: "🌊 ウェーブ {n} 開始！",
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             lvlTitle: "Nivel 14: Cielo Oscuro de Canterbury", startTip: "🌌 FRENTE DE BATALLA: ¡El Lago Tekapo y la Iglesia del Buen Pastor, la vasta reserva de cielo oscuro!", startWarn: "⚠️ ALERTA DE SIGILO: Nuevo enemigo 'Fantasma Nocturno'. Las unidades regulares no pueden apuntarles. ¡Usa héroes para revelarlos!", startBtn: "DEFENDER EL CIELO OSCURO",
@@ -310,7 +268,8 @@
             baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "¡El Observatorio de Canterbury destruido, caen las estrellas!",
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
-            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!"
+            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!",
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -324,6 +283,12 @@
         const musicBtnSpan = document.querySelector('#music-toggle span');
         if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
         
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        if (fsTextSpan) {
+            const isFS = document.fullscreenElement || document.webkitFullscreenElement;
+            fsTextSpan.innerText = isFS ? dict.fs_exit : dict.fs_enter;
+        }
+
         if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
             ui.armorBtn.querySelector('.price').innerText = dict.equipped;
         }
@@ -339,12 +304,16 @@
             ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
         }
     }
-    window.addEventListener('DOMContentLoaded', applyTranslation);
+    
+    window.addEventListener('DOMContentLoaded', () => {
+        applyTranslation();
+        CG_Manager.init();
+        tryAutoplay();
+    });
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
-    // --- 🖱️ & 👆 鼠标与触摸坐标更新逻辑 ---
     let mouseX = canvas.width / 2;
     let mouseY = canvas.height / 2;
     
@@ -369,7 +338,11 @@
     }, { passive: false });
 
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keydown', e => { 
+        keys[e.code] = true; 
+        if(e.code==='Space') triggerAttack(); 
+        if(e.code==='Escape' || e.code==='KeyP') togglePlayerPause();
+    });
     window.addEventListener('keyup', e => keys[e.code] = false);
 
     const btnLeft = document.getElementById('btn-left');
@@ -419,7 +392,7 @@
     const bgm = new Audio('bgm_level14.mp3'); 
     bgm.loop = true; 
     bgm.volume = 0.3;
-    let musicPlaying = true; // 默认开启
+    let musicPlaying = true; 
 
     function toggleMusic(event) {
         if (event) event.currentTarget.blur();
@@ -444,13 +417,9 @@
         const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3', 'laser': 'sniper.mp3' };
         if (soundMap[type]) { 
             let sound = new Audio(soundMap[type]); 
-            if (type === 'gun') {
-                sound.volume = 0.1;  
-            } else if (type === 'sniper' || type === 'hit') {
-                sound.volume = 0.3;  
-            } else {
-                sound.volume = 0.5;  
-            }
+            if (type === 'gun') sound.volume = 0.1;  
+            else if (type === 'sniper' || type === 'hit') sound.volume = 0.3;  
+            else sound.volume = 0.5;  
             sound.play().catch(e => {}); 
         }
     }
@@ -473,6 +442,7 @@
     let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
     let currentWave = 1; let waveTimer = 0; 
     let groundDeathsForAntiAir = 0;
+    let isPlayerPaused = false;
     
     let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
     
@@ -509,10 +479,10 @@
         allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = []; particles = []; lightnings = [];
         
         gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; groundDeathsForAntiAir = 0;
-        currentWave = 1; waveTimer = 0;
+        currentWave = 1; waveTimer = 0; isPlayerPaused = false;
         
         isGameOver = false; isRunning = true;
-        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        CG_Manager.startGameplay();
         ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
         ui.wBtns.forEach(btn => { 
             btn.classList.remove('active'); 
@@ -531,6 +501,48 @@
         animationFrameId = requestAnimationFrame(loop);
     }
 
+    function togglePlayerPause(event) {
+        if (event) event.currentTarget.blur();
+        if (!isRunning || isGameOver) return;
+
+        isPlayerPaused = !isPlayerPaused;
+        const pauseScreen = document.getElementById('pause-screen');
+
+        if (isPlayerPaused) {
+            pauseScreen.style.display = 'flex';
+            if (musicPlaying) bgm.pause();
+        } else {
+            pauseScreen.style.display = 'none';
+            if (musicPlaying) bgm.play().catch(e => {});
+        }
+    }
+
+    function toggleFullscreen(event) {
+        if (event) event.currentTarget.blur();
+        const doc = document.documentElement; 
+        const dict = i18n[currentLang];
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (doc.requestFullscreen) { doc.requestFullscreen().catch(err => console.warn(err)); } 
+            else if (doc.webkitRequestFullscreen) { doc.webkitRequestFullscreen(); } 
+            else { alert(currentLang === 'zh' ? "您的手机浏览器不支持一键全屏。请轻扫页面隐藏地址栏。" : "Fullscreen API is not supported. Please swipe up to hide the address bar."); return; }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_exit;
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_enter;
+        }
+    }
+
+    document.addEventListener('fullscreenchange', applyTranslation);
+    document.addEventListener('webkitfullscreenchange', applyTranslation);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && isRunning && !isGameOver && !isPlayerPaused) togglePlayerPause();
+    });
+
     ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(musicPlaying) bgm.play().catch(e=>{}); initGame(); });
     ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
     ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
@@ -543,7 +555,7 @@
     }
 
     function triggerAttack() {
-        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0 || isPlayerPaused) return;
         let w = weapons[kevin.weapon];
         kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
         playSfx(kevin.weapon);
@@ -672,12 +684,14 @@
         
         if (groundDeathsForAntiAir >= 15) {
             groundDeathsForAntiAir = 0;
-            for(let i=0; i<2; i++) {
-                // 🌟 添加飞船出兵绿光特效
-                spawnEffects.push({ x: ship.x - 30 + i*30, w: 40, y: GROUND_Y, life: 20, maxLife: 20 });
-                spawnSparks(ship.x - 10 + i*30, GROUND_Y - 20, '#39ff14');
-                
-                enemies.push({ x: ship.x - 30 + i*30, attackTimer: 0, hitTimer: 0, stunTimer: 0, w: 50, h: 40, y: GROUND_Y - 220 + Math.random()*20, color: '#8e44ad', hp: 150, maxHp: 150, speed: 2.8, range: 20, damage: 45, reward: 30, xpReward: 4, type: 'flyer', isFlying: true });
+            let currentFlyers = enemies.filter(e => e.type === 'flyer').length;
+            if (currentFlyers < 5) {
+                for(let i=0; i<2; i++) {
+                    spawnEffects.push({ x: ship.x - 30 + i*30, w: 40, y: GROUND_Y, life: 20, maxLife: 20 });
+                    spawnSparks(ship.x - 10 + i*30, GROUND_Y - 20, '#39ff14');
+                    enemies.push({ x: ship.x - 30 + i*30, attackTimer: 0, hitTimer: 0, stunTimer: 0, w: 50, h: 40, y: GROUND_Y - 220 + Math.random()*20, color: '#8e44ad', hp: 150, maxHp: 150, speed: 2.8, range: 20, damage: 45, reward: 30, xpReward: 4, type: 'flyer', isFlying: true });
+                }
+                spawnFloatingText(ship.x, GROUND_Y - 240, '⚠️ WASP SWARM!', '#8e44ad', -1);
             }
         }
 
@@ -685,7 +699,6 @@
             spawnTimer = 0; let rand = Math.random(); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0, armorBreak: 0 }; 
             let healerActive = enemies.some(e => e.type === 'enemy_healer');
             
-            // 🌟 补充绿光特效并增加火花，让出兵更明显，杜绝视觉遮挡问题
             spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 });
             spawnSparks(ship.x + ship.w / 2, GROUND_Y - 20, '#39ff14');
 
@@ -811,6 +824,7 @@
             let targetX = Math.max(hq.x + hq.w, frontX - 60);
             if (healTarget) { if (m.attackTimer <= 0) { healTarget.hp = Math.min(healTarget.maxHp, healTarget.hp - m.damage); healTarget.hitTimer = 10; m.attackTimer = 60; } } 
             if (m.x < targetX - 5) m.x += actualSpeed; else if (m.x > targetX + 5) m.x -= actualSpeed; 
+            return; 
         });
 
         allies.forEach(m => { 
@@ -994,7 +1008,22 @@
             }
 
             let targetInRange = false; 
-            enemies.forEach(t => { if (t.isStealth || (t.isFlying && m.range < 150)) return; let dist = Math.abs(m.x - t.x); if (dist <= m.range + m.w && t.x > m.x) { targetInRange = true; m.facing = 1; if (m.attackTimer <= 0) { if (m.range > 100) { if (m.type === 'sniper') { bullets.push({ x: m.x + m.w, y: GROUND_Y - 35, w: 30, h: 10, color: '#ffea00', dx: 20, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); playSfx('sniper'); m.attackTimer = 90; } else { bullets.push({ x: m.x + m.w, y: GROUND_Y - 25, w: 15, h: 5, color: m.color || '#fff', dx: 12, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); m.attackTimer = 60; } } else { let dmg = m.damage; if (t.armorBreak && t.armorBreak > 0) dmg *= 2.0; t.hp -= dmg; t.hitTimer = 10; t.x += 10; m.attackTimer = 60; } } } }); 
+            enemies.forEach(t => { 
+                if (t.isStealth || (t.isFlying && m.range < 150)) return; 
+                let dist = Math.abs(m.x - t.x); 
+                if (dist <= m.range + m.w && t.x > m.x) { 
+                    targetInRange = true; m.facing = 1;
+                    if (m.attackTimer <= 0) { 
+                        if (m.range > 100) { 
+                            if (m.type === 'sniper') { bullets.push({ x: m.x + m.w, y: GROUND_Y - 35, w: 30, h: 10, color: '#ffea00', dx: 20, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); playSfx('sniper'); m.attackTimer = 90; } 
+                            else { bullets.push({ x: m.x + m.w, y: GROUND_Y - 25, w: 15, h: 5, color: m.color || '#fff', dx: 12, dy: 0, damage: m.damage, isPlayer: true, isRanged: true, isAA: false }); m.attackTimer = 60; } 
+                        } else { 
+                            let dmg = m.damage; if (t.armorBreak && t.armorBreak > 0) dmg *= 2.0; 
+                            t.hp -= dmg; t.hitTimer = 10; t.x += 10; m.attackTimer = 60; 
+                        } 
+                    } 
+                } 
+            }); 
             if (!targetInRange && checkCol({x: m.x, y: m.y, w: m.w + m.range, h: m.h}, ship)) { targetInRange = true; if (m.attackTimer <= 0) { ship.hp -= m.damage; m.attackTimer = 60; } } 
             if (!targetInRange) { m.x += actualSpeed; m.facing = 1;} 
         }); 
@@ -1129,7 +1158,7 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; 
             ctx.fillRect(ship.x + ship.w/2 - 75, shipUiY - 50, 150, 30); 
             ctx.fillStyle = '#e94560'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
-            ctx.fillText('ZOGON POD', ship.x + ship.w/2, shipUiY - 30); 
+            ctx.fillText('PHANTOM POD', ship.x + ship.w/2, shipUiY - 30); 
             ctx.fillStyle = 'rgba(0,0,0,0.6)'; 
             ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120, 10); 
             ctx.fillStyle = '#e94560'; 
@@ -1143,7 +1172,6 @@
 
         if (!kevin.isDead) drawEntity(kevin, true); allies.forEach(a => drawEntity(a, false)); enemies.forEach(e => drawEntity(e, false));
         
-        // 🌟 将绿光特效移动到这里，覆盖在所有实体之上！
         spawnEffects.forEach(se => { 
             let visY = getVisualY(se.x, se.y); 
             let progress = se.life / se.maxLife; 
@@ -1170,7 +1198,7 @@
         });
         
         lightnings.forEach(l => {
-            if (l.path.length > 1) {
+            if (l.path && l.path.length > 1) {
                 ctx.save();
                 ctx.globalAlpha = l.life / 10;
                 ctx.strokeStyle = '#00e5ff';
@@ -1220,8 +1248,6 @@
             let visY = getVisualY(kevin.x, kevin.y); let animProgress = (30 - kevin.attackAnim) / 30; 
             ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
             if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
-            
-            // 🔧 修复长矛物理动画
             else { 
                 let wImg = weapons[kevin.weapon].img; 
                 if (wImg && wImg.complete && wImg.naturalHeight > 0) { 
@@ -1255,44 +1281,55 @@
         if (e.type === 'phantom' && e.isStealth) { ctx.globalAlpha = 0.2; } 
         if (e.type === 'fox_decoy') { ctx.globalAlpha = 0.6; ctx.filter = 'drop-shadow(0 0 15px #fd79a8) brightness(150%)'; } 
 
-        let customBobbing = (e.hitTimer > 0) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
-        if (isKevin) { 
-            if (keys['KeyA'] || keys['KeyD']) customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; 
-            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1); 
-            let currentSprite = e.hasArmor ? armorImg : kevinImg; 
-            if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } 
-            else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); } 
-        } 
-        else { 
-            if (e.sprite && e.sprite.complete) { 
-                ctx.translate(e.x + e.w / 2, visualY + e.h); let scaleFactor = e.h / e.sprite.naturalHeight; ctx.scale(e.facing || 1, 1); ctx.scale(scaleFactor, scaleFactor); 
-                ctx.drawImage(e.sprite, -e.sprite.naturalWidth / 2, -e.sprite.naturalHeight - customBobbing/scaleFactor); 
-            } else { 
-                let imgToDraw = null; 
-                if (e.type === 'grunt') imgToDraw = gruntImg; 
-                else if (e.type === 'tank') imgToDraw = tankImg; 
-                else if (e.type === 'shooter') imgToDraw = shooterImg; 
-                else if (e.type === 'scout') imgToDraw = scoutImg; 
-                else if (e.type === 'flyer') imgToDraw = flyerImg; 
-                else if (e.type === 'devastator') imgToDraw = devImg; 
-                else if (e.type === 'bomber') imgToDraw = bomberImg; 
-                else if (e.type === 'enemy_healer') imgToDraw = enemyHealerImg; 
-                else if (e.type === 'basic') imgToDraw = basicImg; 
-                else if (e.type === 'shield') imgToDraw = shieldImg; 
-                else if (e.type === 'sniper') imgToDraw = sniperImg; 
-                else if (e.type === 'healer') imgToDraw = healerImg; 
-                else if (e.type === 'phantom') imgToDraw = phantomImg;
+        if (e.hitTimer && e.hitTimer > 0) { ctx.filter = 'brightness(200%)'; } 
+        else if (e.stunTimer && e.stunTimer > 0) {
+            ctx.filter = 'drop-shadow(0 0 10px yellow) brightness(120%)';
+            ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 20px Arial'; ctx.fillText('💫', e.x + e.w/2 - 10, visualY - 15);
+        } else if (e.slowTimer && e.slowTimer > 0) {
+            ctx.filter = 'sepia(1) hue-rotate(180deg) saturate(200%) brightness(80%)';
+        } else if (e.attackSpeedBuff && e.attackSpeedBuff > 0) {
+            ctx.filter = 'drop-shadow(0 0 8px #e74c3c)';
+        }
 
+        let customBobbing = (e.hitTimer > 0 || (e.stunTimer && e.stunTimer > 0)) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
+        
+        if (e.type === 'fox' && e.attackTimer > 0) customBobbing = 0; 
+
+        if (isKevin) {
+            if (keys['KeyA'] || keys['KeyD']) { customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; }
+            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1);
+            let currentSprite = e.hasArmor ? armorImg : kevinImg;
+            if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); }
+        } else {
+            if (e.sprite && e.sprite.complete && e.sprite.naturalHeight > 0) {
+                ctx.translate(e.x + e.w / 2, visualY + e.h);
+                let bob = e.bobbingLock ? 0 : customBobbing;
+                
+                if (e.type === 'fox' && e.attackTimer > 100) {
+                    ctx.globalAlpha = 0.5;
+                    ctx.drawImage(e.sprite, -e.sprite.naturalWidth/2 - 20*e.facing, -e.sprite.naturalHeight, e.w, e.h);
+                    ctx.globalAlpha = 1.0;
+                }
+
+                let scaleFactor = e.h / e.sprite.naturalHeight;
+                ctx.scale(e.facing || 1, 1); 
+                ctx.scale(scaleFactor, scaleFactor);
+                ctx.drawImage(e.sprite, -e.sprite.naturalWidth / 2, -e.sprite.naturalHeight - bob/scaleFactor);
+            } else {
+                let imgToDraw = null;
+                if (e.type === 'bomber') imgToDraw = bomberImg; else if (e.type === 'enemy_healer') imgToDraw = enemyHealerImg; else if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; else if (e.type === 'flyer') imgToDraw = flyerImg; else if (e.type === 'devastator') imgToDraw = devImg; else if (e.type === 'phantom') imgToDraw = phantomImg;
+                
                 ctx.translate(e.x + e.w / 2, visualY + e.h); 
                 if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
                     let scaleFactor = e.h / imgToDraw.naturalHeight; ctx.scale(e.facing || 1, 1); ctx.scale(scaleFactor, scaleFactor); ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor); 
                 } else { 
-                    ctx.fillStyle = e.color || '#fff'; ctx.beginPath(); ctx.roundRect(-e.w / 2, -e.h - customBobbing, e.w, e.h, 10); ctx.fill(); 
-                    if (!e.isFlying && e.hp > 0) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill(); }
-                } 
-            } 
-        } 
-        ctx.restore(); 
+                    ctx.fillStyle = e.color || '#fff'; 
+                    ctx.beginPath(); ctx.roundRect(-e.w / 2, -e.h - customBobbing, e.w, e.h, 10); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill();
+                }
+            }
+        }
+        ctx.restore();
         if (e.type !== 'fox_decoy') {
             let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#9b59b6' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
         }
@@ -1360,7 +1397,7 @@
     
     function loop() { 
         if(isRunning && !isGameOver){ 
-            if (!CG_Manager.isPaused) update(); 
+            if (!CG_Manager.isPaused && !isPlayerPaused) update(); 
             draw(); 
         }
         animationFrameId = requestAnimationFrame(loop); 

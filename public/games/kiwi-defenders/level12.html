@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kiwi Defenders - Level 12: Marlborough Vineyards</title>
+    <!-- iOS 全屏元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kiwi Defenders">
+    
     <style>
-        /* 增加 width: 100vw，防止出现滚动条 */
-        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; height: 100dvh; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
         
-        /* 🔧 核心修复：固定原生设计尺寸 1280x870 */
         #game-container { 
-            position: relative; 
-            width: 1280px; 
-            height: 870px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 0 40px rgba(155, 89, 182, 0.15); 
-            background: #000; 
-            transform-origin: center center; 
+            position: relative; width: 1280px; height: 870px; flex-shrink: 0; 
+            display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(155, 89, 182, 0.15); 
+            background: #000; transform-origin: center center; 
         }
         
         canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
@@ -58,56 +56,30 @@
         #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
         #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
 
-        /* 🎵 声音控制栏 */
         #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
-        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #9b59b6; color: #9b59b6; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #9b59b6; color: #9b59b6; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:hover { background: #9b59b6; color: #000; }
         .ctrl-btn.on { background: #9b59b6; color: #000; box-shadow: 0 0 10px #9b59b6; }
 
         /* --- 📱 移动端摇杆与提示 --- */
-        #mobile-controls {
-            display: none; 
-            position: absolute;
-            bottom: 170px; 
-            left: 30px;
-            gap: 40px;
-            z-index: 100;
-        }
-        #mobile-controls button {
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: white; font-size: 36px;
-            backdrop-filter: blur(4px);
-            touch-action: none;
-            outline: none;
-        }
+        #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
+        #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
 
-        @media (max-width: 1000px) {
-            #mobile-controls { display: flex; }
-        }
+        @media (max-width: 1000px) { #mobile-controls { display: flex; } }
 
         @media (orientation: portrait) {
-            body::after {
-                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
-                white-space: pre-wrap;
-                box-sizing: border-box;
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: #050510; color: #1abc9c; display: flex; 
-                justify-content: center; align-items: center;
-                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
-                line-height: 1.5;
-            }
+            body::after { content: "📱 Please rotate your device \A 请旋转手机至横屏游玩"; white-space: pre-wrap; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; color: #1abc9c; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5; }
         }
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <!-- 控制栏包含了暂停和全屏按钮 -->
         <div id="level-controls">
-            <!-- 设置为默认开启 (带有 on class) -->
-            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+            <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
+            <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -121,6 +93,13 @@
         <div id="respawn-screen" class="overlay">
             <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+        </div>
+
+        <!-- 暂停画面 -->
+        <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
+            <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
+            <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
+            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
         </div>
 
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
@@ -182,39 +161,17 @@
     </div>
 
 <script>
-// --- 🎮 纯净版管理器 (SDK 已剥离) ---
-    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    // --- 🎮 纯净版管理器 (SDK 已剥离) ---
     const CG_Manager = {
         isPaused: false, 
-
-        init: async function() {
-            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
-        },
-
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
         startGameplay: function() {},
         stopGameplay: function() {},
-
-        playAd: function(type = 'midgame') {
-            console.log("Demo Mode: Ad skipped.");
-            this.resumeGame();
-        },
-
-        pauseGame: function() {
-            this.isPaused = true;
-            if (typeof bgm !== 'undefined' && !bgm.paused) {
-                bgm.pause();
-            }
-        },
-
-        resumeGame: function() {
-            this.isPaused = false;
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
-                bgm.play().catch(e => {});
-            }
-        }
+        playAd: function(type = 'midgame') { console.log("Demo Mode: Ad skipped."); this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
 
-    // 默认开启音频的破冰策略
     function tryAutoplay() {
         if (musicPlaying) {
             let playPromise = bgm.play();
@@ -232,7 +189,6 @@
         }
     }
 
-    // --- 📐 全局等比例缩放自适应逻辑 ---
     function resizeGame() {
         const container = document.getElementById('game-container');
         const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
@@ -241,7 +197,7 @@
     window.addEventListener('resize', resizeGame);
     resizeGame();
 
-    // --- 🌐 多语言架构 ---
+    // 🌐 多语言架构
     const i18n = {
         en: {
             lvlTitle: "Level 12: Marlborough Vineyards", startTip1: "🍇 BATTLEFRONT: Marlborough Sauvignon Blanc vineyards, overlooking the Sounds!", startWarn: "⚠️ AMBUSH: Zogon forces have activated [Spatial Rifts]! Enemies may spawn directly behind you!", startBtn: "DEFEND THE VINEYARDS",
@@ -258,7 +214,8 @@
             baseFallen: "BASE HAS FALLEN", baseFallenMsg: "Marlborough estate destroyed, New Zealand is in peril!",
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
             backToMap: "BACK TO MAP", restart: "RESTART",
-            waveInbound: "🌊 WAVE {n} INBOUND!"
+            waveInbound: "🌊 WAVE {n} INBOUND!",
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             lvlTitle: "第十二关：马尔堡葡萄园", startTip1: "🍇 战线：马尔堡长相思葡萄园，俯瞰美丽的海湾！", startWarn: "⚠️ 伏击：左贡军团启动了【空间裂隙】！敌人可能直接在您身后生成！", startBtn: "保卫葡萄园",
@@ -275,7 +232,8 @@
             baseFallen: "基地沦陷", baseFallenMsg: "马尔堡庄园被毁，新西兰危在旦夕！",
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
             backToMap: "返回地图", restart: "重新开始",
-            waveInbound: "🌊 第 {n} 波敌军来袭！"
+            waveInbound: "🌊 第 {n} 波敌军来袭！",
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             lvlTitle: "ステージ 12：マールボロ・ヴィンヤード", startTip1: "🍇 前線：マールボロのソーヴィニヨン・ブランのブドウ畑、サウンドを見下ろす絶景！", startWarn: "⚠️ 奇襲：ゾゴン軍が【空間の裂け目】を起動！敵が背後に出現する可能性あり！", startBtn: "ブドウ畑を防衛",
@@ -292,7 +250,8 @@
             baseFallen: "基地陥落", baseFallenMsg: "マールボロの地所が破壊された。ニュージーランドは危機に瀕している！",
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
             backToMap: "マップに戻る", restart: "再試行",
-            waveInbound: "🌊 ウェーブ {n} 開始！"
+            waveInbound: "🌊 ウェーブ {n} 開始！",
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             lvlTitle: "Nivel 12: Viñedos de Marlborough", startTip1: "🍇 FRENTE DE BATALLA: Viñedos de Sauvignon Blanc en Marlborough, ¡con vistas a los Sounds!", startWarn: "⚠️ EMBOSCADA: ¡Las fuerzas Zogon han activado [Fallas Espaciales]! ¡Los enemigos pueden aparecer a tus espaldas!", startBtn: "DEFENDER LOS VIÑEDOS",
@@ -309,7 +268,8 @@
             baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "¡Hacienda de Marlborough destruida, Nueva Zelanda está en peligro!",
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
-            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!"
+            waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!",
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -323,6 +283,12 @@
         const musicBtnSpan = document.querySelector('#music-toggle span');
         if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
         
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        if (fsTextSpan) {
+            const isFS = document.fullscreenElement || document.webkitFullscreenElement;
+            fsTextSpan.innerText = isFS ? dict.fs_exit : dict.fs_enter;
+        }
+
         if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
             ui.armorBtn.querySelector('.price').innerText = dict.equipped;
         }
@@ -339,7 +305,6 @@
         }
     }
     
-    // 初始化时启动 SDK 与音频拦截
     window.addEventListener('DOMContentLoaded', () => {
         applyTranslation();
         CG_Manager.init();
@@ -349,7 +314,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
-    // --- 🖱️ & 👆 鼠标与触摸坐标更新逻辑 ---
     let mouseX = canvas.width / 2;
     let mouseY = canvas.height / 2;
     
@@ -361,20 +325,15 @@
 
     canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
     canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
-
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault(); 
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-        triggerAttack();
-    }, { passive: false });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: false });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); triggerAttack(); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keydown', e => { 
+        keys[e.code] = true; 
+        if(e.code==='Space') triggerAttack(); 
+        if(e.code==='Escape' || e.code==='KeyP') togglePlayerPause();
+    });
     window.addEventListener('keyup', e => keys[e.code] = false);
 
     const btnLeft = document.getElementById('btn-left');
@@ -424,7 +383,7 @@
     const bgm = new Audio('bgm_level12.mp3'); 
     bgm.loop = true; 
     bgm.volume = 0.3;
-    let musicPlaying = true; // 默认开启
+    let musicPlaying = true; 
 
     function toggleMusic(event) {
         if (event) event.currentTarget.blur();
@@ -478,6 +437,7 @@
     let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
     let currentWave = 1; let waveTimer = 0; 
     let groundDeathsForAntiAir = 0;
+    let isPlayerPaused = false;
     
     let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
     
@@ -517,10 +477,10 @@
         zogonRifts = [];
         
         gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; groundDeathsForAntiAir = 0;
-        currentWave = 1; waveTimer = 0;
+        currentWave = 1; waveTimer = 0; isPlayerPaused = false;
         
         isGameOver = false; isRunning = true;
-        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        CG_Manager.startGameplay(); 
         ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
         ui.wBtns.forEach(btn => { 
             btn.classList.remove('active'); 
@@ -539,6 +499,48 @@
         animationFrameId = requestAnimationFrame(loop);
     }
 
+    function togglePlayerPause(event) {
+        if (event) event.currentTarget.blur();
+        if (!isRunning || isGameOver) return;
+
+        isPlayerPaused = !isPlayerPaused;
+        const pauseScreen = document.getElementById('pause-screen');
+
+        if (isPlayerPaused) {
+            pauseScreen.style.display = 'flex';
+            if (musicPlaying) bgm.pause();
+        } else {
+            pauseScreen.style.display = 'none';
+            if (musicPlaying) bgm.play().catch(e => {});
+        }
+    }
+
+    function toggleFullscreen(event) {
+        if (event) event.currentTarget.blur();
+        const doc = document.documentElement; 
+        const dict = i18n[currentLang];
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (doc.requestFullscreen) { doc.requestFullscreen().catch(err => console.warn(err)); } 
+            else if (doc.webkitRequestFullscreen) { doc.webkitRequestFullscreen(); } 
+            else { alert(currentLang === 'zh' ? "您的手机浏览器不支持一键全屏。请轻扫页面隐藏地址栏。" : "Fullscreen API is not supported. Please swipe up to hide the address bar."); return; }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_exit;
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_enter;
+        }
+    }
+
+    document.addEventListener('fullscreenchange', applyTranslation);
+    document.addEventListener('webkitfullscreenchange', applyTranslation);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && isRunning && !isGameOver && !isPlayerPaused) togglePlayerPause();
+    });
+
     ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(musicPlaying) bgm.play().catch(e=>{}); initGame(); });
     ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
     ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
@@ -551,7 +553,7 @@
     }
 
     function triggerAttack() {
-        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0 || isPlayerPaused) return;
         let w = weapons[kevin.weapon];
         kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
         playSfx(kevin.weapon);
@@ -725,12 +727,11 @@
 
         if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
             spawnTimer = 0; let rand = Math.random(); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0 }; 
-            let healerActive = enemies.some(e => e.type === 'enemy_healer');
             
-            // 🌟 在生成新敌人前，先播特效
             spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 });
             spawnSparks(ship.x + ship.w / 2, GROUND_Y - 20, '#39ff14');
 
+            let healerActive = enemies.some(e => e.type === 'enemy_healer');
             if (currentWave >= 3 && rand < 0.15 && !healerActive) { Object.assign(enemy, { w: 45, h: 50, y: GROUND_Y - 50, color: '#fd79a8', hp: 250, maxHp: 250, speed: 1.5, range: 0, damage: 30, reward: 50, xpReward: 8, type: 'enemy_healer' }); }
             else if (currentWave >= 2 && rand < 0.30) { Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#ff5252', hp: 150, maxHp: 150, speed: 4.0, range: 15, damage: 400, reward: 20, xpReward: 5, type: 'bomber' }); }
             else if (currentWave >= 4 && rand < Math.min(0.40, 0.30 + currentWave * 0.01)) { Object.assign(enemy, { w: 180, h: 180, y: GROUND_Y - 180, color: '#c23616', hp: 750, maxHp: 750, speed: 0.4, range: 40, damage: 120, reward: 150, xpReward: 30, type: 'devastator' }); }
@@ -751,14 +752,16 @@
 
             let shouldDestroy = false; 
             let isPenetrating = false; 
-            let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
             let projHitBox = {x: b.x, y: b.y, w: b.w, h: b.h}; 
+            
+            if (!b.hitTargets) b.hitTargets = new Set();
+            let targetList = b.isPlayer ? enemies : allies.concat((kevin.isDead || kevin.isHidden) ? [] : [kevin]); 
 
             for (let t of targetList) { 
-                if (!b.hitTargets) b.hitTargets = new Set();
                 if (!shouldDestroy && checkCol(projHitBox, t) && !b.hitTargets.has(t)) { 
                     let dmg = b.damage; 
                     if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
+                    
                     t.hp -= dmg; 
                     t.hitTimer = 10; 
                     b.hitTargets.add(t);
@@ -1095,7 +1098,7 @@
         ctx.save(); let hqVisY = getVisualY(hq.x, hq.y); if (hq.hitTimer && hq.hitTimer > 0) ctx.filter = 'brightness(200%)'; 
         if (hqImg.complete && hqImg.naturalHeight > 0) { 
             let scaleFactor = hq.h / hqImg.naturalHeight; 
-            ctx.drawImage(hqImg, hq.x - (hqImg.naturalWidth*scaleFactor - hq.w)/2, hqVisY + 27, hqImg.naturalWidth * scaleFactor, hq.h); 
+            ctx.drawImage(hqImg, hq.x - (hqImg.naturalWidth*scaleFactor - hq.w)/2, hqVisY, hqImg.naturalWidth * scaleFactor, hq.h); 
         } else { 
             ctx.fillStyle = '#f5f6fa'; ctx.fillRect(hq.x, hqVisY, hq.w, hq.h); 
             ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(hq.x + hq.w/2, hqVisY, hq.w/2, Math.PI, 0); ctx.fill(); 
@@ -1103,13 +1106,11 @@
         ctx.restore();
         
         ctx.save(); let hqVisUiY = getVisualY(hq.x, hq.y); let hqHpPct = Math.max(0, hq.hp / hq.maxHp); 
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 90, hqVisUiY - 50, 180, 30); 
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 100, hqVisUiY - 50, 200, 30); 
         ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.fillText('MARLBOROUGH ESTATE', hq.x + hq.w/2, hqVisUiY - 30); 
         ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120, 10); 
         ctx.fillStyle = hqHpPct > 0.6 ? '#9b59b6' : (hqHpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(hq.x + hq.w/2 - 60, hqVisUiY - 10, 120 * hqHpPct, 10); 
         ctx.restore();
-        
-        let shipVisY = ship.y; let hover = Math.sin(frameCount * 0.05) * 15; if (shipImg.complete && shipImg.naturalHeight > 0) { ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h); let shpPct = Math.max(0, ship.hp / ship.maxHp); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, ship.w - 80, 10); ctx.fillStyle = '#39ff14'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, (ship.w - 80) * shpPct, 10); }
 
         zogonRifts.forEach(rift => {
             ctx.save();
@@ -1123,9 +1124,9 @@
             ctx.restore();
         });
 
+        let shipVisY = ship.y; let hover = Math.sin(frameCount * 0.05) * 15; if (shipImg.complete && shipImg.naturalHeight > 0) { ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h); let shpPct = Math.max(0, ship.hp / ship.maxHp); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, ship.w - 80, 10); ctx.fillStyle = '#39ff14'; ctx.fillRect(ship.x + 40, shipVisY + hover - 20, (ship.w - 80) * shpPct, 10); }
         if (!kevin.isDead) drawEntity(kevin, true); allies.forEach(a => drawEntity(a, false)); enemies.forEach(e => drawEntity(e, false));
         
-        // 🌟 将光束渲染移动到实体之后，盖在敌人上方！
         let shipBottomY = shipVisY + hover + ship.h - 30; 
         spawnEffects.forEach(se => { 
             let visY = getVisualY(se.x, se.y); 
@@ -1151,7 +1152,6 @@
                 ctx.fillRect(b.x, getVisualY(b.x, b.y) - b.h/2, b.w, b.h);
                 ctx.fillStyle = '#fff'; ctx.fillRect(b.x, getVisualY(b.x, b.y) - b.h/4, b.w, b.h/2);
             } else { 
-                // 🔧 修复巨型色块：强制分离视觉高度和Hitbox高度
                 let drawH = (b.h >= 10) ? 3 : (b.h === 5 || b.h === 8 ? b.h : 3); 
                 ctx.fillRect(b.x, getVisualY(b.x, b.y), b.w, drawH); 
             } 
@@ -1174,8 +1174,6 @@
             let visY = getVisualY(kevin.x, kevin.y); let animProgress = (30 - kevin.attackAnim) / 30; 
             ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
             if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
-            
-            // 🔧 修复：统一长矛 (Spear) 的 45度倾角三段式物理刺击动画逻辑
             else { 
                 let wImg = weapons[kevin.weapon].img; 
                 if (wImg && wImg.complete && wImg.naturalHeight > 0) { 
@@ -1205,29 +1203,36 @@
     function drawEntity(e, isKevin) { 
         let visualY = getVisualY(e.x, e.y); ctx.save();
         if (isKevin && e.isHidden) { ctx.globalAlpha = 0.5; ctx.fillStyle = '#1abc9c'; ctx.font = '14px Arial'; ctx.fillText('SHIELDED', e.x - 10, visualY - 20); } 
-        if (e.hitTimer && e.hitTimer > 0) ctx.filter = 'brightness(200%)'; 
-        else if (e.attackSpeedBuff && e.attackSpeedBuff > 0) { ctx.filter = 'drop-shadow(0 0 10px #1abc9c)'; }
+        if (e.hitTimer && e.hitTimer > 0) { ctx.filter = 'brightness(200%)'; } 
+        else if (e.stunTimer && e.stunTimer > 0) {
+            ctx.filter = 'drop-shadow(0 0 10px yellow) brightness(120%)';
+            ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 20px Arial'; ctx.fillText('💫', e.x + e.w/2 - 10, visualY - 15);
+        } else if (e.slowTimer && e.slowTimer > 0) {
+            ctx.filter = 'sepia(1) hue-rotate(180deg) saturate(200%) brightness(80%)';
+        } else if (e.attackSpeedBuff && e.attackSpeedBuff > 0) {
+            ctx.filter = 'drop-shadow(0 0 8px #e74c3c)';
+        }
 
-        let customBobbing = (e.hitTimer > 0) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
-        if (isKevin) { if (keys['KeyA'] || keys['KeyD']) customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1); let currentSprite = e.hasArmor ? armorImg : kevinImg; if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); } } 
-        else { 
+        let customBobbing = (e.hitTimer > 0 || (e.stunTimer && e.stunTimer > 0)) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
+        
+        if (isKevin) {
+            if (keys['KeyA'] || keys['KeyD']) { customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; }
+            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1);
+            let currentSprite = e.hasArmor ? armorImg : kevinImg;
+            if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); }
+        } else {
             if (e.sprite && e.sprite.complete && e.sprite.naturalHeight > 0) {
                 ctx.translate(e.x + e.w / 2, visualY + e.h);
                 let bob = e.bobbingLock ? 0 : customBobbing;
                 
-                if (e.type === 'fox' && e.attackTimer > 100) {
-                    ctx.globalAlpha = 0.5;
-                    ctx.drawImage(e.sprite, -e.sprite.naturalWidth/2 - 20*e.facing, -e.sprite.naturalHeight, e.w, e.h);
-                    ctx.globalAlpha = 1.0;
-                }
-
                 let scaleFactor = e.h / e.sprite.naturalHeight;
                 ctx.scale(e.facing || 1, 1); 
                 ctx.scale(scaleFactor, scaleFactor);
                 ctx.drawImage(e.sprite, -e.sprite.naturalWidth / 2, -e.sprite.naturalHeight - bob/scaleFactor);
             } else {
                 let imgToDraw = null;
-                if (e.type === 'bomber') imgToDraw = bomberImg; else if (e.type === 'enemy_healer') imgToDraw = enemyHealerImg; else if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; else if (e.type === 'flyer') imgToDraw = flyerImg; else if (e.type === 'devastator') imgToDraw = devImg;
+                if (e.type === 'horse') imgToDraw = horseImg; else if (e.type === 'sheep') imgToDraw = sheepImg; else if (e.type === 'griffin') imgToDraw = griffinImg; else if (e.type === 'eagle') imgToDraw = eagleImg;
+                else if (e.type === 'bomber') imgToDraw = bomberImg; else if (e.type === 'enemy_healer') imgToDraw = enemyHealerImg; else if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; else if (e.type === 'flyer') imgToDraw = flyerImg; else if (e.type === 'devastator') imgToDraw = devImg;
                 
                 ctx.translate(e.x + e.w / 2, visualY + e.h); 
                 if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
@@ -1259,10 +1264,9 @@
         if (kevin.hasArmor) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; }
     }
     
-    // 🔧 修复：严格接收一个布尔值，防止字符串被判定为 true
     function endGame(isVictory) { 
         bgm.pause();
-	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
+	CG_Manager.stopGameplay();
         const dict = i18n[currentLang];
         isRunning = false; 
         isGameOver = true; 
@@ -1276,7 +1280,7 @@
             try {
                 localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
                 let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
-                // 🔧 修复：解锁下一关 (第13关)
+                // 解锁下一关 (第13关)
                 if(currentUnlocked <= 12) {
                     localStorage.setItem('kiwiUnlockedLevel', 13);
                 }
@@ -1306,7 +1310,7 @@
     
     function loop() { 
         if(isRunning && !isGameOver){ 
-            if (!CG_Manager.isPaused) update(); 
+            if (!CG_Manager.isPaused && !isPlayerPaused) update(); 
             draw(); 
         }
         animationFrameId = requestAnimationFrame(loop); 

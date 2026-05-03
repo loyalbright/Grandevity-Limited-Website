@@ -14,8 +14,10 @@ import Layout from '../layouts/Layout.astro';
       <div class="card-grid single">
         <div class="card game-card">
           <a href="/games/kiwi-defenders/" target="_blank" style="text-decoration: none;">
-            <div class="game-image-placeholder">
-              <span style="background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 4px; color: #38bdf8; font-weight: bold; font-size: 1.2rem;">▶ Click to Play Demo</span>
+            <!-- 这里加入了背景图属性：background-image -->
+            <div class="game-image-placeholder" style="background-image: url('/images/games/kiwi-defenders/landscape_cover_campaign_map.webp'); background-size: cover; background-position: center;">
+              <!-- 加深了按钮的底色，并增加了 backdrop-filter 模糊效果，确保文字不受背景图干扰 -->
+              <span style="background: rgba(0,0,0,0.7); padding: 0.5rem 1rem; border-radius: 4px; color: #38bdf8; font-weight: bold; font-size: 1.2rem; backdrop-filter: blur(4px);">▶ Click to Play Demo</span>
             </div>
           </a>
           <div class="card-content">

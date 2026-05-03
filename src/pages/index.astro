@@ -11,7 +11,7 @@ import Layout from '../layouts/Layout.astro';
 
     <section id="games" class="section-container">
       <h2>Original Games</h2>
-      <div class="card-grid single">
+      <div class="card-grid">
         <div class="card game-card">
           <a href="/games/kiwi-defenders/" target="_blank" style="text-decoration: none;">
             <!-- 这里加入了背景图属性：background-image -->
@@ -26,6 +26,20 @@ import Layout from '../layouts/Layout.astro';
             <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">Playable Demo</span>
             <p>A strategic HTML5 tower defense experience. Command your defenses across a unique Kiwi-themed campaign map. Play the pure, SDK-free version directly in your browser.</p>
             <a href="/games/kiwi-defenders/" class="cta-button" target="_blank">Play Now ➔</a>
+          </div>
+        </div>
+
+        <div class="card game-card">
+          <div class="game-image-placeholder" style="background: #0f172a; background-size: cover; background-position: center;">
+            <!-- 使用低调的文字作为未公开项目的占位符 -->
+            <span style="color: #475569; font-weight: 800; font-size: 1.5rem; letter-spacing: 4px;">[ CLASSIFIED ]</span>
+          </div>
+          <div class="card-content">
+            <h3>Project: Pebble <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Working Title)</span></h3>
+            <!-- 橙色的研发中徽章 -->
+            <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">In Development</span>
+            <p>Our next original title is currently in the early prototyping and core engineering phase. Exploring fresh interactive mechanics. More details will be revealed soon.</p>
+            <!-- 既然还在开发中，这里就不放可点击的按钮了，保持神秘感 -->
           </div>
         </div>
       </div>

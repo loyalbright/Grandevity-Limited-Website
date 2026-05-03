@@ -4,60 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kiwi Defenders - Campaign Star Map</title>
+    <!-- 针对 iOS 添加到主屏幕的全屏优化元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kiwi Defenders">
+    
     <style>
-        /* 增加 width: 100vw，防止出现滚动条 */
-        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        /* 引入 dvh 动态视口高度，完美解决手机横屏地址栏遮挡底部的问题 */
+        body { 
+            margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; 
+            width: 100vw; height: 100vh; height: 100dvh; /* dvh 优先 */
+            font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; 
+        }
         
-        /* 🔧 修复：固定原生尺寸，确保电脑端不被拉伸 */
+        /* 地图容器：严格锁定原生 1280x720，绝对不允许被浏览器强制拉伸 */
         #map-container { 
-            position: relative; 
-            width: 1280px; 
-            height: 720px; 
+            position: relative; width: 1280px; height: 720px; 
             box-shadow: 0 0 50px rgba(0, 206, 201, 0.3); 
             background: #0a101d url('map_nz.webp') no-repeat center center; 
-            background-size: cover; 
-            overflow: hidden; 
-            border: 2px solid #00cec9; 
-            border-radius: 10px; 
-            transform-origin: center center; 
+            background-size: cover; overflow: hidden; 
+            border: 2px solid #00cec9; border-radius: 10px; transform-origin: center center; 
         }
 
-        /* 👑 顶栏排版大修：引入统一布局控制 */
+        /* 👑 顶栏排版 */
         #top-bar { 
             position: absolute; top: 0; left: 0; width: 100%; height: 60px; 
             background: rgba(10, 16, 29, 0.85); border-bottom: 2px solid #00cec9; 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; box-sizing: border-box; z-index: 10; backdrop-filter: blur(5px); 
-            gap: 15px; /* 保证标题和右侧按钮组有间距 */
+            padding: 0 20px; box-sizing: border-box; z-index: 10; backdrop-filter: blur(5px); gap: 15px; 
         }
         
-        /* 标题：调小字号，强制不换行并超长省略 */
         .title { 
-            font-size: 20px; font-weight: bold; color: #00cec9; 
-            text-shadow: 0 0 15px #00cec9; text-transform: uppercase; letter-spacing: 1px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1;
+            font-size: 20px; font-weight: bold; color: #00cec9; text-shadow: 0 0 15px #00cec9; 
+            text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; flex-shrink: 1;
         }
 
-        /* 控制面板容器：强制内容横向排列 */
-        .top-controls {
-            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-        }
+        .top-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
-        .xp-display { 
-            font-size: 18px; font-weight: bold; color: #9b59b6; 
-            text-shadow: 0 0 10px #9b59b6; white-space: nowrap; margin-right: 5px;
-        }
+        .xp-display { font-size: 18px; font-weight: bold; color: #9b59b6; text-shadow: 0 0 10px #9b59b6; white-space: nowrap; margin-right: 5px; }
         
-        /* 🕹️ 统一顶栏控件样式（按钮与下拉框） */
+        /* 🕹️ 统一控件样式：强制不换行 */
         .top-btn, .lang-select { 
-            height: 36px; padding: 0 12px; font-family: 'Segoe UI', sans-serif; 
-            font-weight: bold; font-size: 13px; border-radius: 5px; cursor: pointer; 
-            transition: 0.2s; outline: none; display: flex; align-items: center; 
-            justify-content: center; box-sizing: border-box; 
-            white-space: nowrap; /* 核心修复：禁止西班牙语换行 */
+            height: 36px; padding: 0 12px; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 13px; 
+            border-radius: 5px; cursor: pointer; transition: 0.2s; outline: none; 
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box; white-space: nowrap; 
         }
 
-        /* 分别定义各个按钮的主题色 */
         .lang-select { background: rgba(0, 206, 201, 0.1); border: 1px solid #00cec9; color: #00cec9; }
         .lang-select option { background: #050510; color: white; }
         .lang-select:hover { background: rgba(0, 206, 201, 0.3); }
@@ -112,7 +105,6 @@
 <body>
 
     <div id="map-container">
-        <!-- 整理后的统一顶栏结构 -->
         <div id="top-bar">
             <div class="title" data-i18n="title">Kiwi Defenders: Campaign Map</div>
             
@@ -163,14 +155,11 @@
         tryAutoplay();
     });
 
+    // 🔧 修复：无论放大还是缩小，始终等比例计算 transform: scale，确保全屏或桌面端填满窗口，同时守护坐标
     function resizeMap() {
         const container = document.getElementById('map-container');
-        if (window.innerWidth < 1280 || window.innerHeight < 720) {
-            const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
-            container.style.transform = `scale(${scale})`;
-        } else {
-            container.style.transform = `scale(1)`;
-        }
+        const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+        container.style.transform = `scale(${scale})`;
     }
     window.addEventListener('resize', resizeMap);
     resizeMap();
@@ -279,20 +268,41 @@
         }
     }
 
+    // 🔧 修复：全屏目标由容器改为 document.documentElement，并且添加 iOS 回退提示
     function toggleFullscreen() {
-        const container = document.getElementById('map-container');
+        const doc = document.documentElement; 
         const dict = i18n[currentLang];
         const fsText = document.querySelector('#fullscreen-toggle span');
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (container.requestFullscreen) { container.requestFullscreen(); } 
-            else if (container.webkitRequestFullscreen) { container.webkitRequestFullscreen(); }
+        
+        let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (doc.requestFullscreen) {
+                doc.requestFullscreen().catch(err => console.warn(err));
+            } else if (doc.webkitRequestFullscreen) {
+                doc.webkitRequestFullscreen();
+            } else if (doc.mozRequestFullScreen) {
+                doc.mozRequestFullScreen();
+            } else if (doc.msRequestFullscreen) {
+                doc.msRequestFullscreen();
+            } else {
+                // 如果是 iOS Safari（iPhone），不支持 API，弹出友好提示
+                alert(currentLang === 'zh' ? "您的手机浏览器不支持一键全屏。请将手机横屏，并轻扫页面隐藏地址栏获得最佳体验。" : "Fullscreen API is not supported on this browser (e.g. iPhone Safari). Please swipe up to hide the address bar for the best experience.");
+                return;
+            }
             fsText.innerText = dict.fs_exit;
         } else {
             if (document.exitFullscreen) { document.exitFullscreen(); } 
             else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+            else if (document.msExitFullscreen) { document.msExitFullscreen(); }
             fsText.innerText = dict.fs_enter;
         }
     }
+
+    // 监听全屏状态变化，以便用户按 Esc 退出时及时更新文字
+    document.addEventListener('fullscreenchange', applyTranslation);
+    document.addEventListener('webkitfullscreenchange', applyTranslation);
 
     let unlockedLevel = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
     let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;

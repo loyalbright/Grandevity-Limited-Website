@@ -97,26 +97,28 @@ import Layout from '../../layouts/Layout.astro';
     position: static !important; 
   }
 
-  /* --- 2. 手机横屏：终极沉浸模式 --- */
-  /* 当检测到设备是横屏，且高度较小（通常是手机）时触发 */
+/* --- 2. 手机横屏：终极沉浸模式 (修复版) --- */
   @media (max-height: 600px) and (orientation: landscape) {
-    /* 直接隐藏主导航栏、游戏标题和底部的全屏按钮，把屏幕 100% 交给游戏 */
+    /* 隐藏所有多余 UI */
     nav, .navbar, footer, .game-header, .game-controls {
       display: none !important;
     }
     
-    /* 抹平容器的所有内边距 */
-    .player-container {
-      padding: 0 !important;
-      max-width: 100% !important;
-    }
-    
-    /* 让 iframe 容器取消圆角，彻底铺满屏幕 */
+    /* 让游戏容器脱离网页束缚，绝对锁定在屏幕最上层 */
     .iframe-wrapper {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: none !important;
+      aspect-ratio: auto !important;
       border-radius: 0 !important;
       border: none !important;
-      height: 100vh !important;
-      aspect-ratio: auto !important; /* 取消固定的 16:9，让游戏引擎自己去适配手机宽高比 */
+      z-index: 9999 !important; /* 确保它在所有东西的最上面 */
+      background: #000 !important; /* 纯黑底色，防止边缘漏光 */
     }
   }
 </style>

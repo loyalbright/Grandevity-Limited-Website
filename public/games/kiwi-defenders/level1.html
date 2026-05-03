@@ -4,23 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kiwi Defenders - Level 1: Whangārei Bridge</title>
+    <!-- iOS 全屏元标签 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kiwi Defenders">
+    
     <style>
-        /* 增加 width: 100vw，防止出现滚动条 */
-        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
+        body { margin: 0; background-color: #050510; display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh; height: 100dvh; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; user-select: none; }
         
-        /* 🔧 核心修复 1：固定原生设计尺寸 1280x870 */
         #game-container { 
-            position: relative; 
-            width: 1280px; 
-            height: 870px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 0 40px rgba(0, 200, 255, 0.1); 
-            background: #000; 
-            transform-origin: center center; /* 设定缩放中心点 */
+            position: relative; width: 1280px; height: 870px; flex-shrink: 0; 
+            display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0, 200, 255, 0.1); 
+            background: #000; transform-origin: center center; 
         }
         
-        /* 锁定画布和面板尺寸 */
         canvas { width: 1280px; height: 720px; display: block; cursor: crosshair; }
         #ui-panel { width: 1280px; height: 150px; background: rgba(10, 20, 30, 0.95); border-top: 3px solid #34495e; display: flex; padding: 10px; box-sizing: border-box; gap: 15px; padding-bottom: 20px;}
         
@@ -55,56 +52,26 @@
         #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
 
         #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
-        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #00cec9; color: #00cec9; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #00cec9; color: #00cec9; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:hover { background: #00cec9; color: #000; }
         .ctrl-btn.on { background: #00cec9; color: #000; box-shadow: 0 0 10px #00cec9; }
 
-        /* --- 📱 移动端适配 (由于等比缩放，只需处理摇杆和提示) --- */
-        #mobile-controls {
-            display: none; /* 默认PC端隐藏 */
-            position: absolute;
-            bottom: 170px; /* 悬浮在 UI 面板上方 */
-            left: 30px;
-            gap: 40px;
-            z-index: 100;
-        }
-        #mobile-controls button {
-            width: 90px; height: 90px; /* 原生做大一点，缩放后刚好 */
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: white; font-size: 36px;
-            backdrop-filter: blur(4px);
-            touch-action: none;
-            outline: none;
-        }
-
-        /* 当屏幕较小时显示摇杆 */
-        @media (max-width: 1000px) {
-            #mobile-controls { display: flex; }
-        }
-
-        /* 强制竖屏用户旋转手机 */
+        #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
+        #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
+        @media (max-width: 1000px) { #mobile-controls { display: flex; } }
         @media (orientation: portrait) {
-            body::after {
-                content: "📱 Please rotate your device \A 请旋转手机至横屏游玩";
-                white-space: pre-wrap;
-                box-sizing: border-box;
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: #050510; color: #1abc9c; display: flex; 
-                justify-content: center; align-items: center;
-                z-index: 9999; font-size: 24px; text-align: center; padding: 20px;
-                line-height: 1.5;
-            }
+            body::after { content: "📱 Please rotate your device \A 请旋转手机至横屏游玩"; white-space: pre-wrap; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; color: #1abc9c; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5; }
         }
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <!-- 移除冗余控制栏，保留带暂停和全屏的完整版 -->
         <div id="level-controls">
-            <!-- 设置为默认开启 (带有 on class) -->
-            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵 <span>AUDIO: ON</span></button>
+            <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
+            <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
+            <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -119,6 +86,13 @@
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
         </div>
 
+        <!-- 暂停画面 -->
+        <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
+            <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
+            <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
+            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
+        </div>
+
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
             <h1 id="game-over-title" style="font-size: 50px;">BASE HAS FALLEN</h1>
             <p id="game-over-msg" style="font-size: 24px; color: #ccc;">The outpost is destroyed. Northland defense has collapsed!</p>
@@ -128,7 +102,6 @@
 
         <canvas id="gameCanvas" width="1280" height="720"></canvas>
 
-        <!-- 📱 移动端专属：虚拟移动按键 -->
         <div id="mobile-controls">
             <button id="btn-left">◀</button>
             <button id="btn-right">▶</button>
@@ -175,38 +148,17 @@
     </div>
 
 <script>
-// --- 🎮 纯净版管理器 (SDK 已剥离) ---
-    // --- 🎮 Pure Version Manager (SDK Stripped) ---
+    // --- 🎮 纯净版管理器 ---
     const CG_Manager = {
         isPaused: false, 
-
-        init: async function() {
-            console.log("Demo Mode: SDK Disabled. Running pure Web version.");
-        },
-
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
         startGameplay: function() {},
         stopGameplay: function() {},
-
-        playAd: function(type = 'midgame') {
-            console.log("Demo Mode: Ad skipped.");
-            this.resumeGame();
-        },
-
-        pauseGame: function() {
-            this.isPaused = true;
-            if (typeof bgm !== 'undefined' && !bgm.paused) {
-                bgm.pause();
-            }
-        },
-
-        resumeGame: function() {
-            this.isPaused = false;
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) {
-                bgm.play().catch(e => {});
-            }
-        }
+        playAd: function(type = 'midgame') { console.log("Demo Mode: Ad skipped."); this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
-    // 默认开启音频的破冰策略
+
     function tryAutoplay() {
         if (musicPlaying) {
             let playPromise = bgm.play();
@@ -224,18 +176,15 @@
         }
     }
 
-    // --- 📐 全局等比例缩放自适应逻辑 ---
     function resizeGame() {
         const container = document.getElementById('game-container');
-        // 计算缩放比例：用当前屏幕宽高，除以游戏的原生尺寸 (1280宽, 870高)
         const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 870);
         container.style.transform = `scale(${scale})`;
     }
-    // 监听窗口大小变化并初始化
     window.addEventListener('resize', resizeGame);
     resizeGame();
 
-    // --- 🌐 多语言架构 ---
+    // 🌐 多语言架构 (逗号已修复，增加全屏词条)
     const i18n = {
         en: {
             startTip: "✨ Tip: Stand strong on the Whangārei bridge and hold the line!", startBtn: "DEFEND WHANGĀREI",
@@ -251,7 +200,8 @@
             xpEarned: "XP EARNED: +{n}", defenseFailed: "DEFENSE FAILED",
             baseFallen: "BASE HAS FALLEN", baseFallenMsg: "The outpost is destroyed. Defense collapsed!",
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
-            backToMap: "BACK TO MAP", restart: "RESTART"
+            backToMap: "BACK TO MAP", restart: "RESTART",
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             startTip: "✨ 提示：死守旺阿雷大桥，绝不退缩！", startBtn: "保卫旺阿雷",
@@ -267,7 +217,8 @@
             xpEarned: "获得经验: +{n}", defenseFailed: "防守失败",
             baseFallen: "基地沦陷", baseFallenMsg: "前哨站被毁，防线崩溃！",
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
-            backToMap: "返回地图", restart: "重新开始"
+            backToMap: "返回地图", restart: "重新开始",
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             startTip: "✨ ヒント：ファンガレイの橋を死守せよ！", startBtn: "ファンガレイを防衛",
@@ -283,7 +234,8 @@
             xpEarned: "獲得XP: +{n}", defenseFailed: "防衛失敗",
             baseFallen: "基地陥落", baseFallenMsg: "前哨基地が破壊された。防衛線崩壊！",
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
-            backToMap: "マップに戻る", restart: "再試行"
+            backToMap: "マップに戻る", restart: "再試行",
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             startTip: "✨ Consejo: ¡Mantente firme en el puente de Whangārei y no cedas!", startBtn: "DEFENDER WHANGĀREI",
@@ -299,7 +251,8 @@
             xpEarned: "XP GANADA: +{n}", defenseFailed: "DEFENSA FALLIDA",
             baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "El puesto de avanzada está destruido. ¡La defensa colapsó!",
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
-            backToMap: "VOLVER AL MAPA", restart: "REINTENTAR"
+            backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -313,23 +266,20 @@
         const musicBtnSpan = document.querySelector('#music-toggle span');
         if (musicBtnSpan) musicBtnSpan.innerText = musicPlaying ? dict.musicOn : dict.musicOff;
         
-        if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') {
-            ui.armorBtn.querySelector('.price').innerText = dict.equipped;
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        if (fsTextSpan) {
+            const isFS = document.fullscreenElement || document.webkitFullscreenElement;
+            fsTextSpan.innerText = isFS ? dict.fs_exit : dict.fs_enter;
         }
+
+        if (ui.armorBtn && ui.armorBtn.dataset.bought === 'true') ui.armorBtn.querySelector('.price').innerText = dict.equipped;
         ui.wBtns.forEach(btn => {
-            if (btn.classList.contains('active')) {
-                btn.querySelector('.price').innerText = dict.equipped;
-            } else if (btn.dataset.bought) {
-                btn.querySelector('.price').innerText = dict.owned;
-            }
+            if (btn.classList.contains('active')) btn.querySelector('.price').innerText = dict.equipped;
+            else if (btn.dataset.bought) btn.querySelector('.price').innerText = dict.owned;
         });
-        
-        if (kevin && kevin.isDead) {
-            ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
-        }
+        if (kevin && kevin.isDead) ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
     }
     
-    // 初始化时启动 SDK 与音频拦截
     window.addEventListener('DOMContentLoaded', () => {
         applyTranslation();
         CG_Manager.init();
@@ -358,9 +308,8 @@
     const spearImg = new Image(); spearImg.src = 'spear.webp';
 
     const bgm = new Audio('bgm_level1.mp3'); 
-    bgm.loop = true; 
-    bgm.volume = 0.3;
-    let musicPlaying = true; // 默认开启
+    bgm.loop = true; bgm.volume = 0.3;
+    let musicPlaying = true; 
 
     function toggleMusic(event) {
         if (event) event.currentTarget.blur(); 
@@ -383,13 +332,8 @@
 
     function playSfx(type) {
         if (!musicPlaying) return; 
-
         const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3' };
-        if (soundMap[type]) { 
-            let sound = new Audio(soundMap[type]); 
-            sound.volume = 0.5; 
-            sound.play().catch(e => {}); 
-        }
+        if (soundMap[type]) { let sound = new Audio(soundMap[type]); sound.volume = 0.5; sound.play().catch(e => {}); }
     }
 
     const ui = {
@@ -404,13 +348,15 @@
     let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
     ui.globalXpText.innerText = globalXP;
 
-    let isRunning = false; let isGameOver = false; let frameCount = 0;
+    // 补齐生命周期变量
+    let isRunning = false; let isGameOver = false; let frameCount = 0; let animationFrameId;
     let gold = 300; let sessionXP = 0; let ultTimer = 0; let spawnTimer = 0;
     let currentUpgrades = { gold: 0, hp: 0, spd: 0, dmg: 0 };
     const GROUND_Y = 510; 
     let hq, ship, kevin;
     let allies = []; let enemies = []; let bullets = [];
     let floatingTexts = []; let souls = []; let spawnEffects = []; 
+    let isPlayerPaused = false;
 
     const weapons = {
         kick:  { type: 'melee', damage: 30, range: 60, cooldown: 30 }, 
@@ -432,10 +378,10 @@
         kevin = { x: 250, y: GROUND_Y - 60, w: 60, h: 60, color: '#4caf50', hp: 500, maxHp: 500, speed: kevinSpd, weapon: 'kick', attackTimer: 0, isAttacking: false, attackAnim: 0, hitTimer: 0, isDead: false, isHidden: false, hasArmor: false, facing: 1 };
         allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = [];
         
-        gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0;
+        gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; isPlayerPaused = false;
 
-	isGameOver = false; isRunning = true;
-        CG_Manager.startGameplay(); // 👈 告诉平台，玩家开打了！
+        isGameOver = false; isRunning = true;
+        CG_Manager.startGameplay(); 
         ui.gameOverScreen.style.display = 'none'; ui.restartBtn.style.display = 'none'; ui.respawnScreen.style.display = 'none';
         ui.wBtns.forEach(btn => { 
             btn.classList.remove('active'); 
@@ -449,38 +395,69 @@
         });
         ui.armorBtn.classList.remove('active'); ui.armorBtn.dataset.bought = ''; ui.armorBtn.querySelector('.price').innerText = '100';
         applyTranslation();
-        requestAnimationFrame(loop);
+        animationFrameId = requestAnimationFrame(loop);
     }
 
-    // --- 🎯 鼠标与触摸坐标更新逻辑 ---
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
-    
+    function togglePlayerPause(event) {
+        if (event) event.currentTarget.blur();
+        if (!isRunning || isGameOver) return;
+
+        isPlayerPaused = !isPlayerPaused;
+        const pauseScreen = document.getElementById('pause-screen');
+
+        if (isPlayerPaused) {
+            pauseScreen.style.display = 'flex';
+            if (musicPlaying) bgm.pause();
+        } else {
+            pauseScreen.style.display = 'none';
+            if (musicPlaying) bgm.play().catch(e => {});
+        }
+    }
+
+    // 加入全屏控制
+    function toggleFullscreen(event) {
+        if (event) event.currentTarget.blur();
+        const doc = document.documentElement; 
+        const dict = i18n[currentLang];
+        const fsTextSpan = document.querySelector('#fs-toggle span');
+        let isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+        if (!isFullscreen) {
+            if (doc.requestFullscreen) { doc.requestFullscreen().catch(err => console.warn(err)); } 
+            else if (doc.webkitRequestFullscreen) { doc.webkitRequestFullscreen(); } 
+            else { alert(currentLang === 'zh' ? "您的手机浏览器不支持一键全屏。请轻扫页面隐藏地址栏。" : "Fullscreen API is not supported. Please swipe up to hide the address bar."); return; }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_exit;
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); } 
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            if (fsTextSpan) fsTextSpan.innerText = dict.fs_enter;
+        }
+    }
+    document.addEventListener('fullscreenchange', applyTranslation);
+    document.addEventListener('webkitfullscreenchange', applyTranslation);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && isRunning && !isGameOver && !isPlayerPaused) togglePlayerPause();
+    });
+
+    let mouseX = canvas.width / 2; let mouseY = canvas.height / 2;
     function updateAim(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
         mouseX = (clientX - rect.left) / rect.width * canvas.width;
         mouseY = (clientY - rect.top) / rect.height * canvas.height;
     }
 
-    // 1. PC端鼠标事件
     canvas.addEventListener('mousemove', (e) => updateAim(e.clientX, e.clientY));
     canvas.addEventListener('mousedown', (e) => { if(e.button === 0) triggerAttack(); });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); triggerAttack(); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
-    // 2. 移动端触摸事件
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-        triggerAttack();
-    }, { passive: false });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        updateAim(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: false });
-
-    // 3. 键盘与虚拟按键逻辑
     const keys = {};
-    window.addEventListener('keydown', e => { keys[e.code] = true; if(e.code==='Space') triggerAttack(); });
+    window.addEventListener('keydown', e => { 
+        keys[e.code] = true; 
+        if(e.code==='Space') triggerAttack(); 
+        if(e.code==='Escape' || e.code==='KeyP') togglePlayerPause(); 
+    });
     window.addEventListener('keyup', e => keys[e.code] = false);
 
     const btnLeft = document.getElementById('btn-left');
@@ -498,9 +475,7 @@
     }
     
     ui.startBtn.addEventListener('click', (e) => { 
-        e.currentTarget.blur();
-        ui.startScreen.style.display = 'none'; 
-        // 只需尝试播放音频即可（因为已经通过 tryAutoplay 初始化拦截）
+        e.currentTarget.blur(); ui.startScreen.style.display = 'none'; 
         if (musicPlaying) bgm.play().catch(e => {}); 
         initGame(); 
     });
@@ -509,7 +484,7 @@
     ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
 
     function triggerAttack() {
-        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0) return;
+        if (!isRunning || isGameOver || kevin.isDead || kevin.attackTimer > 0 || isPlayerPaused) return;
         let w = weapons[kevin.weapon];
         kevin.isAttacking = true; kevin.attackAnim = 30; kevin.attackTimer = w.cooldown;
         
@@ -530,15 +505,8 @@
     
     function equipWeapon(btn, id) { 
         const dict = i18n[currentLang];
-        ui.wBtns.forEach(b => { 
-            if(b.id !== 'armor-btn') { 
-                b.classList.remove('active'); 
-                if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; 
-            } 
-        }); 
-        btn.classList.add('active'); 
-        btn.querySelector('.price').innerText = dict.equipped; 
-        kevin.weapon = id; 
+        ui.wBtns.forEach(b => { if(b.id !== 'armor-btn') { b.classList.remove('active'); if(b.dataset.bought) b.querySelector('.price').innerText = dict.owned; } }); 
+        btn.classList.add('active'); btn.querySelector('.price').innerText = dict.equipped; kevin.weapon = id; 
     }
     
     ui.sBtns.forEach(btn => btn.addEventListener('click', (e) => { e.currentTarget.blur(); let type = btn.dataset.type; let price = parseInt(btn.dataset.price); if (gold >= price && !kevin.isDead) { gold -= price; let ally = { x: hq.x + hq.w, attackTimer: 0, hitTimer: 0, type: type }; if (type === 'basic') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8bc34a', hp: 120, maxHp: 120, speed: 2.5, range: 20, damage: 25 }); if (type === 'shield') Object.assign(ally, { w: 55, h: 65, y: GROUND_Y - 65, color: '#795548', hp: 550, maxHp: 550, speed: 1.2, range: 20, damage: 15 }); if (type === 'sniper') Object.assign(ally, { w: 65, h: 65, y: GROUND_Y - 65, color: '#2e7d32', hp: 100, maxHp: 100, speed: 1.8, range: 350, damage: 75 }); if (type === 'healer') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#ff9ecd', hp: 150, maxHp: 150, speed: 2.0, range: 150, damage: -50 }); allies.push(ally); } }));
@@ -597,37 +565,12 @@
     function draw() {
         if (bgImg.complete && bgImg.naturalHeight !== 0) { ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height); } else { ctx.fillStyle = '#0a101d'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
         
-        ctx.save(); 
-        let hqVisUiY = getVisualY(hq.x, hq.y); 
-        let hqHpPct = Math.max(0, hq.hp / hq.maxHp); 
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; 
-        ctx.fillRect(hq.x + hq.w/2 - 100, hqVisUiY - 50, 200, 30); 
-        ctx.fillStyle = '#1abc9c'; ctx.font = 'bold 16px Arial'; 
-        ctx.fillText('BASE WHANGĀREI', hq.x + hq.w/2 - 80, hqVisUiY - 30); 
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; 
-        ctx.fillRect(hq.x + hq.w/2 - 80, hqVisUiY - 10, 160, 10); 
-        ctx.fillStyle = hqHpPct > 0.6 ? '#1abc9c' : (hqHpPct > 0.3 ? '#f1c40f' : '#e74c3c'); 
-        ctx.fillRect(hq.x + hq.w/2 - 80, hqVisUiY - 10, 160 * hqHpPct, 10); 
-        ctx.restore();
+        ctx.save(); let hqVisUiY = getVisualY(hq.x, hq.y); let hqHpPct = Math.max(0, hq.hp / hq.maxHp); ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(hq.x + hq.w/2 - 100, hqVisUiY - 50, 200, 30); ctx.fillStyle = '#1abc9c'; ctx.font = 'bold 16px Arial'; ctx.fillText('BASE WHANGĀREI', hq.x + hq.w/2 - 80, hqVisUiY - 30); ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(hq.x + hq.w/2 - 80, hqVisUiY - 10, 160, 10); ctx.fillStyle = hqHpPct > 0.6 ? '#1abc9c' : (hqHpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(hq.x + hq.w/2 - 80, hqVisUiY - 10, 160 * hqHpPct, 10); ctx.restore();
 
         let shipVisY = ship.y; let hover = 0;
         if (shipImg.complete && shipImg.naturalHeight !== 0) {
-            hover = Math.sin(frameCount * 0.05) * 15; 
-            ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h);
-            
-            // 🔧 修复 2：增加飞船顶部的半透明底框和名称 (完美对齐)
-            ctx.save();
-            let shipUiY = shipVisY + hover;
-            let shpPct = Math.max(0, ship.hp / ship.maxHp); 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; 
-            ctx.fillRect(ship.x + ship.w/2 - 75, shipUiY - 50, 150, 30); 
-            ctx.fillStyle = '#e94560'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center';
-            ctx.fillText('ZOGON POD', ship.x + ship.w/2, shipUiY - 30); 
-            ctx.fillStyle = 'rgba(0,0,0,0.6)'; 
-            ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120, 10); 
-            ctx.fillStyle = '#e94560'; 
-            ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120 * shpPct, 10); 
-            ctx.restore();
+            hover = Math.sin(frameCount * 0.05) * 15; ctx.drawImage(shipImg, ship.x, shipVisY + hover, ship.w, ship.h);
+            ctx.save(); let shipUiY = shipVisY + hover; let shpPct = Math.max(0, ship.hp / ship.maxHp); ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fillRect(ship.x + ship.w/2 - 75, shipUiY - 50, 150, 30); ctx.fillStyle = '#e94560'; ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.fillText('ZOGON POD', ship.x + ship.w/2, shipUiY - 30); ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120, 10); ctx.fillStyle = '#e94560'; ctx.fillRect(ship.x + ship.w/2 - 60, shipUiY - 10, 120 * shpPct, 10); ctx.restore();
         } else {
             ctx.fillStyle = ship.color; ctx.fillRect(ship.x, shipVisY, ship.w, ship.h); ctx.fillStyle = '#8e44ad'; ctx.fillRect(ship.x + 40, shipVisY + 100, 150, 80); ctx.fillStyle = '#e74c3c'; ctx.font = '24px Arial'; ctx.fillText('ZOGON', ship.x + 70, shipVisY + 40);
         }
@@ -658,7 +601,6 @@
 
     function drawEntity(e, isKevin) { 
         let visualY = getVisualY(e.x, e.y); ctx.save(); if (isKevin && e.isHidden) ctx.globalAlpha = 0.5; if (e.hitTimer && e.hitTimer > 0) ctx.filter = 'brightness(200%)'; 
-        
         let customBobbing = (e.hitTimer > 0) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
         if (isKevin) { 
             if (keys['KeyA'] || keys['KeyD']) customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; 
@@ -666,85 +608,49 @@
             let currentSprite = e.hasArmor ? armorImg : kevinImg; 
             if (currentSprite.complete && currentSprite.naturalHeight > 0) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } 
             else { ctx.fillStyle = e.color || '#4caf50'; ctx.fillRect(-e.w/2, -e.h - customBobbing, e.w, e.h); } 
-        } 
-        else { 
+        } else { 
             let imgToDraw = null; 
-            if (e.type === 'grunt') imgToDraw = gruntImg; 
-            else if (e.type === 'tank') imgToDraw = tankImg; 
-            else if (e.type === 'shooter') imgToDraw = shooterImg; 
-            else if (e.type === 'scout') imgToDraw = scoutImg; 
-            else if (e.type === 'basic') imgToDraw = basicImg; 
-            else if (e.type === 'shield') imgToDraw = shieldImg; 
-            else if (e.type === 'sniper') imgToDraw = sniperImg; 
-            else if (e.type === 'healer') imgToDraw = healerImg; 
-            else if (e.type === 'haikou') imgToDraw = haikouImg; 
-            else if (e.type === 'raiatea') imgToDraw = raiateaImg; 
-
+            if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; 
+            else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; 
+            else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; 
+            else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; 
+            else if (e.type === 'haikou') imgToDraw = haikouImg; else if (e.type === 'raiatea') imgToDraw = raiateaImg; 
             ctx.translate(e.x + e.w / 2, visualY + e.h); 
             if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
-                let scaleFactor = e.h / imgToDraw.naturalHeight; 
-                ctx.scale(e.facing || 1, 1); 
-                ctx.scale(scaleFactor, scaleFactor); 
-                ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor); 
+                let scaleFactor = e.h / imgToDraw.naturalHeight; ctx.scale(e.facing || 1, 1); ctx.scale(scaleFactor, scaleFactor); ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor); 
             } else { 
                 ctx.fillStyle = e.color || '#fff'; ctx.fillRect(-e.w / 2, -e.h - customBobbing, e.w, e.h); 
                 if (!e.isFlying && e.hp > 0) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill(); }
             } 
         } 
         ctx.restore(); 
-        
         let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
     }
 
     function updateUI() { ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; ui.wBtns.forEach(btn => { if(btn.id !== 'armor-btn') btn.disabled = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); }); ui.sBtns.forEach(btn => btn.disabled = kevin.isDead || gold < parseInt(btn.dataset.price)); ui.armorBtn.disabled = kevin.isDead || kevin.hasArmor || gold < 100; }
     
     function endGame(isVictory) { 
-        bgm.pause();
-	CG_Manager.stopGameplay(); // 👈 告诉平台，这局打完了！
-        const dict = i18n[currentLang];
-        isRunning = false; 
-        isGameOver = true; 
-        
+        bgm.pause(); CG_Manager.stopGameplay(); 
+        const dict = i18n[currentLang]; isRunning = false; isGameOver = true; 
         if (isVictory) {
             let safeSessionXP = typeof sessionXP !== 'undefined' ? sessionXP : 0;
             let currentGlobalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
             let finalSessionXP = safeSessionXP + 500;
-            let newGlobalXP = currentGlobalXP + finalSessionXP;
-            
-            try {
-                localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
-                let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
-                if(currentUnlocked <= 1) {
-                    localStorage.setItem('kiwiUnlockedLevel', 2);
-                }
-            } catch(e) {
-                console.error("Local storage write failed:", e);
-            }
+            localStorage.setItem('kiwiGlobalXP', currentGlobalXP + finalSessionXP); 
+            let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
+            if(currentUnlocked <= 1) localStorage.setItem('kiwiUnlockedLevel', 2);
             ui.sessionXpMsg.innerText = dict.xpEarned.replace('{n}', finalSessionXP); 
-        } else {
-            ui.sessionXpMsg.innerText = dict.defenseFailed; 
-        }
-        
-        ui.gameOverTitle.innerText = isVictory ? dict.victory : dict.baseFallen; 
-        ui.gameOverTitle.style.color = isVictory ? '#f1c40f' : '#e74c3c'; 
+        } else { ui.sessionXpMsg.innerText = dict.defenseFailed; }
+        ui.gameOverTitle.innerText = isVictory ? dict.victory : dict.baseFallen; ui.gameOverTitle.style.color = isVictory ? '#f1c40f' : '#e74c3c'; 
         ui.gameOverMsg.innerText = isVictory ? dict.victoryMsg : dict.baseFallenMsg; 
-        ui.respawnScreen.style.display = 'none'; 
-        ui.gameOverScreen.style.display = 'flex'; 
-        ui.restartBtn.style.display = 'block'; 
-        
-        if (isVictory) {
-            ui.restartBtn.innerText = dict.backToMap; 
-            ui.restartBtn.onclick = () => { window.location.href = "index.html"; };
-        } else {
-            ui.restartBtn.innerText = dict.restart; 
-            ui.restartBtn.onclick = () => { window.location.reload(); };
-        }
+        ui.respawnScreen.style.display = 'none'; ui.gameOverScreen.style.display = 'flex'; ui.restartBtn.style.display = 'block'; 
+        if (isVictory) { ui.restartBtn.innerText = dict.backToMap; ui.restartBtn.onclick = () => { window.location.href = "index.html"; }; } 
+        else { ui.restartBtn.innerText = dict.restart; ui.restartBtn.onclick = () => { window.location.reload(); }; }
     }
     
-    // 🔧 核心修复：添加 CrazyGames 暂停检测
     function loop() { 
         if(isRunning && !isGameOver){ 
-            if (!CG_Manager.isPaused) update(); 
+            if (!CG_Manager.isPaused && !isPlayerPaused) update(); 
             draw(); 
         }
         animationFrameId = requestAnimationFrame(loop); 

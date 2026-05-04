@@ -55,11 +55,13 @@
         #respawn-screen { background: rgba(50, 0, 0, 0.7); z-index: 40; display: none; }
         #respawn-btn { background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5); }
 
+        /* 🎵 声音控制栏 */
         #level-controls { position: absolute; top: 50px; right: 20px; display: flex; gap: 10px; z-index: 100; }
         .ctrl-btn { background: rgba(0, 0, 0, 0.6); border: 1px solid #f39c12; color: #f39c12; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; backdrop-filter: blur(4px); transition: 0.2s; outline: none; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:hover { background: #f39c12; color: #000; }
         .ctrl-btn.on { background: #f39c12; color: #000; box-shadow: 0 0 10px #f39c12; }
 
+        /* --- 📱 移动端摇杆与提示 --- */
         #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
         #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
 
@@ -554,7 +556,10 @@
             let hitbox = { x: kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - w.range, y: kevin.y - 30, w: w.range, h: kevin.h + 60 };
             enemies.forEach(e => { 
                 if (e.isFlying) return; 
-                if (checkCol(hitbox, e)) { e.hp -= boostedDamage; e.x += 15 * kevin.facing; playSfx('hit'); spawnSparks(e.x + e.w/2, e.y + e.h/2, '#fff'); } 
+                if (checkCol(hitbox, e)) { 
+                    let dmg = boostedDamage; if (e.armorBreak && e.armorBreak > 0) dmg *= 2.0; 
+                    e.hp -= dmg; e.x += 15 * kevin.facing; playSfx('hit'); spawnSparks(e.x + e.w/2, e.y + e.h/2, '#fff'); 
+                } 
             }); 
             if (checkCol(hitbox, ship)) ship.hp -= boostedDamage;
         } else {
@@ -576,6 +581,7 @@
                 });
             } else {
                 let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
+                // 🛑 FIXED: Set `isAA: false` here to signify this bullet should NOT hit flyers
                 bullets.push({ x: startX, y: kevin.y + 20, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
             }
         }
@@ -596,24 +602,26 @@
     
     ui.sBtns.forEach(btn => btn.addEventListener('click', (e) => { e.currentTarget.blur(); let type = btn.dataset.type; let price = parseInt(btn.dataset.price); if (gold >= price && !kevin.isDead) { gold -= price; let ally = { x: hq.x + hq.w, attackTimer: 0, hitTimer: 0, type: type }; if (type === 'basic') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8bc34a', hp: 100, maxHp: 100, speed: 2.5, range: 20, damage: 20 }); if (type === 'shield') Object.assign(ally, { w: 55, h: 65, y: GROUND_Y - 65, color: '#795548', hp: 450, maxHp: 450, speed: 1.2, range: 20, damage: 10 }); if (type === 'sniper') Object.assign(ally, { w: 65, h: 65, y: GROUND_Y - 65, color: '#2e7d32', hp: 80, maxHp: 80, speed: 1.8, range: 350, damage: 60 }); if (type === 'healer') Object.assign(ally, { w: 40, h: 40, y: GROUND_Y - 40, color: '#ff9ecd', hp: 120, maxHp: 120, speed: 2, range: 150, damage: -40 }); allies.push(ally); } }));
     
-    ui.ultBtns.forEach(btn => btn.addEventListener('click', (e) => { 
-        e.currentTarget.blur();
-        if (ultTimer >= 3600 && !kevin.isDead) { 
-            ultTimer = 0; let type = btn.dataset.type; 
-            let ally = { x: hq.x + hq.w, hitTimer: 0, type: type }; 
-            
-            if (type === 'hitachi') { 
-                Object.assign(ally, { w: 100, h: 120, y: GROUND_Y - 120, color: '#00c6ff', hp: 900, maxHp: 900, speed: 3.5, range: 45, damage: 110, attackTimer: 0, sprite: shibaImg }); 
-            } else if (type === 'yantai') { 
-                Object.assign(ally, { w: 150, h: 130, y: GROUND_Y - 130, color: '#bdc3c7', hp: 2500, maxHp: 2500, speed: 0.8, range: 50, damage: 60, attackTimer: 0, sprite: sealImg }); 
-            } else if (type === 'klamath') { 
-                Object.assign(ally, { w: 100, h: 80, y: GROUND_Y - 160, color: '#8e44ad', hp: 650, maxHp: 650, speed: 3.2, range: 35, damage: 65, attackTimer: 0, isFlying: true, sprite: eagleImg });
-            } else if (type === 'macquarie') { 
-                Object.assign(ally, { w: 100, h: 110, y: GROUND_Y - 110, color: '#f1c40f', hp: 1200, maxHp: 1200, speed: 1.2, range: 250, damage: 130, attackTimer: 0, sprite: pelicanImg });
+    ui.ultBtns.forEach(btn => { 
+        btn.addEventListener('click', (e) => { 
+            e.currentTarget.blur();
+            if (ultTimer >= 3600 && !kevin.isDead) { 
+                ultTimer = 0; let type = btn.dataset.type; 
+                let ally = { x: hq.x + hq.w, hitTimer: 0, type: type }; 
+                
+                if (type === 'hitachi') { 
+                    Object.assign(ally, { w: 100, h: 120, y: GROUND_Y - 120, color: '#00c6ff', hp: 900, maxHp: 900, speed: 3.5, range: 45, damage: 110, attackTimer: 0, sprite: shibaImg }); 
+                } else if (type === 'yantai') { 
+                    Object.assign(ally, { w: 150, h: 130, y: GROUND_Y - 130, color: '#bdc3c7', hp: 2500, maxHp: 2500, speed: 0.8, range: 50, damage: 60, attackTimer: 0, sprite: sealImg }); 
+                } else if (type === 'klamath') { 
+                    Object.assign(ally, { w: 100, h: 80, y: GROUND_Y - 160, color: '#8e44ad', hp: 650, maxHp: 650, speed: 3.2, range: 35, damage: 65, attackTimer: 0, isFlying: true, sprite: eagleImg });
+                } else if (type === 'macquarie') { 
+                    Object.assign(ally, { w: 100, h: 110, y: GROUND_Y - 110, color: '#f1c40f', hp: 1200, maxHp: 1200, speed: 1.2, range: 250, damage: 130, attackTimer: 0, sprite: pelicanImg });
+                } 
+                allies.push(ally); 
             } 
-            allies.push(ally); 
-        } 
-    }));
+        });
+    });
 
     function spawnSoul(entity, dir) { souls.push({ x: entity.x + entity.w / 2, y: entity.y, color: entity.color || '#fff', life: 60, maxLife: 60, dx: dir * 0.8, dy: -1.5 }); }
     function spawnFloatingText(x, y, text, color, dir) { floatingTexts.push({ x: x, y: y, text: text, color: color, life: 40, maxLife: 40, dx: dir * 1.5, dy: -1.8 }); }
@@ -685,7 +693,7 @@
             if (frameCount % 3 === 0) spawnSparks(geyser.x + Math.random()*geyser.w, GROUND_Y, '#00e5ff');
         }
 
-        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#2ecc71'; ui.ultBtns.forEach(b => b.disabled = false); }
+        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#f39c12'; ui.ultBtns.forEach(b => b.disabled = false); }
         floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
         souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
         spawnEffects.forEach(se => { se.life--; }); spawnEffects = spawnEffects.filter(se => se.life > 0);
@@ -697,7 +705,7 @@
         let baseInterval = Math.max(100, 220 - (frameCount / 200)); let currentInterval = Math.max(50, baseInterval - (pushProgress * 60)); 
         
         if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
-            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0 }; 
+            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0 }; 
             
             if (rand < 0.15 + (pushProgress * 0.15)) { Object.assign(enemy, { w: 135, h: 85, y: GROUND_Y - 85, color: '#c0392b', hp: 350, maxHp: 350, speed: 0.8, range: 25, damage: 30, reward: 35, xpReward: 6, type: 'tank' }); } 
             else if (rand < 0.35 + (pushProgress * 0.2)) { Object.assign(enemy, { w: 50, h: 40, y: GROUND_Y - 160, color: '#8e44ad', hp: 90, maxHp: 90, speed: 2.2, range: 20, damage: 30, reward: 25, xpReward: 4, type: 'flyer', isFlying: true }); }
@@ -721,6 +729,11 @@
             if (b.isRanged && !b.isAA) projHitBox = {x: b.x, y: 0, w: b.w, h: canvas.height}; 
 
             for (let t of targetList) { 
+                // 🛑 FIX: Check `b.isAA` against `t.isFlying`. Horizontal shots ignore flying enemies.
+                if (b.isPlayer && b.isAA === false && t.isFlying) {
+                    continue; 
+                }
+
                 if (!hit && checkCol(projHitBox, t)) { 
                     let dmg = b.damage; 
                     if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
@@ -728,8 +741,16 @@
                     if (b.isRanged) spawnSparks(b.x, b.y, '#ffea00');
                 } 
             } 
-            if (b.isPlayer && !hit && checkCol(projHitBox, ship)) { ship.hp -= b.damage; hit = true; playSfx('hit'); spawnSparks(b.x, b.y, '#ff4500'); } 
-            if (!b.isPlayer && !hit && checkCol(projHitBox, hq)) { hq.hp -= b.damage; hq.hitTimer = 10; hit = true; playSfx('hit'); spawnSparks(b.x, b.y, '#ccc');} 
+            
+            // 🛑 FIX: Ensure Player Bullets do not hit the bottom empty space of the Spaceship
+            if (b.isPlayer && !hit && checkCol(projHitBox, ship) && b.y < ship.y + ship.h - 80) { 
+                ship.hp -= b.damage; hit = true; playSfx('hit'); spawnSparks(b.x, b.y, '#ff4500'); 
+            } 
+            
+            if (!b.isPlayer && !hit && checkCol(projHitBox, hq)) { 
+                hq.hp -= b.damage; hq.hitTimer = 10; hit = true; playSfx('hit'); spawnSparks(b.x, b.y, '#ccc');
+            } 
+            
             if (hit || b.x < 0 || b.x > canvas.width || b.y < -100 || b.y > canvas.height) bullets.splice(i, 1); 
         }
         

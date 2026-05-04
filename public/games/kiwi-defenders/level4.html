@@ -61,6 +61,7 @@
         .ctrl-btn:hover { background: #3498db; color: #000; }
         .ctrl-btn.on { background: #3498db; color: #000; box-shadow: 0 0 10px #3498db; }
 
+        /* --- 📱 移动端摇杆与提示 --- */
         #mobile-controls { display: none; position: absolute; bottom: 170px; left: 30px; gap: 40px; z-index: 100; }
         #mobile-controls button { width: 90px; height: 90px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 36px; backdrop-filter: blur(4px); touch-action: none; outline: none; }
 
@@ -556,12 +557,14 @@
         } else {
             if (w.isAntiAir) {
                 let startX = kevin.x + kevin.w / 2; let startY = getVisualY(kevin.x, kevin.y) + kevin.h / 2;
-                let dx = mouseX - startX; let dy = mouseY - startY;
-                kevin.facing = dx >= 0 ? 1 : -1; if (dx === 0 && dy === 0) dx = kevin.facing; dy = Math.min(0, dy); 
+                let dx = mouseX - startX; let dy = Math.min(0, mouseY - startY);
+                if (dx === 0 && dy === 0) dx = kevin.facing; 
                 let angle = Math.atan2(dy, dx);
+                kevin.facing = dx >= 0 ? 1 : -1; 
                 bullets.push({ x: startX, y: startY, w: 24, h: 6, color: '#00e5ff', dx: Math.cos(angle) * w.speed, dy: Math.sin(angle) * w.speed, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: true, angle: angle });
             } else {
                 let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
+                // 🛑 修复1：明确标注非防空武器 `isAA: false`，配合下方碰撞逻辑
                 bullets.push({ x: startX, y: GROUND_Y - 30, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
             }
         }
@@ -676,11 +679,18 @@
             let isPenetrating = b.type === 'water';
             let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
             
+            // 🛑 修复2：缩小飞船针对低空投射物的判定区域。这样可以射击飞船下方的敌人。
             let projHitBox = b;
             if (b.isRanged && !b.isAA) projHitBox = {x: b.x, y: 0, w: b.w, h: canvas.height}; 
 
             for (let t of targetList) { 
                 if (!b.hitTargets) b.hitTargets = new Set();
+                
+                // 🛑 修复1配合：弓箭水平射击不能打飞行毒蜂
+                if (b.isPlayer && b.isAA === false && t.isFlying) {
+                    continue; 
+                }
+
                 if (!shouldDestroy && checkCol(projHitBox, t) && !b.hitTargets.has(t)) { 
                     let dmg = b.damage; 
                     if (t === kevin && kevin.hasArmor) dmg = Math.floor(dmg * 0.5); 
@@ -693,7 +703,8 @@
                 } 
             } 
             
-            if (b.isPlayer && !shouldDestroy && checkCol(projHitBox, ship)) { 
+            // 🛑 修复2配合：如果子弹是玩家发射且不在飞船的 y 轴主体范围内（比如很低），就不击中飞船
+            if (b.isPlayer && !shouldDestroy && checkCol(projHitBox, ship) && b.y < ship.y + ship.h - 80) { 
                 if (!b.hitTargets) b.hitTargets = new Set();
                 if (!b.hitTargets.has(ship)) {
                     ship.hp -= b.damage; b.hitTargets.add(ship); playSfx('hit'); spawnSparks(b.x + b.w, b.y + b.h/2, '#ff4500');
@@ -934,7 +945,7 @@
             let visY = getVisualY(kevin.x, kevin.y); let weaponId = kevin.weapon; let animProgress = (30 - kevin.attackAnim) / 30; 
             ctx.save(); ctx.translate(kevin.x + kevin.w / 2, visY + kevin.h / 2); ctx.scale(kevin.facing, 1); 
             if (kevin.weapon === 'kick') { for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.beginPath(); ctx.arc(kevin.w/2 + animProgress*30 + i*8, kevin.h/2 - 10, 6, 0, Math.PI*2); ctx.fill(); } } 
-            else { let wImg = weapons[kevin.weapon].img; if (wImg && wImg.complete && wImg.naturalHeight > 0) { if (kevin.weapon === 'sword') { ctx.rotate(-Math.PI / 3 + (Math.PI / 1.5) * Math.sin(animProgress * Math.PI)); ctx.drawImage(wImg, 10, -30, 60, 60); } else if (kevin.weapon === 'spear') { let maxThrust = 60; let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6)); ctx.translate(25 + currentThrust, -5); ctx.rotate(Math.PI / 4); ctx.drawImage(wImg, -30, -30, 60, 60); } else if (kevin.weapon === 'bow') { ctx.drawImage(wImg, 10 - Math.sin(animProgress * Math.PI)*5, -30, 60, 60); } } }
+            else { let wImg = weapons[kevin.weapon].img; if (wImg && wImg.complete && wImg.naturalHeight > 0) { if (kevin.weapon === 'sword') { ctx.rotate(-Math.PI / 3 + (Math.PI / 1.5) * Math.sin(animProgress * Math.PI)); ctx.drawImage(wImg, 10, -30, 60, 60); } else if (kevin.weapon === 'spear') { let maxThrust = 60; let currentThrust = (animProgress < 0.3) ? (animProgress / 0.3) * maxThrust : (animProgress < 0.4 ? maxThrust : maxThrust * (1 - (animProgress - 0.4) / 0.6)); ctx.save(); ctx.translate(25 + currentThrust, -5); ctx.rotate(Math.PI / 4); ctx.drawImage(wImg, -30, -30, 60, 60); ctx.restore(); } else if (kevin.weapon === 'bow') { ctx.drawImage(wImg, 10 - Math.sin(animProgress * Math.PI)*5, -30, 60, 60); } } }
             ctx.restore();
         }
         

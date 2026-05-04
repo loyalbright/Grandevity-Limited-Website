@@ -368,8 +368,8 @@
     const shooterImg = new Image(); shooterImg.src = 'zogon_shooter.webp'; 
     const scoutImg = new Image(); scoutImg.src = 'zogon_scout.webp'; 
     const flyerImg = new Image(); flyerImg.src = 'zogon_flyer.webp'; 
+    const devImg = new Image(); devImg.src = 'zogon_blocker_monster.webp'; 
     const aaGunImg = new Image(); aaGunImg.src = 'aa_gun.webp';
-
     const basicImg = new Image(); basicImg.src = 'novice_bird.webp'; 
     const shieldImg = new Image(); shieldImg.src = 'shield_bird.webp'; 
     const sniperImg = new Image(); sniperImg.src = 'sniper_bird.webp'; 
@@ -574,7 +574,7 @@
                 bullets.push({ x: startX, y: startY, w: 24, h: 6, color: '#00e5ff', dx: Math.cos(angle) * w.speed, dy: Math.sin(angle) * w.speed, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: true, angle: angle });
             } else {
                 let startX = kevin.facing === 1 ? kevin.x + kevin.w : kevin.x - 30;
-                // 🛑 FIXED: Set `isAA: false` here so Kevin's bow explicitly ignores flying enemies!
+                // 🛑 修复：必须在此显式标注 isAA: false，配合子弹循环中的限制条件
                 bullets.push({ x: startX, y: GROUND_Y - 30, w: 30, h: 5, color: '#ffea00', dx: w.speed * kevin.facing, dy: 0, damage: boostedDamage, isPlayer: true, isRanged: true, isAA: false });
             }
         }
@@ -667,7 +667,7 @@
         let currentInterval = Math.max(45, baseInterval - (pushProgress * 25)); 
         
         if (spawnTimer >= currentInterval && enemies.length < maxEnemies) { 
-            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0 }; 
+            spawnTimer = 0; let rand = Math.random(); spawnEffects.push({ x: ship.x + ship.w / 2 - 17, w: 40, y: GROUND_Y, life: 20, maxLife: 20 }); let enemy = { x: ship.x + ship.w / 2 - 30, attackTimer: 0, hitTimer: 0, stunTimer: 0 }; 
             
             if (currentWave >= 4 && rand < Math.min(0.12, 0.02 + currentWave * 0.01)) { 
                 Object.assign(enemy, { w: 180, h: 180, y: GROUND_Y - 180, color: '#c23616', hp: 600, maxHp: 600, speed: 0.3, range: 40, damage: 100, reward: 150, xpReward: 30, type: 'devastator' }); 
@@ -676,7 +676,7 @@
             else if (rand < 0.40 + (pushProgress * 0.2)) { Object.assign(enemy, { w: 50, h: 40, y: GROUND_Y - 160, color: '#8e44ad', hp: 90, maxHp: 90, speed: 2.2, range: 20, damage: 30, reward: 30, xpReward: 4, type: 'flyer', isFlying: true }); }
             else if (rand < 0.60) { Object.assign(enemy, { w: 35, h: 45, y: GROUND_Y - 45, color: '#00ced1', hp: 60, maxHp: 60, speed: 1.5, range: 450, damage: 25, reward: 25, xpReward: 3, type: 'shooter' }); } 
             else if (rand < 0.80) { Object.assign(enemy, { w: 35, h: 35, y: GROUND_Y - 35, color: '#e67e22', hp: 70, maxHp: 70, speed: 4.5, range: 15, damage: 15, reward: 20, xpReward: 2, type: 'scout' }); } 
-            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#8e44ad', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 15, xpReward: 1, type: 'grunt' }); } 
+            else { Object.assign(enemy, { w: 40, h: 40, y: GROUND_Y - 40, color: '#6ab04c', hp: 100, maxHp: 100, speed: 1.8, range: 20, damage: 20, reward: 15, xpReward: 1, type: 'grunt' }); } 
             enemies.push(enemy); 
         }
 
@@ -690,7 +690,9 @@
             let shouldDestroy = false; 
             let isPenetrating = false; 
             let targetList = b.isPlayer ? enemies : allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
-            let projHitBox = {x: b.x, y: b.y, w: b.w, h: b.h}; 
+            
+            let projHitBox = b;
+            if (b.isRanged && !b.isAA) projHitBox = {x: b.x, y: 0, w: b.w, h: canvas.height}; 
 
             for (let t of targetList) { 
                 if (!b.hitTargets) b.hitTargets = new Set();
@@ -838,13 +840,19 @@
 
             if (m.type === 'kitsune') {
                 m.facing = 1;
-                let target = enemies.filter(e => e.x > m.x).sort((a,b) => a.x - b.x)[0];
+                let targets = enemies.filter(e => e.x > m.x).sort((a,b) => a.x - b.x);
+                let target = targets.length > 0 ? targets[0] : null;
                 if (target) {
                     if (Math.abs(m.x - target.x) <= m.range) {
                         if (m.attackTimer === 0) {
+                            // 🛑 修复：赋予子弹精确追踪的角度，并设定为 isAA: true
+                            let sx = m.x + m.w; let sy = m.y + m.h/2;
+                            let tx = target.x + (target.w||0)/2; let ty = target.y + (target.h||0)/2;
+                            let angle = Math.atan2(ty - sy, tx - sx);
+                            
                             bullets.push({ 
-                                x: m.x + m.w, y: m.y + m.h/2, w: 18, h: 18, color: '#82ccdd', 
-                                dx: 14, dy: (target.y - m.y)*0.02, damage: m.damage, isPlayer: true, isRanged: true, isAA: false, type: 'frost' 
+                                x: sx, y: sy, w: 18, h: 18, color: '#82ccdd', 
+                                dx: Math.cos(angle)*14, dy: Math.sin(angle)*14, damage: m.damage, isPlayer: true, isRanged: true, isAA: true, type: 'frost', angle: angle 
                             }); 
                             playSfx('sniper'); m.attackTimer = 70; 
                         }
@@ -895,7 +903,12 @@
         let validTargets = allies.concat(kevin.isDead || kevin.isHidden ? [] : [kevin]); 
         enemies.forEach(m => { 
             if (m.baseSpeed === undefined) m.baseSpeed = m.speed;
-            if (m.slowTimer && m.slowTimer > 0) {
+            
+            if (m.stunTimer && m.stunTimer > 0) {
+                m.stunTimer--;
+                m.speed = 0; 
+                m.attackTimer = Math.max(m.attackTimer, 10); 
+            } else if (m.slowTimer && m.slowTimer > 0) {
                 m.slowTimer--;
                 m.speed = m.baseSpeed * 0.4; 
             } else {
@@ -981,7 +994,9 @@
         bullets.forEach(b => { 
             ctx.save(); ctx.fillStyle = b.color || '#fff'; 
             if (b.isAA) { 
-                ctx.shadowBlur = 10; ctx.shadowColor = b.color; ctx.translate(b.x, getVisualY(b.x, b.y)); ctx.rotate(b.angle || 0); ctx.beginPath(); ctx.ellipse(0, 0, b.w/2, b.h/2, 0, 0, Math.PI*2); ctx.fill(); 
+                ctx.translate(b.x, getVisualY(b.x, b.y)); ctx.rotate(b.angle || 0);
+                ctx.shadowBlur = 10; ctx.shadowColor = b.color;
+                ctx.beginPath(); ctx.ellipse(0, 0, b.w/2, b.h/2, 0, 0, Math.PI*2); ctx.fill(); 
             } 
             else if (b.type === 'solar') { 
                 ctx.shadowBlur = 20; ctx.shadowColor = '#e67e22';
@@ -990,8 +1005,9 @@
             }
             else if (b.type === 'frost') { 
                 ctx.shadowBlur = 15; ctx.shadowColor = '#3498db'; ctx.globalAlpha = 0.9;
-                ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/2, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x, getVisualY(b.x, b.y), b.w/4, 0, Math.PI*2); ctx.fill();
+                ctx.translate(b.x, getVisualY(b.x, b.y)); ctx.rotate(b.angle || 0);
+                ctx.beginPath(); ctx.arc(0, 0, b.w/2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, b.w/4, 0, Math.PI*2); ctx.fill();
             }
             else { 
                 let drawH = (b.h === 40 || b.h === 10) ? 3 : (b.h === 5 || b.h === 8 ? b.h : 3); 
@@ -1044,51 +1060,44 @@
         let visualY = getVisualY(e.x, e.y); ctx.save();
         if (isKevin && e.isHidden) { ctx.globalAlpha = 0.5; ctx.fillStyle = '#1abc9c'; ctx.font = '14px Arial'; ctx.fillText('SHIELDED', e.x - 10, visualY - 20); } 
         if (e.hitTimer && e.hitTimer > 0) { ctx.filter = 'brightness(200%)'; } 
-        
-        let customBobbing = (e.hitTimer > 0) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
-        if (isKevin) { 
-            if (keys['KeyA'] || keys['KeyD']) customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; 
-            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1); 
-            let currentSprite = e.hasArmor ? armorImg : kevinImg; 
-            if (currentSprite.complete && currentSprite.naturalHeight > 0) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } 
-            else { ctx.fillStyle = e.color || '#4caf50'; ctx.fillRect(-e.w/2, -e.h - customBobbing, e.w, e.h); } 
-        } 
-        else { 
-            let imgToDraw = null;
-            if (e.type === 'grunt') imgToDraw = gruntImg; 
-            else if (e.type === 'tank') imgToDraw = tankImg; 
-            else if (e.type === 'shooter') imgToDraw = shooterImg; 
-            else if (e.type === 'scout') imgToDraw = scoutImg; 
-            else if (e.type === 'basic') imgToDraw = basicImg; 
-            else if (e.type === 'shield') imgToDraw = shieldImg; 
-            else if (e.type === 'sniper') imgToDraw = sniperImg; 
-            else if (e.type === 'healer') imgToDraw = healerImg; 
-            else if (e.type === 'flyer') imgToDraw = flyerImg; 
-            else if (e.type === 'devastator') imgToDraw = devImg;
-            else if (e.sprite) imgToDraw = e.sprite;
+        else if (e.stunTimer && e.stunTimer > 0) {
+            ctx.filter = 'drop-shadow(0 0 10px yellow) brightness(120%)';
+            ctx.fillStyle = '#f1c40f'; ctx.font = 'bold 20px Arial'; ctx.fillText('💫', e.x + e.w/2 - 10, visualY - 15);
+        } else if (e.slowTimer && e.slowTimer > 0) {
+            // 🛑 修复核心：移除导致浏览器硬件加速死机 (Freeze) 的复杂滤镜
+            ctx.filter = 'brightness(60%)'; 
+            ctx.fillStyle = '#82ccdd'; ctx.font = 'bold 16px Arial'; ctx.fillText('❄️', e.x + e.w/2 - 8, visualY - 5);
+        }
 
-            ctx.translate(e.x + e.w / 2, visualY + e.h); 
-            if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
-                let scaleFactor = e.h / imgToDraw.naturalHeight; 
-                ctx.scale(e.facing || 1, 1); 
-                ctx.scale(scaleFactor, scaleFactor); 
-                let bob = (e.type === 'goat' || e.type === 'wombat') ? 0 : customBobbing;
-                ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - bob/scaleFactor); 
-            } else { 
-                if (e.isFlying) {
-                    let wingFlap = Math.sin(frameCount * 0.5) * 10;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; 
-                    ctx.beginPath(); ctx.ellipse(0, -e.h + 10 + wingFlap, 15, 8, 0, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = e.color || '#fff'; 
-                    ctx.beginPath(); ctx.ellipse(0, -e.h/2 - customBobbing, e.w/2, e.h/2, 0, 0, Math.PI*2); ctx.fill();
-                } else {
-                    ctx.fillStyle = e.color || '#fff'; ctx.fillRect(-e.w / 2, -e.h - customBobbing, e.w, e.h); 
-                    if (e.hp > 0) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill(); }
-                }
-            } 
-        } 
-        ctx.restore(); 
+        let customBobbing = (e.hitTimer > 0 || (e.stunTimer && e.stunTimer > 0)) ? 0 : Math.abs(Math.sin(frameCount * 0.1 + e.x * 0.01)) * 4;
         
+        if (isKevin) {
+            if (keys['KeyA'] || keys['KeyD']) { customBobbing = Math.abs(Math.sin(frameCount * 0.15)) * 10; }
+            ctx.translate(e.x + e.w / 2, visualY + e.h); ctx.scale(e.facing || 1, 1);
+            let currentSprite = e.hasArmor ? armorImg : kevinImg;
+            if (currentSprite.complete) { ctx.drawImage(currentSprite, -e.w / 2, -e.h - customBobbing, e.w, e.h); } else { ctx.fillStyle = e.color; ctx.roundRect(-e.w/2, -e.h - customBobbing, e.w, e.h, 20); ctx.fill(); }
+        } else {
+            if (e.sprite && e.sprite.complete && e.sprite.naturalHeight > 0) {
+                ctx.translate(e.x + e.w / 2, visualY + e.h);
+                let bob = (e.type === 'bighorn' || e.type === 'wombat' || e.type === 'kitsune') ? 0 : customBobbing;
+                let scaleFactor = e.h / e.sprite.naturalHeight;
+                ctx.scale(e.facing || 1, 1);
+                ctx.scale(scaleFactor, scaleFactor);
+                ctx.drawImage(e.sprite, -e.sprite.naturalWidth / 2, -e.sprite.naturalHeight - bob/scaleFactor);
+            } else {
+                let imgToDraw = null;
+                if (e.type === 'grunt') imgToDraw = gruntImg; else if (e.type === 'tank') imgToDraw = tankImg; else if (e.type === 'shooter') imgToDraw = shooterImg; else if (e.type === 'scout') imgToDraw = scoutImg; else if (e.type === 'basic') imgToDraw = basicImg; else if (e.type === 'shield') imgToDraw = shieldImg; else if (e.type === 'sniper') imgToDraw = sniperImg; else if (e.type === 'healer') imgToDraw = healerImg; else if (e.type === 'flyer') imgToDraw = flyerImg; else if (e.type === 'devastator') imgToDraw = devImg;
+                ctx.translate(e.x + e.w / 2, visualY + e.h); 
+                if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight > 0) { 
+                    let scaleFactor = e.h / imgToDraw.naturalHeight; ctx.scale(e.facing || 1, 1); ctx.scale(scaleFactor, scaleFactor); ctx.drawImage(imgToDraw, -imgToDraw.naturalWidth / 2, -imgToDraw.naturalHeight - customBobbing/scaleFactor); 
+                } else { 
+                    ctx.fillStyle = e.color || '#fff'; 
+                    ctx.beginPath(); ctx.roundRect(-e.w / 2, -e.h - customBobbing, e.w, e.h, 10); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-e.w/4, -e.h/1.5 - customBobbing, 4, 0, Math.PI*2); ctx.fill();
+                }
+            }
+        }
+        ctx.restore();
         let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
     }
     
@@ -1124,6 +1133,7 @@
             try {
                 localStorage.setItem('kiwiGlobalXP', newGlobalXP); 
                 let currentUnlocked = parseInt(localStorage.getItem('kiwiUnlockedLevel')) || 1;
+                // 解锁下一关 (第6关)
                 if(currentUnlocked <= 5) {
                     localStorage.setItem('kiwiUnlockedLevel', 6);
                 }

@@ -72,6 +72,7 @@
             <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
             <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
             <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
+            <button id="quit-toggle" class="ctrl-btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="confirmQuit()">🚪&nbsp;<span data-i18n="quitBtn">QUIT TO MAP</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -84,13 +85,13 @@
         <div id="respawn-screen" class="overlay">
             <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+            <button id="retreat-btn" class="action-btn" style="background: #7f8c8d; box-shadow: 0 3px 10px rgba(127,140,141,0.4); padding: 10px 30px; font-size: 18px; margin-top: 12px;" data-i18n="retreatBtn">RETREAT</button>
         </div>
 
         <!-- 暂停画面 -->
         <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
             <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
             <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
-            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
         </div>
 
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
@@ -189,6 +190,7 @@
         en: {
             startTip: "✨ Tip: Stand strong on the Whangārei bridge and hold the line!", startBtn: "DEFEND WHANGĀREI",
             respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)",
+            retreatBtn: "RETREAT",
             baseWhangarei: "🏙️ BASE WHANGĀREI:", goldLabel: "💰 GOLD:", xpLabel: "🌟 TOTAL XP:", zogonPod: "🛸 ZOGON POD:",
             armory: "🗡️ ARMORY", summon: "🐤 SUMMON", reinforcements: "🌍 WHANGĀREI REINFORCEMENTS",
             wUnarmed: "🥋 UNARMED", wSword: "🗡️ SWORD", wBow: "🏹 COMP. BOW", wSpear: "🔱 SPEAR", wArmor: "🦺 ARMOR (Half Damage)",
@@ -201,11 +203,12 @@
             baseFallen: "BASE HAS FALLEN", baseFallenMsg: "The outpost is destroyed. Defense collapsed!",
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
             backToMap: "BACK TO MAP", restart: "RESTART",
-            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", quitConfirm: "Quit to map? Current run progress will be lost.", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             startTip: "✨ 提示：死守旺阿雷大桥，绝不退缩！", startBtn: "保卫旺阿雷",
             respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)",
+            retreatBtn: "撤退",
             baseWhangarei: "🏙️ 旺阿雷基地:", goldLabel: "💰 资金:", xpLabel: "🌟 总经验:", zogonPod: "🛸 敌军母舰:",
             armory: "🗡️ 武器库", summon: "🐤 召唤兵种", reinforcements: "🌍 旺阿雷增援",
             wUnarmed: "🥋 空手", wSword: "🗡️ 长剑", wBow: "🏹 复合弓", wSpear: "🔱 长矛", wArmor: "🦺 防弹衣 (减伤一半)",
@@ -218,11 +221,12 @@
             baseFallen: "基地沦陷", baseFallenMsg: "前哨站被毁，防线崩溃！",
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
             backToMap: "返回地图", restart: "重新开始",
-            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", quitConfirm: "确定要返回星图吗？当前进度将丢失。", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             startTip: "✨ ヒント：ファンガレイの橋を死守せよ！", startBtn: "ファンガレイを防衛",
             respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)",
+            retreatBtn: "撤退",
             baseWhangarei: "🏙️ ファンガレイ基地:", goldLabel: "💰 資金:", xpLabel: "🌟 合計XP:", zogonPod: "🛸 ゾゴン・ポッド:",
             armory: "🗡️ 武器庫", summon: "🐤 召喚", reinforcements: "🌍 ファンガレイ増援",
             wUnarmed: "🥋 素手", wSword: "🗡️ 剣", wBow: "🏹 コンパウンドボウ", wSpear: "🔱 槍", wArmor: "🦺 アーマー (被ダメージ半減)",
@@ -235,11 +239,12 @@
             baseFallen: "基地陥落", baseFallenMsg: "前哨基地が破壊された。防衛線崩壊！",
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
             backToMap: "マップに戻る", restart: "再試行",
-            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", quitConfirm: "マップへ戻りますか？現在の進行状況は失われます。", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             startTip: "✨ Consejo: ¡Mantente firme en el puente de Whangārei y no cedas!", startBtn: "DEFENDER WHANGĀREI",
             respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)",
+            retreatBtn: "RETIRARSE",
             baseWhangarei: "🏙️ BASE WHANGĀREI:", goldLabel: "💰 ORO:", xpLabel: "🌟 XP TOTAL:", zogonPod: "🛸 NAVE ZOGON:",
             armory: "🗡️ ARMERÍA", summon: "🐤 INVOCAR", reinforcements: "🌍 REFUERZOS",
             wUnarmed: "🥋 DESARMADO", wSword: "🗡️ ESPADA", wBow: "🏹 ARCO COMP.", wSpear: "🔱 LANZA", wArmor: "🦺 ARMADURA (Mitad Daño)",
@@ -252,7 +257,7 @@
             baseFallen: "LA BASE HA CAÍDO", baseFallenMsg: "El puesto de avanzada está destruido. ¡La defensa colapsó!",
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
-            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", quitConfirm: "¿Salir al mapa? Se perderá el progreso de esta partida.", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -342,7 +347,8 @@
         wBtns: document.querySelectorAll('.w-btn'), sBtns: document.querySelectorAll('.s-btn'), armorBtn: document.getElementById('armor-btn'),
         startScreen: document.getElementById('start-screen'), startBtn: document.getElementById('start-btn'),
         gameOverScreen: document.getElementById('game-over-screen'), gameOverTitle: document.getElementById('game-over-title'), gameOverMsg: document.getElementById('game-over-msg'), sessionXpMsg: document.getElementById('session-xp-msg'), restartBtn: document.getElementById('restart-btn'),
-        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn')
+        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn'),
+        retreatBtn: document.getElementById('retreat-btn')
     };
 
     let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
@@ -379,6 +385,10 @@
         allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = [];
         
         gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; isPlayerPaused = false;
+        // Reset UI change-detection caches so the first updateUI call after restart writes everything fresh.
+        _uiCache.gold = -1; _uiCache.baseHp = -1; _uiCache.shipHp = -1; _uiCache.globalXP = -1;
+        _uiCache.wBtns.length = 0; _uiCache.sBtns.length = 0; _uiCache.armorBtn = null;
+        _ultCache.sec = -1; _ultCache.ready = null;
 
         isGameOver = false; isRunning = true;
         CG_Manager.startGameplay(); 
@@ -411,6 +421,13 @@
         } else {
             pauseScreen.style.display = 'none';
             if (musicPlaying) bgm.play().catch(e => {});
+        }
+    }
+
+    function confirmQuit() {
+        if (document.activeElement) document.activeElement.blur();
+        if (confirm(i18n[currentLang].quitConfirm)) {
+            window.location.href = 'index.html';
         }
     }
 
@@ -481,6 +498,7 @@
     });
     
     ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
+    ui.retreatBtn.addEventListener('click', (e) => { e.currentTarget.blur(); if (kevin.isDead && !isGameOver) { endGame(false); } });
     ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
 
     function triggerAttack() {
@@ -521,7 +539,7 @@
         frameCount++; updateUI();
         let enemyFrontLineX = ship.x; enemies.forEach(e => { if (e.x < enemyFrontLineX) enemyFrontLineX = e.x; });
         if (!kevin.isDead) { if (keys['KeyA'] || keys['ArrowLeft']) { kevin.x -= kevin.speed; kevin.facing = -1; } if (keys['KeyD'] || keys['ArrowRight']) { kevin.x += kevin.speed; kevin.facing = 1; } kevin.x = Math.max(hq.x + 50, Math.min(kevin.x, enemyFrontLineX - kevin.w)); kevin.y = GROUND_Y - kevin.h; kevin.isHidden = (kevin.x < hq.x + hq.w - 10); if (kevin.isHidden && kevin.hp > 0 && kevin.hp < kevin.maxHp) { if (frameCount % 60 === 0) { kevin.hp = Math.min(kevin.maxHp, kevin.hp + 25); let vY = getVisualY(kevin.x, kevin.y); spawnFloatingText(kevin.x + 10, vY - 10, '+25', '#2ecc71', -0.5); } } if (kevin.attackTimer > 0) kevin.attackTimer--; if (kevin.hitTimer > 0) kevin.hitTimer--; if (kevin.isAttacking) { kevin.attackAnim -= 5; if (kevin.attackAnim <= 0) kevin.isAttacking = false; } if (kevin.hp <= 0) { let vY = getVisualY(kevin.x, kevin.y); spawnSoul({x: kevin.x, y: vY, w: kevin.w, color: kevin.color}, -1); kevin.isDead = true; if (hq.hp > 0) { ui.respawnScreen.style.display = 'flex'; ui.respawnBtn.disabled = globalXP < 100; ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp; } } }
-        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#2ecc71'; ui.ultBtns.forEach(b => b.disabled = false); }
+        if (ultTimer < 3600) { ultTimer++; const ultSec = Math.floor(ultTimer/60); if (ultSec !== _ultCache.sec) { ui.ultTimerText.innerText = dict.readying.replace('{n}', ultSec); _ultCache.sec = ultSec; } if (_ultCache.ready !== false) { ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); _ultCache.ready = false; } } else { if (_ultCache.ready !== true) { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#2ecc71'; ui.ultBtns.forEach(b => b.disabled = false); _ultCache.ready = true; _ultCache.sec = -1; } }
         floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
         souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
         spawnEffects.forEach(se => { se.life--; }); spawnEffects = spawnEffects.filter(se => se.life > 0);
@@ -627,7 +645,34 @@
         let hpPct = Math.max(0, e.hp / (e.maxHp || 100)); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(e.x, visualY - 12, e.w, 6); ctx.fillStyle = hpPct > 0.6 ? '#2ecc71' : (hpPct > 0.3 ? '#f1c40f' : '#e74c3c'); ctx.fillRect(e.x, visualY - 12, e.w * hpPct, 6); 
     }
 
-    function updateUI() { ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; ui.wBtns.forEach(btn => { if(btn.id !== 'armor-btn') btn.disabled = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); }); ui.sBtns.forEach(btn => btn.disabled = kevin.isDead || gold < parseInt(btn.dataset.price)); ui.armorBtn.disabled = kevin.isDead || kevin.hasArmor || gold < 100; }
+    // Change-detection cache for updateUI — avoids ~840 unnecessary DOM writes per second.
+    // Sentinel values guarantee the first call writes everything.
+    const _uiCache = { gold: -1, baseHp: -1, shipHp: -1, globalXP: -1, wBtns: [], sBtns: [], armorBtn: null };
+    const _ultCache = { sec: -1, ready: null };
+
+    function updateUI() {
+        // Scalar text fields — only write when value changes.
+        if (gold !== _uiCache.gold) { ui.gold.innerText = gold; _uiCache.gold = gold; }
+        const baseHpVal = Math.floor(Math.max(0, hq.hp));
+        if (baseHpVal !== _uiCache.baseHp) { ui.baseHp.innerText = baseHpVal; _uiCache.baseHp = baseHpVal; }
+        const shipHpVal = Math.floor(Math.max(0, ship.hp));
+        if (shipHpVal !== _uiCache.shipHp) { ui.shipHp.innerText = shipHpVal; _uiCache.shipHp = shipHpVal; }
+        if (globalXP !== _uiCache.globalXP) { ui.globalXpText.innerText = globalXP; _uiCache.globalXP = globalXP; }
+
+        // Button disabled states — compute desired state, only write when it changes.
+        // wBtns contains armorBtn; the loop intentionally skips it (handled separately below).
+        ui.wBtns.forEach((btn, i) => {
+            if (btn.id === 'armor-btn') return;
+            const desired = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price));
+            if (_uiCache.wBtns[i] !== desired) { btn.disabled = desired; _uiCache.wBtns[i] = desired; }
+        });
+        ui.sBtns.forEach((btn, i) => {
+            const desired = kevin.isDead || gold < parseInt(btn.dataset.price);
+            if (_uiCache.sBtns[i] !== desired) { btn.disabled = desired; _uiCache.sBtns[i] = desired; }
+        });
+        const armorDesired = kevin.isDead || kevin.hasArmor || gold < 100;
+        if (_uiCache.armorBtn !== armorDesired) { ui.armorBtn.disabled = armorDesired; _uiCache.armorBtn = armorDesired; }
+    }
     
     function endGame(isVictory) { 
         bgm.pause(); CG_Manager.stopGameplay(); 

@@ -122,7 +122,6 @@
 
         <div id="bottom-bar">
             <button class="tool-btn" onclick="resetProgress()" data-i18n="resetData">RESET DATA</button>
-            <button class="tool-btn" onclick="cheatUnlock()" style="background: #8e44ad; box-shadow: 0 0 10px #8e44ad;" data-i18n="unlockAll">UNLOCK ALL</button>
         </div>
 
         <div id="upgrades-overlay">
@@ -160,7 +159,7 @@
     const i18n = {
         en: {
             title: "KIWI DEFENDERS: CAMPAIGN MAP", reserveXp: "RESERVE XP:", upgradesBtn: "🧬 UPGRADES",
-            musicOn: "MUSIC: ON", musicOff: "MUSIC: OFF", resetData: "RESET DATA", unlockAll: "UNLOCK ALL",
+            musicOn: "MUSIC: ON", musicOff: "MUSIC: OFF", resetData: "RESET DATA",
             upTitle: "TACTICAL UPGRADES", upAvail: "AVAILABLE XP:", closeBtn: "CLOSE", up_btn: "UPGRADE",
             up_cost: "COST:", up_gold_name: "Starting Gold", up_gold_desc: "Start each mission with more funds.",
             up_hp_name: "Base Hull", up_hp_desc: "Permanently increase Base health points.",
@@ -170,7 +169,7 @@
         },
         zh: {
             title: "新西兰捍卫者：星图战役", reserveXp: "储备经验值:", upgradesBtn: "🧬 科技天赋",
-            musicOn: "音乐: 开", musicOff: "音乐: 关", resetData: "重置数据", unlockAll: "解锁全关卡",
+            musicOn: "音乐: 开", musicOff: "音乐: 关", resetData: "重置数据",
             upTitle: "战术天赋升级", upAvail: "可用经验值:", closeBtn: "关闭面板", up_btn: "升级",
             up_cost: "消耗:", up_gold_name: "初始资金", up_gold_desc: "每次任务开始时携带更多的战备资金。",
             up_hp_name: "基地装甲", up_hp_desc: "永久提升防守基地的最大生命值。",
@@ -180,7 +179,7 @@
         },
         ja: {
             title: "キーウィ・ディフェンダーズ：星図キャンペーン", reserveXp: "予備XP:", upgradesBtn: "🧬 タレント",
-            musicOn: "音楽: オン", musicOff: "音楽: オフ", resetData: "データリセット", unlockAll: "全ステージ解放",
+            musicOn: "音楽: オン", musicOff: "音楽: オフ", resetData: "データリセット",
             upTitle: "戦術アップグレード", upAvail: "利用可能なXP:", closeBtn: "閉じる", up_btn: "強化",
             up_cost: "コスト:", up_gold_name: "初期資金", up_gold_desc: "各ミッションをより多くの資金で開始します。",
             up_hp_name: "基地装甲", up_hp_desc: "基地の最大HPを永久に増加させます。",
@@ -190,7 +189,7 @@
         },
         es: {
             title: "KIWI DEFENDERS: MAPA DE CAMPAÑA", reserveXp: "XP DE RESERVA:", upgradesBtn: "🧬 MEJORAS",
-            musicOn: "MÚSICA: ENCENDIDA", musicOff: "MÚSICA: APAGADA", resetData: "RESETEAR DATOS", unlockAll: "DESBLOQUEAR TODO",
+            musicOn: "MÚSICA: ENCENDIDA", musicOff: "MÚSICA: APAGADA", resetData: "RESETEAR DATOS",
             upTitle: "MEJORAS TÁCTICAS", upAvail: "XP DISPONIBLE:", closeBtn: "CERRAR", up_btn: "MEJORAR",
             up_cost: "COSTO:", up_gold_name: "Oro Inicial", up_gold_desc: "Comienza cada misión con más fondos.",
             up_hp_name: "Casco Base", up_hp_desc: "Aumenta permanentemente los puntos de salud de la base.",
@@ -331,7 +330,6 @@
         });
     }
 
-    function cheatUnlock() { localStorage.setItem('kiwiUnlockedLevel', 16); localStorage.setItem('kiwiGlobalXP', globalXP + 5000); location.reload(); }
     function resetProgress() { if(confirm("Reset all progress?")) { localStorage.setItem('kiwiUnlockedLevel', 1); localStorage.setItem('kiwiGlobalXP', 0); localStorage.removeItem('kiwiUpgrades'); location.reload(); } }
 
     const UP_DEFS = {

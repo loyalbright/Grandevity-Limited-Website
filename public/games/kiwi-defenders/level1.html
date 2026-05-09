@@ -335,10 +335,44 @@
         }
     }
 
+    // Audio pool — replaces per-call `new Audio()` which was causing severe mobile stutter
+    // during melee combat (30-60 allocations/sec). Pre-creates a few Audio instances per sound
+    // and cycles through them. No allocations, no decoder spin-up, no GC pressure mid-game.
+    const _sfxMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3' };
+    const _sfxPoolSize = { 'hit': 5 };  // 'hit' fires constantly; others use default
+    const _sfxDefaultPoolSize = 3;
+    const _sfxPools = {};   // url -> [Audio, Audio, ...]
+    const _sfxIdx = {};     // url -> current cycling index
+    (function initSfxPools() {
+        const seenUrls = new Set();
+        for (const type in _sfxMap) {
+            const url = _sfxMap[type];
+            if (seenUrls.has(url)) continue;
+            seenUrls.add(url);
+            const size = _sfxPoolSize[type] || _sfxDefaultPoolSize;
+            const pool = [];
+            for (let i = 0; i < size; i++) {
+                const a = new Audio(url);
+                a.volume = 0.5;
+                a.preload = 'auto';
+                pool.push(a);
+            }
+            _sfxPools[url] = pool;
+            _sfxIdx[url] = 0;
+        }
+    })();
+
     function playSfx(type) {
-        if (!musicPlaying) return; 
-        const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3' };
-        if (soundMap[type]) { let sound = new Audio(soundMap[type]); sound.volume = 0.5; sound.play().catch(e => {}); }
+        if (!musicPlaying) return;
+        const url = _sfxMap[type];
+        if (!url) return;
+        const pool = _sfxPools[url];
+        const idx = _sfxIdx[url];
+        const a = pool[idx];
+        _sfxIdx[url] = (idx + 1) % pool.length;
+        // Rewind and play. If still playing, this restarts it on the same element.
+        try { a.currentTime = 0; } catch (e) {}
+        a.play().catch(e => {});
     }
 
     const ui = {

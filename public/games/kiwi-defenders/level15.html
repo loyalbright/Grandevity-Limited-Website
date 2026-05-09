@@ -80,6 +80,7 @@
             <button id="pause-toggle" class="ctrl-btn" onclick="togglePlayerPause(event)">⏸️&nbsp;<span data-i18n="pauseBtn">PAUSE</span></button>
             <button id="fs-toggle" class="ctrl-btn" onclick="toggleFullscreen(event)">📱&nbsp;<span data-i18n="fs_enter">FULLSCREEN</span></button>
             <button id="music-toggle" class="ctrl-btn on" onclick="toggleMusic(event)">🎵&nbsp;<span>AUDIO: ON</span></button>
+            <button id="quit-toggle" class="ctrl-btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="confirmQuit()">🚪&nbsp;<span data-i18n="quitBtn">QUIT TO MAP</span></button>
         </div>
 
         <div id="start-screen" class="overlay">
@@ -92,13 +93,13 @@
         <div id="respawn-screen" class="overlay">
             <h1 style="color: #e74c3c; font-size: 50px;" data-i18n="respawnTitle">KEVIN HAS FALLEN!</h1>
             <button id="respawn-btn" class="action-btn">Respawn (100 XP)</button>
+            <button id="retreat-btn" class="action-btn" style="background: #7f8c8d; box-shadow: 0 3px 10px rgba(127,140,141,0.4); padding: 10px 30px; font-size: 18px; margin-top: 12px;" data-i18n="retreatBtn">RETREAT</button>
         </div>
 
         <!-- 暂停画面 -->
         <div id="pause-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.85); z-index: 60;">
             <h1 style="color: #f1c40f; font-size: 60px; text-shadow: 0 0 20px #f1c40f;" data-i18n="pausedTitle">GAME PAUSED</h1>
             <button id="resume-btn" class="action-btn" style="background: #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.5);" onclick="togglePlayerPause()" data-i18n="resumeBtn">RESUME</button>
-            <button class="action-btn" style="background: #e74c3c; box-shadow: 0 5px 15px rgba(231,76,60,0.5); margin-top: 15px;" onclick="window.location.href='index.html'" data-i18n="quitBtn">QUIT TO MAP</button>
         </div>
 
         <div id="game-over-screen" class="overlay" style="display: none; background: rgba(0,0,0,0.9);">
@@ -201,6 +202,7 @@
         en: {
             lvlTitle: "Level 15: Otago Abyss", startTip: "⛰️ BATTLEFRONT: Otago Peninsula, defend the majestic Larnach Castle!", startBtn: "DEFEND LARNACH CASTLE",
             respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)",
+            retreatBtn: "RETREAT",
             baseOtago: "🏰 LARNACH CASTLE:", goldLabel: "💰 GOLD:", waveLabel: "🌊 WAVE:", xpLabel: "🌟 TOTAL XP:", zogonPod: "🛸 ABYSSAL POD:",
             armory: "🗡️ ARMORY", summon: "🐤 SUMMON", reinforcements: "🌏 OTAGO REINFORCEMENTS",
             wUnarmed: "🥋 UNARMED", wSword: "🗡️ SWORD", wBow: "🏹 COMP. BOW", wSpear: "🔱 SPEAR", wAA: "🔫 AA GUN", wArmor: "🦺 ARMOR",
@@ -214,11 +216,12 @@
             victory: "VICTORY!", victoryMsg: "Invasion halted! Region secured.",
             backToMap: "BACK TO MAP", restart: "RESTART",
             waveInbound: "🌊 WAVE {n} INBOUND!",
-            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
+            pauseBtn: "PAUSE", pausedTitle: "GAME PAUSED", resumeBtn: "RESUME", quitBtn: "QUIT TO MAP", quitConfirm: "Quit to map? Current run progress will be lost.", fs_enter: "FULLSCREEN", fs_exit: "EXIT FULLSCREEN"
         },
         zh: {
             lvlTitle: "第十五关：奥塔哥深渊", startTip: "⛰️ 战线：奥塔哥半岛，保卫宏伟的拉纳克城堡！", startBtn: "保卫拉纳克城堡",
             respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)",
+            retreatBtn: "撤退",
             baseOtago: "🏰 拉纳克城堡:", goldLabel: "💰 资金:", waveLabel: "🌊 波次:", xpLabel: "🌟 总经验:", zogonPod: "🛸 深渊母舰:",
             armory: "🗡️ 武器库", summon: "🐤 召唤兵种", reinforcements: "🌏 奥塔哥增援",
             wUnarmed: "🥋 空手", wSword: "🗡️ 长剑", wBow: "🏹 复合弓", wSpear: "🔱 长矛", wAA: "🔫 防空机枪", wArmor: "🦺 防弹衣",
@@ -232,11 +235,12 @@
             victory: "任务完成！", victoryMsg: "成功阻止入侵！区域安全。",
             backToMap: "返回地图", restart: "重新开始",
             waveInbound: "🌊 第 {n} 波敌军来袭！",
-            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", fs_enter: "全屏游玩", fs_exit: "退出全屏"
+            pauseBtn: "暂停", pausedTitle: "游戏已暂停", resumeBtn: "继续游戏", quitBtn: "返回星图", quitConfirm: "确定要返回星图吗？当前进度将丢失。", fs_enter: "全屏游玩", fs_exit: "退出全屏"
         },
         ja: {
             lvlTitle: "ステージ 15：オタゴの深淵", startTip: "⛰️ 前線：オタゴ半島、雄大なラーナック城を防衛せよ！", startBtn: "ラーナック城を防衛",
             respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)",
+            retreatBtn: "撤退",
             baseOtago: "🏰 ラーナック城:", goldLabel: "💰 資金:", waveLabel: "🌊 ウェーブ:", xpLabel: "🌟 合計XP:", zogonPod: "🛸 アビサル・ポッド:",
             armory: "🗡️ 武器庫", summon: "🐤 召喚", reinforcements: "🌏 オタゴ増援",
             wUnarmed: "🥋 素手", wSword: "🗡️ 剣", wBow: "🏹 コンパウンドボウ", wSpear: "🔱 槍", wAA: "🔫 対空砲", wArmor: "🦺 アーマー",
@@ -250,11 +254,12 @@
             victory: "勝利！", victoryMsg: "侵略を阻止した！エリア確保。",
             backToMap: "マップに戻る", restart: "再試行",
             waveInbound: "🌊 ウェーブ {n} 開始！",
-            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", fs_enter: "全画面表示", fs_exit: "全画面終了"
+            pauseBtn: "一時停止", pausedTitle: "一時停止中", resumeBtn: "再開", quitBtn: "マップへ戻る", quitConfirm: "マップへ戻りますか？現在の進行状況は失われます。", fs_enter: "全画面表示", fs_exit: "全画面終了"
         },
         es: {
             lvlTitle: "Nivel 15: Abismo de Otago", startTip: "⛰️ FRENTE DE BATALLA: ¡Península de Otago, defiende el majestuoso Castillo de Larnach!", startBtn: "DEFENDER EL CASTILLO",
             respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)",
+            retreatBtn: "RETIRARSE",
             baseOtago: "🏰 CASTILLO LARNACH:", goldLabel: "💰 ORO:", waveLabel: "🌊 OLEADA:", xpLabel: "🌟 XP TOTAL:", zogonPod: "🛸 NAVE ABISAL:",
             armory: "🗡️ ARMERÍA", summon: "🐤 INVOCAR", reinforcements: "🌏 REFUERZOS DE OTAGO",
             wUnarmed: "🥋 DESARMADO", wSword: "🗡️ ESPADA", wBow: "🏹 ARCO COMP.", wSpear: "🔱 LANZA", wAA: "🔫 CAÑÓN AA", wArmor: "🦺 ARMADURA",
@@ -268,7 +273,7 @@
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
             waveInbound: "🌊 ¡OLEADA {n} EN CAMINO!",
-            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
+            pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", quitConfirm: "¿Salir al mapa? Se perderá el progreso de esta partida.", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
         }
     };
 
@@ -410,20 +415,71 @@
         }
     }
 
-    function playSfx(type) {
-        if (!musicPlaying) return; 
-        const soundMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3', 'laser': 'sniper.mp3' };
-        if (soundMap[type]) { 
-            let sound = new Audio(soundMap[type]); 
-            if (type === 'gun') {
-                sound.volume = 0.1;  
-            } else if (type === 'sniper' || type === 'hit') {
-                sound.volume = 0.3;  
-            } else {
-                sound.volume = 0.5;  
+    // Audio pool — replaces per-call `new Audio()` which was causing severe mobile stutter
+    // during melee combat (30-60 allocations/sec). Pre-creates a few Audio instances per sound
+    // and cycles through them. No allocations, no decoder spin-up, no GC pressure mid-game.
+    //
+    // Two additional protections layered on top:
+    //   1. Mobile devices: skip the 'hit' sound entirely. The high-frequency hit chatter
+    //      hammers the mobile audio thread even with pooling, causing visible stutter.
+    //   2. Rate-limit: even on desktop, 'hit' fires faster than the ear can distinguish.
+    //      Cap it at one play per 80ms so it sounds the same but does ~5x less work.
+    const _isMobile = (typeof navigator !== 'undefined') && (
+        /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry/i.test(navigator.userAgent)
+        || ('ontouchstart' in window && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 900)
+    );
+    const _sfxMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3', 'laser': 'sniper.mp3' };
+    const _sfxVolume = { 'gun': 0.1, 'sniper': 0.3, 'hit': 0.3 };  // per-type volume; defaults to 0.5
+    const _sfxPoolSize = { 'hit': 5 };  // 'hit' fires constantly; others use default
+    const _sfxDefaultPoolSize = 3;
+    const _sfxMinIntervalMs = { 'hit': 80 };  // rate-limit hit sounds to ~12/sec max
+    const _sfxLastPlayed = {};   // type -> last play timestamp (ms)
+    const _sfxPools = {};        // url -> [Audio, Audio, ...]
+    const _sfxIdx = {};          // url -> current cycling index
+    (function initSfxPools() {
+        const seenUrls = new Set();
+        for (const type in _sfxMap) {
+            // Skip pooling 'hit' on mobile — we won't play it anyway.
+            if (_isMobile && type === 'hit') continue;
+            const url = _sfxMap[type];
+            if (seenUrls.has(url)) continue;
+            seenUrls.add(url);
+            const size = _sfxPoolSize[type] || _sfxDefaultPoolSize;
+            const vol = (_sfxVolume[type] !== undefined) ? _sfxVolume[type] : 0.5;
+            const pool = [];
+            for (let i = 0; i < size; i++) {
+                const a = new Audio(url);
+                a.volume = vol;
+                a.preload = 'auto';
+                pool.push(a);
             }
-            sound.play().catch(e => {}); 
+            _sfxPools[url] = pool;
+            _sfxIdx[url] = 0;
         }
+    })();
+
+    function playSfx(type) {
+        if (!musicPlaying) return;
+        // Mobile: hit sounds disabled entirely — high call frequency overwhelms mobile audio thread.
+        if (_isMobile && type === 'hit') return;
+        // Rate-limit high-frequency sounds (currently just 'hit') so we don't fire faster than
+        // ~12/sec — the ear can't distinguish individual hits beyond that anyway.
+        const minInterval = _sfxMinIntervalMs[type];
+        if (minInterval) {
+            const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            if (now - (_sfxLastPlayed[type] || 0) < minInterval) return;
+            _sfxLastPlayed[type] = now;
+        }
+        const url = _sfxMap[type];
+        if (!url) return;
+        const pool = _sfxPools[url];
+        if (!pool) return;
+        const idx = _sfxIdx[url];
+        const a = pool[idx];
+        _sfxIdx[url] = (idx + 1) % pool.length;
+        // Rewind and play. If still playing, this restarts it on the same element.
+        try { a.currentTime = 0; } catch (e) {}
+        a.play().catch(e => {});
     }
 
     const ui = {
@@ -433,7 +489,8 @@
         wBtns: document.querySelectorAll('.w-btn'), sBtns: document.querySelectorAll('.s-btn'), armorBtn: document.getElementById('armor-btn'),
         startScreen: document.getElementById('start-screen'), startBtn: document.getElementById('start-btn'),
         gameOverScreen: document.getElementById('game-over-screen'), gameOverTitle: document.getElementById('game-over-title'), gameOverMsg: document.getElementById('game-over-msg'), sessionXpMsg: document.getElementById('session-xp-msg'), restartBtn: document.getElementById('restart-btn'),
-        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn')
+        respawnScreen: document.getElementById('respawn-screen'), respawnBtn: document.getElementById('respawn-btn'),
+        retreatBtn: document.getElementById('retreat-btn')
     };
 
     let globalXP = parseInt(localStorage.getItem('kiwiGlobalXP')) || 0;
@@ -481,6 +538,11 @@
         allies = []; enemies = []; bullets = []; floatingTexts = []; souls = []; spawnEffects = []; particles = []; lightnings = [];
         
         gold = startGold; sessionXP = 0; frameCount = 0; ultTimer = 0; spawnTimer = 0; groundDeathsForAntiAir = 0;
+        // Reset UI change-detection caches so first updateUI call writes everything fresh.
+        _uiCache.gold = -1; _uiCache.baseHp = -1; _uiCache.shipHp = -1; _uiCache.globalXP = -1; _uiCache.wave = -1;
+        _uiCache.wBtns.length = 0; _uiCache.wBtnsLabels.length = 0; _uiCache.sBtns.length = 0;
+        _uiCache.armorBtn = null; _uiCache.armorLabel = null;
+        _ultCache.sec = -1; _ultCache.ready = null;
         currentWave = 1; waveTimer = 0; isPlayerPaused = false;
         
         isGameOver = false; isRunning = true;
@@ -519,6 +581,13 @@
         }
     }
 
+    function confirmQuit() {
+        if (document.activeElement) document.activeElement.blur();
+        if (confirm(i18n[currentLang].quitConfirm)) {
+            window.location.href = 'index.html';
+        }
+    }
+
     function toggleFullscreen(event) {
         if (event) event.currentTarget.blur();
         const doc = document.documentElement; 
@@ -548,6 +617,7 @@
     ui.startBtn.addEventListener('click', (e) => { e.currentTarget.blur(); ui.startScreen.style.display = 'none'; if(musicPlaying) bgm.play().catch(e=>{}); initGame(); });
     ui.restartBtn.addEventListener('click', (e) => { e.currentTarget.blur(); initGame(); });
     ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
+    ui.retreatBtn.addEventListener('click', (e) => { e.currentTarget.blur(); if (kevin.isDead && !isGameOver) { endGame(false); } });
     ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
 
     function spawnSparks(x, y, color) {
@@ -634,6 +704,12 @@
     function spawnFloatingText(x, y, text, color, dir) { floatingTexts.push({ x: x, y: y, text: text, color: color, life: 40, maxLife: 40, dx: dir * 1.5, dy: -1.8 }); }
     function getVisualY(x, physicalY) { return physicalY; } 
 
+
+    // Change-detection caches for updateUI / ult-timer — avoids ~1000 unnecessary DOM writes per second.
+    // Sentinel values guarantee the first call writes everything.
+    const _uiCache = { gold: -1, baseHp: -1, shipHp: -1, globalXP: -1, wave: -1, wBtns: [], wBtnsLabels: [], sBtns: [], armorBtn: null, armorLabel: null };
+    const _ultCache = { sec: -1, ready: null };
+
     function update() {
         const dict = i18n[currentLang];
         frameCount++; updateUI();
@@ -672,7 +748,7 @@
         lightnings.forEach(l => l.life--); 
         lightnings = lightnings.filter(l => l.life > 0);
 
-        if (ultTimer < 3600) { ultTimer++; ui.ultTimerText.innerText = dict.readying.replace('{n}', Math.floor(ultTimer/60)); ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); } else { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#e67e22'; ui.ultBtns.forEach(b => b.disabled = false); }
+        if (ultTimer < 3600) { ultTimer++; const ultSec = Math.floor(ultTimer/60); if (ultSec !== _ultCache.sec) { ui.ultTimerText.innerText = dict.readying.replace('{n}', ultSec); _ultCache.sec = ultSec; } if (_ultCache.ready !== false) { ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); _ultCache.ready = false; } } else { if (_ultCache.ready !== true) { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#e67e22'; ui.ultBtns.forEach(b => b.disabled = false); _ultCache.ready = true; _ultCache.sec = -1; } }
         floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
         souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
         spawnEffects.forEach(se => { se.life--; }); spawnEffects = spawnEffects.filter(se => se.life > 0);
@@ -1235,18 +1311,32 @@
     
     function updateUI() { 
         const dict = i18n[currentLang];
-        ui.gold.innerText = gold; ui.baseHp.innerText = Math.floor(Math.max(0, hq.hp)); ui.shipHp.innerText = Math.floor(Math.max(0, ship.hp)); ui.globalXpText.innerText = globalXP; ui.wave.innerText = currentWave; 
-        ui.wBtns.forEach(btn => { 
+        // Scalar text fields — only write when value changes.
+        if (gold !== _uiCache.gold) { ui.gold.innerText = gold; _uiCache.gold = gold; }
+        const baseHpVal = Math.floor(Math.max(0, hq.hp));
+        if (baseHpVal !== _uiCache.baseHp) { ui.baseHp.innerText = baseHpVal; _uiCache.baseHp = baseHpVal; }
+        const shipHpVal = Math.floor(Math.max(0, ship.hp));
+        if (shipHpVal !== _uiCache.shipHp) { ui.shipHp.innerText = shipHpVal; _uiCache.shipHp = shipHpVal; }
+        if (globalXP !== _uiCache.globalXP) { ui.globalXpText.innerText = globalXP; _uiCache.globalXP = globalXP; }
+        if (typeof currentWave !== 'undefined' && currentWave !== _uiCache.wave) { ui.wave.innerText = currentWave; _uiCache.wave = currentWave; }
+        // Weapon button states + label text — only write on change.
+        ui.wBtns.forEach((btn, i) => { 
             if(btn.id !== 'armor-btn') {
-                btn.disabled = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); 
+                const desired = kevin.isDead || (!btn.dataset.bought && gold < parseInt(btn.dataset.price)); 
+                if (_uiCache.wBtns[i] !== desired) { btn.disabled = desired; _uiCache.wBtns[i] = desired; }
                 if (btn.dataset.bought) {
-                    btn.querySelector('.price').innerText = btn.classList.contains('active') ? dict.equipped : dict.owned;
+                    const label = btn.classList.contains('active') ? dict.equipped : dict.owned;
+                    if (_uiCache.wBtnsLabels[i] !== label) { btn.querySelector('.price').innerText = label; _uiCache.wBtnsLabels[i] = label; }
                 }
             }
         }); 
-        ui.sBtns.forEach(btn => btn.disabled = kevin.isDead || gold < parseInt(btn.dataset.price)); 
-        ui.armorBtn.disabled = kevin.isDead || kevin.hasArmor || gold < 100; 
-        if (kevin.hasArmor) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; }
+        ui.sBtns.forEach((btn, i) => { 
+            const desired = kevin.isDead || gold < parseInt(btn.dataset.price);
+            if (_uiCache.sBtns[i] !== desired) { btn.disabled = desired; _uiCache.sBtns[i] = desired; }
+        }); 
+        const armorDesired = kevin.isDead || kevin.hasArmor || gold < 100;
+        if (_uiCache.armorBtn !== armorDesired) { ui.armorBtn.disabled = armorDesired; _uiCache.armorBtn = armorDesired; }
+        if (kevin.hasArmor && _uiCache.armorLabel !== dict.equipped) { ui.armorBtn.querySelector('.price').innerText = dict.equipped; _uiCache.armorLabel = dict.equipped; }
     }
     
     function endGame(isVictory) { 

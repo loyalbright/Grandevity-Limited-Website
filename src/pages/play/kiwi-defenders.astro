@@ -124,17 +124,36 @@ import Layout from '../../layouts/Layout.astro';
 </style>
 
 <script>
-  // 前端全屏逻辑
   const btn = document.getElementById('fullscreen-btn');
+  // 建议全屏整个容器而不是仅仅 iframe，这样兼容性更好
   const iframe = document.getElementById('game-frame');
-  
-  btn.addEventListener('click', () => {
-    if (iframe.requestFullscreen) {
-      iframe.requestFullscreen();
-    } else if (iframe.webkitRequestFullscreen) { /* Safari 支持 */
-      iframe.webkitRequestFullscreen();
-    } else if (iframe.msRequestFullscreen) { /* IE11 支持 */
-      iframe.msRequestFullscreen();
+
+  btn.addEventListener('click', async () => {
+    try {
+      // 第一步：先触发全屏请求
+      if (iframe.requestFullscreen) {
+        await iframe.requestFullscreen();
+      } else if (iframe.webkitRequestFullscreen) { /* Safari 支持 */
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { /* IE11 支持 */
+        iframe.msRequestFullscreen();
+      }
+
+      // 第二步：全屏成功后，强制锁定为横屏 (Landscape)
+      // 注意：这必须在全屏状态下才能被浏览器允许
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (error) {
+      // 捕获错误以防静默崩溃
+      console.warn("全屏或横屏锁定被拒绝:", error);
+    }
+  });
+
+  // 监听退出全屏事件，自动解除方向锁定，把控制权还给手机
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
     }
   });
 </script>

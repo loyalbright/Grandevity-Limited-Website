@@ -338,14 +338,28 @@
     // Audio pool — replaces per-call `new Audio()` which was causing severe mobile stutter
     // during melee combat (30-60 allocations/sec). Pre-creates a few Audio instances per sound
     // and cycles through them. No allocations, no decoder spin-up, no GC pressure mid-game.
+    //
+    // Two additional protections layered on top:
+    //   1. Mobile devices: skip the 'hit' sound entirely. The high-frequency hit chatter
+    //      hammers the mobile audio thread even with pooling, causing visible stutter.
+    //   2. Rate-limit: even on desktop, 'hit' fires faster than the ear can distinguish.
+    //      Cap it at one play per 80ms so it sounds the same but does ~5x less work.
+    const _isMobile = (typeof navigator !== 'undefined') && (
+        /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry/i.test(navigator.userAgent)
+        || ('ontouchstart' in window && Math.min(window.innerWidth || 9999, window.innerHeight || 9999) < 900)
+    );
     const _sfxMap = { 'sword': 'sword.mp3', 'bow': 'bow.mp3', 'spear': 'spear.mp3', 'kick': 'spear.mp3', 'sniper': 'sniper.mp3', 'hit': 'hit.mp3', 'gun': 'sniper.mp3', 'heavy': 'sword.mp3' };
     const _sfxPoolSize = { 'hit': 5 };  // 'hit' fires constantly; others use default
     const _sfxDefaultPoolSize = 3;
-    const _sfxPools = {};   // url -> [Audio, Audio, ...]
-    const _sfxIdx = {};     // url -> current cycling index
+    const _sfxMinIntervalMs = { 'hit': 80 };  // rate-limit hit sounds to ~12/sec max
+    const _sfxLastPlayed = {};   // type -> last play timestamp (ms)
+    const _sfxPools = {};        // url -> [Audio, Audio, ...]
+    const _sfxIdx = {};          // url -> current cycling index
     (function initSfxPools() {
         const seenUrls = new Set();
         for (const type in _sfxMap) {
+            // Skip pooling 'hit' on mobile — we won't play it anyway.
+            if (_isMobile && type === 'hit') continue;
             const url = _sfxMap[type];
             if (seenUrls.has(url)) continue;
             seenUrls.add(url);
@@ -364,9 +378,20 @@
 
     function playSfx(type) {
         if (!musicPlaying) return;
+        // Mobile: hit sounds disabled entirely — high call frequency overwhelms mobile audio thread.
+        if (_isMobile && type === 'hit') return;
+        // Rate-limit high-frequency sounds (currently just 'hit') so we don't fire faster than
+        // ~12/sec — the ear can't distinguish individual hits beyond that anyway.
+        const minInterval = _sfxMinIntervalMs[type];
+        if (minInterval) {
+            const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            if (now - (_sfxLastPlayed[type] || 0) < minInterval) return;
+            _sfxLastPlayed[type] = now;
+        }
         const url = _sfxMap[type];
         if (!url) return;
         const pool = _sfxPools[url];
+        if (!pool) return;
         const idx = _sfxIdx[url];
         const a = pool[idx];
         _sfxIdx[url] = (idx + 1) % pool.length;

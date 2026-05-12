@@ -2,7 +2,7 @@
 title: "Publishing Kiwi Defenders as a Modern HTML5 Web Game"
 description: "How we tackled cross-domain storage, asynchronous advertisement flows, and compliance to ship a seamless browser game."
 date: 2026-05-10
-category: "Web Engineering"
+category: "Games"
 ---
 
 Shipping a browser game in 2026 involves much more than simply uploading files to a website. 

@@ -1,5 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+// 目前暂且抓取英文博客来填充页面（如果你后续建立了 zh 文件夹并翻译了博客，请将 'en/' 改为 'zh/'）
+const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
+const latestPosts = allPosts
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
 ---
 
 <Layout title="Grandevity | 互动工作室与数字解决方案" lang="zh">
@@ -14,7 +21,6 @@ import Layout from '../../layouts/Layout.astro';
       
       <div class="card-grid">
         
-        <!-- 卡片 1：Kiwi Defenders -->
         <div class="card game-card">
           <a href="/play/kiwi-defenders/" style="text-decoration: none;">
             <div class="game-image-placeholder" style="background-image: url('/images/games/kiwi-defenders/landscape_cover_campaign_map.webp'); background-size: cover; background-position: center;">
@@ -29,7 +35,6 @@ import Layout from '../../layouts/Layout.astro';
           </div>
         </div>
 
-        <!-- 卡片 2：神秘的新项目 Project: Pebble -->
         <div class="card game-card">
           <div class="game-image-placeholder" style="background: #0f172a; background-size: cover; background-position: center;">
             <span style="color: #475569; font-weight: 800; font-size: 1.5rem; letter-spacing: 4px;">[ 机密档案 ]</span>
@@ -48,15 +53,23 @@ import Layout from '../../layouts/Layout.astro';
       <h2>最新洞见</h2>
       <p class="section-subtitle">深入探讨历史、系统设计与数字架构。</p>
       
-      <div class="card-grid single">
-        <div class="card">
-          <div class="card-content">
-            <h3>时间的架构 (The Architecture of Time)</h3>
-            <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">人文洞察</span>
-            <p>长安是如何用一滴滴水来衡量秩序的？深度探索唐代历史城市规划与系统化的计时机制背后的底层逻辑。</p>
-            <a href="/blog/humanities/the-architecture-of-time" class="cta-button">阅读文章 ➔</a>
+      <div class="card-grid">
+        {latestPosts.map((post) => (
+          <div class="card">
+            <div class="card-content">
+              <h3>{post.data.title}</h3>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">{post.data.category}</span>
+              <p>{post.data.description}</p>
+              <a href={`/blog/${post.id.replace('en/', '')}`} class="cta-button">阅读文章 ➔</a>
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="/blog" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
+          查看所有洞见 ➔
+        </a>
       </div>
     </section>
 
@@ -66,20 +79,28 @@ import Layout from '../../layouts/Layout.astro';
       
       <div class="card-grid">
         <div class="card">
-          <h3>数字与网络服务</h3>
-          <p>开发、维护和托管高性能的数字店面、网络工具与内容平台，确保架构的可扩展性。</p>
+          <div class="card-content">
+            <h3>数字与网络服务</h3>
+            <p>开发、维护和托管高性能的数字店面、网络工具与内容平台，确保架构的可扩展性。</p>
+          </div>
         </div>
         <div class="card">
-          <h3>商业咨询</h3>
-          <p>为独立企业和初创公司提供战略性运营指导与流程优化咨询，提升运营效率。</p>
+          <div class="card-content">
+            <h3>商业咨询</h3>
+            <p>为独立企业和初创公司提供战略性运营指导与流程优化咨询，提升运营效率。</p>
+          </div>
         </div>
         <div class="card">
-          <h3>财务与记账</h3>
-          <p>编制财务记录和总账对账，确保绝对的精确度与合规性，为您的业务增长最大化资金跑道。</p>
+          <div class="card-content">
+            <h3>财务与记账</h3>
+            <p>编制财务记录和总账对账，确保绝对的精确度与合规性，为您的业务增长最大化资金跑道。</p>
+          </div>
         </div>
         <div class="card">
-          <h3>系统与 ERP 架构</h3>
-          <p>定制 ERP 解决方案设计与实施，跨越财务数据与企业运营技术之间的鸿沟。</p>
+          <div class="card-content">
+            <h3>系统与 ERP 架构</h3>
+            <p>定制 ERP 解决方案设计与实施，跨越财务数据与企业运营技术之间的鸿沟。</p>
+          </div>
         </div>
       </div>
     </section>

@@ -28,7 +28,7 @@ This significantly improved stability during:
 2. Reward claims
 3. Interstitial playback events
 
-**[Read our previous technical deep-dive on the Zogon Alien AI systems ➔](/blog/kiwi-defenders-zogon-ai-systems)**
+**[Read our previous technical deep-dive on the Zogon Alien AI systems ➔](/blog/en/games/kiwi-defenders-zogon-ai-systems)**
 
 ### Solving Cross-Domain Save Problems
 

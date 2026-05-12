@@ -1,7 +1,7 @@
 ---
 title: "Inside the AI Systems Behind the Zogon Alien Army"
 description: "How we used state-machine logic, tactical support units, and adaptive spawn pressure to create a dynamic enemy force in Kiwi Defenders."
-date: 2026-05-16
+date: 2026-05-09
 category: "Games"
 ---
 

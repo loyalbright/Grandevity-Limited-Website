@@ -62,10 +62,15 @@ const switchText = lang === 'en' ? '中文' : 'EN';
       </div>
       
       <div class="footer-bottom">
-        <a href="/privacy-policy" style="color: #64748b; text-decoration: none; font-size: 0.9rem; margin-left: 1rem;">Privacy Policy</a>
-        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '于新西兰注册成立。'}</p>
-        <p class="nzbn-text">NZBN: 9429053472120</p>
+      <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '于新西兰注册成立。'}</p>
+      <p class="nzbn-text">NZBN: 9429053472120</p>
+      
+      <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
+        <a href="/privacy-policy" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Privacy Policy</a>
+        <span style="color: #475569; font-size: 0.9rem;">|</span>
+        <a href="/terms-of-service" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Terms of Service</a>
       </div>
+    </div>
     </footer>
   </body>
 </html>

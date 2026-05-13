@@ -95,6 +95,27 @@
                 z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5;
             }
         }
+
+	/* Studio Branding */
+	#studio-logo-link {
+    	    position: absolute;
+    	    top: 80px; /* Positions it nicely below your top-bar */
+    	    left: 20px;
+    	    z-index: 100;
+    	    transition: transform 0.2s ease-in-out;
+    	    cursor: pointer;
+	}
+
+	#studio-logo-link img {
+    	    width: 200px; /* Adjust this depending on how wide your logo is */
+    	    height: auto;
+    	    filter: drop-shadow(0 0 10px rgba(0, 206, 201, 0.4)); /* Makes it pop against the map */
+	}
+
+	#studio-logo-link:hover {
+    	    transform: scale(1.1); /* Adds a nice interactive bounce */
+	}
+
     </style>
 </head>
 <body>
@@ -116,6 +137,10 @@
                 <button id="music-toggle" class="top-btn on" onclick="toggleMusic()">🎵&nbsp;<span>MUSIC: ON</span></button> 
             </div>
         </div>
+
+	<a id="studio-logo-link" href="https://grandevity.co.nz" target="_blank" title="Visit Grandevity Studio">
+    	    <img src="grandevity_logo.webp" alt="Grandevity Limited">
+	</a>
 
         <svg id="path-layer"></svg>
         <div id="nodes-container"></div>

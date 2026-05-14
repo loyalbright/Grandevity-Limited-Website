@@ -19,7 +19,7 @@ category: "游戏"
 
 这使得敌方的怪物波次表现得更像是一场协调一致的军事突击，而不是一群毫无关联、只知道顺着路线排队送死的单位。
 
-**[阅读我们上一篇关于新西兰战术战场设计的深度解析 ➔](zh/blog/games/kiwi-defenders-nz-battlefield-design)**
+**[阅读我们上一篇关于新西兰战术战场设计的深度解析 ➔](/kiwi-defenders-nz-battlefield-design)**
 
 ### 辅助单位彻底改变了游戏 Meta
 

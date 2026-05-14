@@ -2,7 +2,7 @@
 title: "优化 HTML5 Canvas 性能以实现 60 FPS 丝滑游玩"
 description: "在浏览器游戏中减少垃圾回收卡顿并管理高效渲染管线的硬核技术。"
 date: 2026-05-12
-category: "Web 工程"
+category: "游戏"
 ---
 
 ### 为什么浏览器性能至关重要？

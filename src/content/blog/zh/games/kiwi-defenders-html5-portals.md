@@ -2,7 +2,7 @@
 title: "适配各大 HTML5 游戏门户：Kiwi Defenders 的发行之路"
 description: "解决 iframe 缩放、Visibility API 以及模块化 SDK 集成，实现全球浏览器分发。"
 date: 2026-05-14
-category: "Web 工程"
+category: "游戏"
 ---
 
 ### 浏览器游戏发行的隐藏复杂性

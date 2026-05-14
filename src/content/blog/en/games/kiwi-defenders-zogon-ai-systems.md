@@ -19,7 +19,7 @@ Every Zogon unit operates through lightweight state-machine logic that controls:
 
 This allows enemy waves to behave more like coordinated assaults instead of disconnected units walking down lanes.
 
-**[Read our previous breakdown on designing New Zealand as a tactical battlefield ➔](/blog/kiwi-defenders-nz-battlefield-design)**
+**[Read our previous breakdown on designing New Zealand as a tactical battlefield ➔](/blog/games/kiwi-defenders-nz-battlefield-design)**
 
 ### Support Units Changed the Entire Meta
 

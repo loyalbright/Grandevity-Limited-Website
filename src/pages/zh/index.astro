@@ -2,8 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-// 目前暂且抓取英文博客来填充页面（如果你后续建立了 zh 文件夹并翻译了博客，请将 'en/' 改为 'zh/'）
-const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
+// （抓取中文博客来填充页面）
+const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
 const latestPosts = allPosts
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);

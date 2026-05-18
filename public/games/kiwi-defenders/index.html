@@ -95,10 +95,28 @@
                 z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5;
             }
         }
+
+	/* Studio Branding */
+	#studio-logo-link {
+    	    position: absolute;
+    	    top: 80px; /* Positions it nicely below your top-bar */
+    	    left: 20px;
+    	    z-index: 100;
+    	    transition: transform 0.2s ease-in-out;
+    	    cursor: pointer;
+	}
+
+	#studio-logo-link img {
+    	    width: 200px; /* Adjust this depending on how wide your logo is */
+    	    height: auto;
+    	    filter: drop-shadow(0 0 10px rgba(0, 206, 201, 0.4)); /* Makes it pop against the map */
+	}
+
+	#studio-logo-link:hover {
+    	    transform: scale(1.1); /* Adds a nice interactive bounce */
+	}
+
     </style>
-    <!-- Yandex Games SDK. Served from /sdk.js by Yandex's hosting. Must load before
-         YaGames.init() runs (init is called from the YAG module further down). -->
-    <script src="/sdk.js"></script>
 </head>
 <body>
 
@@ -115,11 +133,14 @@
                     <option value="zh">简体中文</option>
                     <option value="ja">日本語</option>
                     <option value="es">Español</option>
-                    <option value="ru">Русский</option>
                 </select>
                 <button id="music-toggle" class="top-btn on" onclick="toggleMusic()">🎵&nbsp;<span>MUSIC: ON</span></button> 
             </div>
         </div>
+
+	<a id="studio-logo-link" href="https://grandevity.co.nz" target="_blank" title="Visit Grandevity Studio">
+    	    <img src="grandevity_logo.webp" alt="Grandevity Limited">
+	</a>
 
         <svg id="path-layer"></svg>
         <div id="nodes-container"></div>
@@ -137,85 +158,18 @@
     </div>
 
 <script>
-    // ===== Yandex Games SDK integration =====
-    // Wraps the Yandex Games SDK for the campaign map. The map doesn't end levels itself,
-    // so no interstitials are shown here — those happen inside each levelN.html. This
-    // module initializes the SDK, signals LoadingAPI.ready(), auto-detects the player's
-    // language, and pauses/mutes audio on platform pause events.
-    const YAG = {
-        ysdk: null,
-        sdkReady: false,
-
-        init: async function() {
-            if (typeof YaGames === 'undefined') {
-                console.log("YAG: SDK not loaded. Running standalone.");
-                return;
-            }
-            try {
-                this.ysdk = await YaGames.init();
-                this.sdkReady = true;
-                console.log("YAG: SDK initialized.");
-                try {
-                    this.ysdk.on('game_api_pause', () => { CG_Manager.pauseGame(); });
-                    this.ysdk.on('game_api_resume', () => { CG_Manager.resumeGame(); });
-                } catch (e) { console.warn("YAG: event subscription failed:", e); }
-            } catch (e) {
-                console.warn("YAG: SDK init failed:", e);
-            }
-        },
-
-        notifyReady: function() {
-            if (!this.sdkReady) return;
-            try {
-                if (this.ysdk.features && this.ysdk.features.LoadingAPI) {
-                    this.ysdk.features.LoadingAPI.ready();
-                    console.log("YAG: LoadingAPI.ready() sent.");
-                }
-            } catch (e) { console.warn("YAG: LoadingAPI.ready failed:", e); }
-        },
-
-        getPreferredLang: function() {
-            if (!this.sdkReady) return null;
-            try {
-                const lang = this.ysdk.environment.i18n.lang;
-                if (['en', 'zh', 'ja', 'es', 'ru'].includes(lang)) return lang;
-                return null;
-            } catch (e) { return null; }
-        },
-    };
-
     const CG_Manager = {
-        isPaused: false,
-        init: async function() { await YAG.init(); },
+        isPaused: false, 
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
         startGameplay: function() {},
         stopGameplay: function() {},
-        playAd: function(onComplete) { if (onComplete) onComplete(false); },
-        pauseGame: function() {
-            this.isPaused = true;
-            if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause();
-        },
-        resumeGame: function() {
-            this.isPaused = false;
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {});
-        }
+        playAd: function() { this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
 
-    window.addEventListener('DOMContentLoaded', async () => {
-        // Initialize the Yandex SDK first so language detection and ready-signal work.
-        await CG_Manager.init();
-        // Auto-select language from the player's Yandex locale, unless they've explicitly
-        // chosen one before (the in-game switcher persists an explicit choice).
-        const hasExplicitLang = !!localStorage.getItem('kiwiLang');
-        if (!hasExplicitLang) {
-            const sdkLang = YAG.getPreferredLang();
-            if (sdkLang) currentLang = sdkLang;
-        }
-        applyTranslation();
-        if (typeof document.getElementById('lang-switcher') !== 'undefined' && document.getElementById('lang-switcher')) {
-            document.getElementById('lang-switcher').value = currentLang;
-        }
-        // Tell Yandex the map is interactive (required — turns "Game Ready" green).
-        YAG.notifyReady();
+    window.addEventListener('DOMContentLoaded', () => {
+        CG_Manager.init();
         tryAutoplay();
     });
 
@@ -267,16 +221,6 @@
             up_spd_name: "Agilidad de Kevin", up_spd_desc: "Aumenta la velocidad de movimiento táctico de Kevin.",
             up_dmg_name: "Ajuste de Armas", up_dmg_desc: "Todas las armas infligen más daño por golpe.",
             levelTooltip: "Nivel", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
-        },
-        ru: {
-            title: "ЗАЩИТНИКИ КИВИ: КАРТА КАМПАНИИ", reserveXp: "ЗАПАС XP:", upgradesBtn: "🧬 УЛУЧШЕНИЯ",
-            musicOn: "МУЗЫКА: ВКЛ", musicOff: "МУЗЫКА: ВЫКЛ", resetData: "СБРОС ДАННЫХ",
-            upTitle: "ТАКТИЧЕСКИЕ УЛУЧШЕНИЯ", upAvail: "ДОСТУПНО XP:", closeBtn: "ЗАКРЫТЬ", up_btn: "УЛУЧШИТЬ",
-            up_cost: "СТОИМОСТЬ:", up_gold_name: "Стартовое золото", up_gold_desc: "Начинайте каждую миссию с большим запасом золота.",
-            up_hp_name: "Прочность базы", up_hp_desc: "Навсегда увеличивает максимальный запас здоровья базы.",
-            up_spd_name: "Скорость Кевина", up_spd_desc: "Увеличивает тактическую скорость передвижения Кевина.",
-            up_dmg_name: "Улучшение оружия", up_dmg_desc: "Всё оружие наносит больше урона за удар.",
-            levelTooltip: "Уровень", fs_enter: "ПОЛНОЭКРАННЫЙ РЕЖИМ", fs_exit: "ВЫЙТИ ИЗ ПОЛНОЭКРАННОГО РЕЖИМА"
         }
     };
 
@@ -440,6 +384,7 @@
     }
 
     drawPaths(); drawNodes();
+    window.addEventListener('DOMContentLoaded', applyTranslation);
 </script>
 </body>
 </html>

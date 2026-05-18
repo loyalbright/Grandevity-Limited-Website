@@ -63,9 +63,6 @@
             body::after { content: "📱 Please rotate your device \A 请旋转手机至横屏游玩"; white-space: pre-wrap; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; color: #1abc9c; display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 24px; text-align: center; padding: 20px; line-height: 1.5; }
         }
     </style>
-    <!-- Yandex Games SDK. Served from /sdk.js by Yandex's hosting. Must load before
-         YaGames.init() runs (init is called from the YAG module further down). -->
-    <script src="/sdk.js"></script>
 </head>
 <body>
 
@@ -153,150 +150,15 @@
     </div>
 
 <script>
-    // ===== Yandex Games SDK integration =====
-    // Wraps the Yandex Games SDK. Game code never touches `ysdk` directly — it goes through
-    // YAG / CG_Manager. If the SDK fails to load (running outside Yandex, dev server), every
-    // call degrades gracefully to a no-op.
-    //
-    // Yandex SDK model:
-    // - /sdk.js is loaded in <head>; YaGames.init() returns the ysdk object (a Promise).
-    // - LoadingAPI.ready() MUST be called when the game is interactive (requirement 1.19.2).
-    // - GameplayAPI.start()/.stop() mark gameplay boundaries (level start/end, pause, ads).
-    // - game_api_pause / game_api_resume events fire when the platform shows startup ads or
-    //   the player loses focus — we pause+mute on pause, resume on resume.
-    // - adv.showFullscreenAdv() shows an interstitial; adv.showRewardedVideo() shows a
-    //   rewarded video (used for the "Watch Ad to Respawn" option).
-    // - ysdk.environment.i18n.lang gives the player's language for auto-selection.
-    const YAG = {
-        ysdk: null,
-        sdkReady: false,
-
-        init: async function() {
-            if (typeof YaGames === 'undefined') {
-                console.log("YAG: SDK not loaded. Running standalone.");
-                return;
-            }
-            try {
-                this.ysdk = await YaGames.init();
-                this.sdkReady = true;
-                console.log("YAG: SDK initialized.");
-                // Subscribe to platform pause/resume (startup ads, focus loss).
-                try {
-                    this.ysdk.on('game_api_pause', () => { CG_Manager.pauseGame(); });
-                    this.ysdk.on('game_api_resume', () => { CG_Manager.resumeGame(); });
-                } catch (e) { console.warn("YAG: event subscription failed:", e); }
-            } catch (e) {
-                console.warn("YAG: SDK init failed:", e);
-            }
-        },
-
-        // Tell Yandex the game is interactive. Required (item 1.19.2) — turns the
-        // "Game Ready" indicator green. Call once, as soon as the game is playable.
-        notifyReady: function() {
-            if (!this.sdkReady) return;
-            try {
-                if (this.ysdk.features && this.ysdk.features.LoadingAPI) {
-                    this.ysdk.features.LoadingAPI.ready();
-                    console.log("YAG: LoadingAPI.ready() sent.");
-                }
-            } catch (e) { console.warn("YAG: LoadingAPI.ready failed:", e); }
-        },
-
-        // Player's preferred language from the SDK, mapped to our supported set.
-        getPreferredLang: function() {
-            if (!this.sdkReady) return null;
-            try {
-                const lang = this.ysdk.environment.i18n.lang;  // e.g. 'ru', 'en', 'tr'
-                if (['en', 'zh', 'ja', 'es', 'ru'].includes(lang)) return lang;
-                return null;  // unsupported language → caller keeps its default
-            } catch (e) { return null; }
-        },
-
-        // Gameplay markers (requirement 1.19.3). Safe no-ops when SDK absent.
-        gameplayStart: function() {
-            if (!this.sdkReady) return;
-            try {
-                if (this.ysdk.features && this.ysdk.features.GameplayAPI) this.ysdk.features.GameplayAPI.start();
-            } catch (e) {}
-        },
-        gameplayStop: function() {
-            if (!this.sdkReady) return;
-            try {
-                if (this.ysdk.features && this.ysdk.features.GameplayAPI) this.ysdk.features.GameplayAPI.stop();
-            } catch (e) {}
-        },
-
-        // Interstitial (fullscreen) ad. `onDone` is called when the ad closes or errors.
-        showInterstitial: function(onDone) {
-            const done = () => { try { onDone && onDone(); } catch (e) { console.error(e); } };
-            if (!this.sdkReady) { done(); return; }
-            try {
-                this.ysdk.adv.showFullscreenAdv({
-                    callbacks: {
-                        onClose: () => { done(); },
-                        onError: (err) => { console.log("YAG: interstitial error:", err); done(); },
-                    }
-                });
-            } catch (e) {
-                console.warn("YAG: showFullscreenAdv failed:", e);
-                done();
-            }
-        },
-
-        // True if a rewarded video can be offered. Yandex has no pre-check, so we treat
-        // "SDK ready" as "rewarded available" and rely on the error callback otherwise.
-        canShowRewarded: function() {
-            return this.sdkReady;
-        },
-
-        // Rewarded video. `onComplete(wasRewarded)` — true only if the player earned the
-        // reward (watched far enough). Pause/mute handled by the caller around this.
-        showRewarded: function(onComplete) {
-            const cb = (ok) => { try { onComplete && onComplete(ok); } catch (e) { console.error(e); } };
-            if (!this.sdkReady) { cb(false); return; }
-            let rewarded = false;
-            try {
-                this.ysdk.adv.showRewardedVideo({
-                    callbacks: {
-                        onRewarded: () => { rewarded = true; },
-                        onClose: () => { cb(rewarded); },
-                        onError: (err) => { console.log("YAG: rewarded error:", err); cb(false); },
-                    }
-                });
-            } catch (e) {
-                console.warn("YAG: showRewardedVideo failed:", e);
-                cb(false);
-            }
-        },
-    };
-
-    // --- Game manager (pause/resume audio + gameplay markers for ad lifecycle) ---
+    // --- 🎮 纯净版管理器 ---
     const CG_Manager = {
-        isPaused: false,
-        init: async function() { await YAG.init(); },
-        startGameplay: function() { YAG.gameplayStart(); },
-        stopGameplay: function() { YAG.gameplayStop(); },
-        // Legacy entry point — kept for interface compatibility with other platform builds.
-        playAd: function(onComplete) { if (onComplete) onComplete(false); },
-        pauseGame: function() {
-            this.isPaused = true;
-            // Mute ALL audio while paused/ad-showing. bgm is the music track; _sfxPools
-            // holds the sound-effect pool. Freezing isPaused stops new SFX; this loop
-            // silences any still playing.
-            if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause();
-            if (typeof _sfxPools !== 'undefined') {
-                try {
-                    for (const url in _sfxPools) {
-                        _sfxPools[url].forEach(a => { if (!a.paused) a.pause(); });
-                    }
-                } catch (e) {}
-            }
-        },
-        resumeGame: function() {
-            this.isPaused = false;
-            // Resume only the background music. In-flight SFX were transient.
-            if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {});
-        }
+        isPaused: false, 
+        init: async function() { console.log("Demo Mode: SDK Disabled."); },
+        startGameplay: function() {},
+        stopGameplay: function() {},
+        playAd: function(type = 'midgame') { console.log("Demo Mode: Ad skipped."); this.resumeGame(); },
+        pauseGame: function() { this.isPaused = true; if (typeof bgm !== 'undefined' && !bgm.paused) bgm.pause(); },
+        resumeGame: function() { this.isPaused = false; if (typeof musicPlaying !== 'undefined' && musicPlaying) bgm.play().catch(e => {}); }
     };
 
     function tryAutoplay() {
@@ -328,7 +190,7 @@
     const i18n = {
         en: {
             startTip: "✨ Tip: Stand strong on the Whangārei bridge and hold the line!", startBtn: "DEFEND WHANGĀREI",
-            respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)", respawnAdBtn: "📺 Watch Ad to Respawn",
+            respawnTitle: "KEVIN HAS FALLEN!", respawnBtn: "Respawn (100 XP)", respawnNoXp: "Not enough XP (100)",
             retreatBtn: "RETREAT",
             baseWhangarei: "🏙️ BASE WHANGĀREI:", goldLabel: "💰 GOLD:", xpLabel: "🌟 TOTAL XP:", zogonPod: "🛸 ZOGON POD:",
             armory: "🗡️ ARMORY", summon: "🐤 SUMMON", reinforcements: "🌍 WHANGĀREI REINFORCEMENTS",
@@ -346,7 +208,7 @@
         },
         zh: {
             startTip: "✨ 提示：死守旺阿雷大桥，绝不退缩！", startBtn: "保卫旺阿雷",
-            respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)", respawnAdBtn: "📺 看广告复活",
+            respawnTitle: "凯文倒下了！", respawnBtn: "复活 (100 XP)", respawnNoXp: "XP 不足 (100)",
             retreatBtn: "撤退",
             baseWhangarei: "🏙️ 旺阿雷基地:", goldLabel: "💰 资金:", xpLabel: "🌟 总经验:", zogonPod: "🛸 敌军母舰:",
             armory: "🗡️ 武器库", summon: "🐤 召唤兵种", reinforcements: "🌍 旺阿雷增援",
@@ -364,7 +226,7 @@
         },
         ja: {
             startTip: "✨ ヒント：ファンガレイの橋を死守せよ！", startBtn: "ファンガレイを防衛",
-            respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)", respawnAdBtn: "📺 広告を見て復活",
+            respawnTitle: "ケビンが倒れた！", respawnBtn: "復活 (100 XP)", respawnNoXp: "XP不足 (100)",
             retreatBtn: "撤退",
             baseWhangarei: "🏙️ ファンガレイ基地:", goldLabel: "💰 資金:", xpLabel: "🌟 合計XP:", zogonPod: "🛸 ゾゴン・ポッド:",
             armory: "🗡️ 武器庫", summon: "🐤 召喚", reinforcements: "🌍 ファンガレイ増援",
@@ -382,7 +244,7 @@
         },
         es: {
             startTip: "✨ Consejo: ¡Mantente firme en el puente de Whangārei y no cedas!", startBtn: "DEFENDER WHANGĀREI",
-            respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)", respawnAdBtn: "📺 Ver Anuncio para Reaparecer",
+            respawnTitle: "¡KEVIN HA CAÍDO!", respawnBtn: "Reaparecer (100 XP)", respawnNoXp: "XP Insuficiente (100)",
             retreatBtn: "RETIRARSE",
             baseWhangarei: "🏙️ BASE WHANGĀREI:", goldLabel: "💰 ORO:", xpLabel: "🌟 XP TOTAL:", zogonPod: "🛸 NAVE ZOGON:",
             armory: "🗡️ ARMERÍA", summon: "🐤 INVOCAR", reinforcements: "🌍 REFUERZOS",
@@ -397,24 +259,6 @@
             victory: "¡VICTORIA!", victoryMsg: "¡Invasión detenida! Región asegurada.",
             backToMap: "VOLVER AL MAPA", restart: "REINTENTAR",
             pauseBtn: "PAUSA", pausedTitle: "JUEGO PAUSADO", resumeBtn: "REANUDAR", quitBtn: "SALIR AL MAPA", quitConfirm: "¿Salir al mapa? Se perderá el progreso de esta partida.", fs_enter: "PANTALLA COMPLETA", fs_exit: "SALIR PANTALLA"
-        },
-        ru: {
-            startTip: "✨ Совет: Надежно удерживайте оборону на мосту Фангареи и не отступайте!", startBtn: "ЗАЩИТИТЬ ФАНГАРЕИ",
-            respawnTitle: "КЕВИН ПАЛ!", respawnBtn: "Возродиться (100 XP)", respawnNoXp: "Недостаточно XP (100)", respawnAdBtn: "📺 Возродиться за рекламу",
-            retreatBtn: "ОТСТУПИТЬ",
-            baseWhangarei: "🏙️ БАЗА ФАНГАРЕИ:", goldLabel: "💰 ЗОЛОТО:", xpLabel: "🌟 ВСЕГО XP:", zogonPod: "🛸 КОРАБЛЬ ЗОГОН:",
-            armory: "🗡️ АРСЕНАЛ", summon: "🐤 ПРИЗЫВ", reinforcements: "🌍 ПОДКРЕПЛЕНИЕ ФАНГАРЕИ",
-            wUnarmed: "🥋 БЕЗ ОРУЖИЯ", wSword: "🗡️ МЕЧ", wBow: "🏹 БЛОЧНЫЙ ЛУК", wSpear: "🔱 КОПЬЁ", wArmor: "🦺 БРОНЯ (Получаемый урон снижен вдвое)",
-            sBasic: "🐤 НОВОБРАНЕЦ", sShield: "🛡️ ЩИТОНОСЕЦ", sSniper: "🔫 СНАЙПЕР", sHealer: "🥝 МЕДИК",
-            uHaikou: "CN Хайкоу - Гиббон", uRaiatea: "PF Раиатеа - Морская черепаха",
-            musicOn: "МУЗЫКА: ВКЛ", musicOff: "МУЗЫКА: ВЫКЛ",
-            equipped: "ЭКИПИРОВАНО", owned: "В НАЛИЧИИ",
-            readying: "⏳ ЗАРЯДКА... ({n}/60)", ready: "🔥 ГОТОВ К УДАРУ!",
-            xpEarned: "ПОЛУЧЕНО XP: +{n}", defenseFailed: "ОБОРОНА ПРОВАЛЕНА", xpMobLine: "XP за врагов: +{n}", xpBossLine: "Бонус за босса: +{n}", xpEffortLine: "Бонус за старание: +{n}",
-            baseFallen: "БАЗА ПАЛА", baseFallenMsg: "Форпост уничтожен. Оборона рухнула!",
-            victory: "ПОБЕДА!", victoryMsg: "Вторжение остановлено! Регион в безопасности.",
-            backToMap: "НА КАРТУ", restart: "ЗАНОВО",
-            pauseBtn: "ПАУЗА", pausedTitle: "ПАУЗА", resumeBtn: "ПРОДОЛЖИТЬ", quitBtn: "ВЫЙТИ НА КАРТУ", quitConfirm: "Выйти на карту? Прогресс текущей попытки будет потерян.", fs_enter: "ПОЛНОЭКРАННЫЙ РЕЖИМ", fs_exit: "ВЫЙТИ ИЗ ПОЛНОЭКРАННОГО РЕЖИМА"
         }
     };
 
@@ -439,22 +283,12 @@
             if (btn.classList.contains('active')) btn.querySelector('.price').innerText = dict.equipped;
             else if (btn.dataset.bought) btn.querySelector('.price').innerText = dict.owned;
         });
-        if (kevin && kevin.isDead) updateRespawnBtn();
+        if (kevin && kevin.isDead) ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp;
     }
     
-    window.addEventListener('DOMContentLoaded', async () => {
-        // Initialize the Yandex SDK first so language detection and ready-signal work.
-        await CG_Manager.init();
-        // Auto-select language from the player's Yandex locale, unless they've explicitly
-        // chosen one before (localStorage preserves an explicit in-game choice).
-        const hasExplicitLang = !!localStorage.getItem('kiwiLang');
-        if (!hasExplicitLang) {
-            const sdkLang = YAG.getPreferredLang();
-            if (sdkLang) currentLang = sdkLang;
-        }
+    window.addEventListener('DOMContentLoaded', () => {
         applyTranslation();
-        // Tell Yandex the game is interactive (required — turns "Game Ready" green).
-        YAG.notifyReady();
+        CG_Manager.init();
         tryAutoplay();
     });
 
@@ -649,11 +483,9 @@
         if (isPlayerPaused) {
             pauseScreen.style.display = 'flex';
             if (musicPlaying) bgm.pause();
-            YAG.gameplayStop();
         } else {
             pauseScreen.style.display = 'none';
             if (musicPlaying) bgm.play().catch(e => {});
-            YAG.gameplayStart();
         }
     }
 
@@ -730,67 +562,7 @@
         initGame(); 
     });
     
-    // Performs the actual respawn — heal Kevin, position him, hide the death overlay.
-    // Called from the click handler after determining whether ad/XP/free path applied.
-    function doRespawn() {
-        kevin.hp = kevin.maxHp;
-        kevin.x = hq.x + hq.w + 20;
-        kevin.y = GROUND_Y - kevin.h;
-        kevin.isDead = false;
-        ui.respawnScreen.style.display = 'none';
-    }
-
-    // Centralized respawn button state. Three possible states:
-    //   1. Rewarded video available → "📺 Watch Ad to Respawn" (primary)
-    //   2. No ad, XP ≥ 100           → "Respawn (100 XP)" (fallback)
-    //   3. No ad, XP < 100           → disabled (only Retreat works)
-    // Called when Kevin dies and when language changes.
-    function updateRespawnBtn() {
-        if (!kevin || !kevin.isDead) return;
-        const dict = i18n[currentLang];
-        if (YAG.canShowRewarded()) {
-            ui.respawnBtn.disabled = false;
-            ui.respawnBtn.innerText = dict.respawnAdBtn;
-        } else if (globalXP >= 100) {
-            ui.respawnBtn.disabled = false;
-            ui.respawnBtn.innerText = dict.respawnBtn;
-        } else {
-            ui.respawnBtn.disabled = true;
-            ui.respawnBtn.innerText = dict.respawnNoXp;
-        }
-    }
-
-    ui.respawnBtn.addEventListener('click', (e) => {
-        e.currentTarget.blur();
-        if (!kevin.isDead) return;
-        if (YAG.canShowRewarded()) {
-            // Watch-ad path: rewarded video replaces the XP cost. Disable button during the
-            // ad to prevent double-click. Pause/mute audio for the ad, resume after. If the
-            // player didn't earn the reward (closed early / error), fall back to XP cost.
-            ui.respawnBtn.disabled = true;
-            CG_Manager.pauseGame();
-            YAG.showRewarded((wasRewarded) => {
-                CG_Manager.resumeGame();
-                if (wasRewarded) {
-                    doRespawn();
-                } else if (globalXP >= 100) {
-                    globalXP -= 100;
-                    try { localStorage.setItem('kiwiGlobalXP', globalXP); } catch(e){}
-                    ui.globalXpText.innerText = globalXP;
-                    doRespawn();
-                } else {
-                    updateRespawnBtn();  // re-enable / refresh state
-                }
-            });
-        } else if (globalXP >= 100) {
-            // XP-cost fallback path (no ad — running standalone, SDK failed, etc.).
-            globalXP -= 100;
-            try { localStorage.setItem('kiwiGlobalXP', globalXP); } catch(e){}
-            ui.globalXpText.innerText = globalXP;
-            doRespawn();
-        }
-        // If neither holds, button is disabled — click does nothing.
-    });
+    ui.respawnBtn.addEventListener('click', (e) => { e.currentTarget.blur(); if (globalXP >= 100 && kevin.isDead) { globalXP -= 100; localStorage.setItem('kiwiGlobalXP', globalXP); kevin.hp = kevin.maxHp; kevin.x = hq.x + hq.w + 20; kevin.y = GROUND_Y - kevin.h; kevin.isDead = false; ui.respawnScreen.style.display = 'none'; ui.globalXpText.innerText = globalXP; } });
     ui.retreatBtn.addEventListener('click', (e) => { e.currentTarget.blur(); if (kevin.isDead && !isGameOver) { endGame(false); } });
     ui.armorBtn.addEventListener('click', (e) => { e.currentTarget.blur(); const dict = i18n[currentLang]; if (!kevin.hasArmor && !kevin.isDead && gold >= 100) { gold -= 100; kevin.hasArmor = true; kevin.maxHp += 200; kevin.hp += 200; ui.armorBtn.dataset.bought = 'true'; ui.armorBtn.classList.add('active'); ui.armorBtn.querySelector('.price').innerText = dict.equipped; } });
 
@@ -941,7 +713,7 @@
         const dict = i18n[currentLang];
         frameCount++; updateUI();
         let enemyFrontLineX = ship.x; enemies.forEach(e => { if (e.x < enemyFrontLineX) enemyFrontLineX = e.x; });
-        if (!kevin.isDead) { if (keys['KeyA'] || keys['ArrowLeft']) { kevin.x -= kevin.speed; kevin.facing = -1; } if (keys['KeyD'] || keys['ArrowRight']) { kevin.x += kevin.speed; kevin.facing = 1; } kevin.x = Math.max(hq.x + 50, Math.min(kevin.x, enemyFrontLineX - kevin.w)); kevin.y = GROUND_Y - kevin.h; kevin.isHidden = (kevin.x < hq.x + hq.w - 10); if (kevin.isHidden && kevin.hp > 0 && kevin.hp < kevin.maxHp) { if (frameCount % 60 === 0) { kevin.hp = Math.min(kevin.maxHp, kevin.hp + 25); let vY = getVisualY(kevin.x, kevin.y); spawnFloatingText(kevin.x + 10, vY - 10, '+25', '#2ecc71', -0.5); } } if (kevin.attackTimer > 0) kevin.attackTimer--; if (kevin.hitTimer > 0) kevin.hitTimer--; if (kevin.isAttacking) { kevin.attackAnim -= 5; if (kevin.attackAnim <= 0) kevin.isAttacking = false; } if (kevin.hp <= 0) { let vY = getVisualY(kevin.x, kevin.y); spawnSoul({x: kevin.x, y: vY, w: kevin.w, color: kevin.color}, -1); kevin.isDead = true; if (hq.hp > 0) { ui.respawnScreen.style.display = 'flex'; updateRespawnBtn(); } } }
+        if (!kevin.isDead) { if (keys['KeyA'] || keys['ArrowLeft']) { kevin.x -= kevin.speed; kevin.facing = -1; } if (keys['KeyD'] || keys['ArrowRight']) { kevin.x += kevin.speed; kevin.facing = 1; } kevin.x = Math.max(hq.x + 50, Math.min(kevin.x, enemyFrontLineX - kevin.w)); kevin.y = GROUND_Y - kevin.h; kevin.isHidden = (kevin.x < hq.x + hq.w - 10); if (kevin.isHidden && kevin.hp > 0 && kevin.hp < kevin.maxHp) { if (frameCount % 60 === 0) { kevin.hp = Math.min(kevin.maxHp, kevin.hp + 25); let vY = getVisualY(kevin.x, kevin.y); spawnFloatingText(kevin.x + 10, vY - 10, '+25', '#2ecc71', -0.5); } } if (kevin.attackTimer > 0) kevin.attackTimer--; if (kevin.hitTimer > 0) kevin.hitTimer--; if (kevin.isAttacking) { kevin.attackAnim -= 5; if (kevin.attackAnim <= 0) kevin.isAttacking = false; } if (kevin.hp <= 0) { let vY = getVisualY(kevin.x, kevin.y); spawnSoul({x: kevin.x, y: vY, w: kevin.w, color: kevin.color}, -1); kevin.isDead = true; if (hq.hp > 0) { ui.respawnScreen.style.display = 'flex'; ui.respawnBtn.disabled = globalXP < 100; ui.respawnBtn.innerText = globalXP >= 100 ? dict.respawnBtn : dict.respawnNoXp; } } }
         if (ultTimer < 3600) { ultTimer++; const ultSec = Math.floor(ultTimer/60); if (ultSec !== _ultCache.sec) { ui.ultTimerText.innerText = dict.readying.replace('{n}', ultSec); _ultCache.sec = ultSec; } if (_ultCache.ready !== false) { ui.ultTimerText.style.color = '#ccc'; ui.ultBtns.forEach(b => b.disabled = true); _ultCache.ready = false; } } else { if (_ultCache.ready !== true) { ui.ultTimerText.innerText = dict.ready; ui.ultTimerText.style.color = '#2ecc71'; ui.ultBtns.forEach(b => b.disabled = false); _ultCache.ready = true; _ultCache.sec = -1; } }
         floatingTexts.forEach(ft => { ft.x += ft.dx; ft.y += ft.dy; ft.life--; }); floatingTexts = floatingTexts.filter(ft => ft.life > 0);
         souls.forEach(s => { s.x += s.dx; s.y += s.dy; s.life--; }); souls = souls.filter(s => s.life > 0);
@@ -1127,11 +899,6 @@
         ui.respawnScreen.style.display = 'none'; ui.gameOverScreen.style.display = 'flex'; ui.restartBtn.style.display = 'block'; 
         if (isVictory) { ui.restartBtn.innerText = dict.backToMap; ui.restartBtn.onclick = () => { window.location.href = "index.html"; }; } 
         else { ui.restartBtn.innerText = dict.restart; ui.restartBtn.onclick = () => { window.location.reload(); }; }
-        // Yandex: the level has ended — mark gameplay stopped, then show a fullscreen
-        // interstitial ad. The game-over screen stays visible underneath the ad. Done last
-        // so the player sees their score first. Shown on victory and defeat alike.
-        YAG.gameplayStop();
-        YAG.showInterstitial();
     }
     
     function loop() { 

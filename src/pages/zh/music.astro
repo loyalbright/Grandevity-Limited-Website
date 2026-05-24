@@ -1,33 +1,46 @@
 ---
-// 注意这里要多退一层目录才能找到 layouts
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="原创音乐与原声带 - Grandevity Limited" lang="zh">
+<Layout title="跨越千年的声音 - Grandevity Limited" lang="zh">
   <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1rem; min-height: 70vh;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: #1e293b;">原创音乐</h1>
-    <p style="color: #64748b; margin-bottom: 3rem; font-size: 1.1rem;">
-      探索为我们的游戏世界精心打造的原创原声带与沉浸式音频体验。
-    </p>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #1e293b;">跨越千年的声音，治愈现代的灵魂</h1>
+      <p style="color: #64748b; font-size: 1.15rem; line-height: 1.7; max-width: 700px; margin: 0 auto;">
+        本频道专注于中国古典文学的现代重构与谱新曲。我们将传世的诗词歌赋与现代华语流行音乐（Mandopop, Indie, Chillhop）完美交融。让传统的文字化作伴随你公路旅行、深夜冥想、缓解都市内耗的治愈旋律。
+      </p>
+    </header>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-      
-      <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #f8fafc;">
-        <h2 style="margin-top: 0; color: #0f172a;">Kiwi Defenders 原声带</h2>
-        <p style="color: #475569; font-size: 0.95rem;">完整的原创游戏配乐，包含动感的战斗主旋律与氛围感十足的探索曲目。</p>
-        <div style="margin-top: 1rem; padding: 1rem; background: #e2e8f0; border-radius: 8px; text-align: center; color: #64748b;">
-          [ 音频播放器 / 嵌入代码将放置于此 ]
-        </div>
+    <div style="margin-bottom: 3rem;">
+      <h2 style="font-size: 1.5rem; color: #0f172a; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">最新视听企划</h2>
+      <div style="border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);">
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src="https://youtu.be/lkCpRb9tXEY" 
+          title="Grandevity 原创音乐" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
       </div>
-
-      <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; background: #f8fafc;">
-        <h2 style="margin-top: 0; color: #0f172a;">代号：Pebble (开发中)</h2>
-        <p style="color: #475569; font-size: 0.95rem;">为我们即将推出的全新互动体验所制作的早期音频原型与氛围草图。</p>
-        <div style="margin-top: 1rem; padding: 1rem; background: #e2e8f0; border-radius: 8px; text-align: center; color: #64748b;">
-          [ 音频播放器 / 嵌入代码将放置于此 ]
-        </div>
+      <div style="text-align: right; margin-top: 0.5rem;">
+        <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: none; font-weight: 500; font-size: 0.95rem;">
+          在 YouTube 上探索更多企划 ➔
+        </a>
       </div>
+    </div>
 
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem;">
+      <h2 style="font-size: 1.25rem; color: #0f172a; margin-top: 0; margin-bottom: 0.75rem;">商业合作与版权声明</h2>
+      <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+        本页面所有原创音乐、编曲及视觉内容均由 <strong>Grandevity Limited</strong> 运营并持有合法商业版权。我们欢迎独立游戏、影视创作、Vlog 及商业广告采购非独家背景 BGM 授权。
+      </p>
+      <p style="margin: 0; font-size: 0.95rem;">
+        <strong style="color: #1e293b;">商业授权咨询邮箱：</strong> 
+        <a href="mailto:contact@grandevity.co.nz" style="color: #2563eb; text-decoration: none;">contact@grandevity.co.nz</a>
+      </p>
     </div>
   </main>
-</Layout>
+</Layout>/你的频道链接

@@ -2,45 +2,133 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="跨越千年的声音 - Grandevity Limited" lang="zh">
-  <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1rem; min-height: 70vh;">
-    <header style="text-align: center; margin-bottom: 3rem;">
-      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: #1e293b;">跨越千年的声音，治愈现代的灵魂</h1>
-      <p style="color: #64748b; font-size: 1.15rem; line-height: 1.7; max-width: 700px; margin: 0 auto;">
-        本频道专注于中国古典文学的现代重构与谱新曲。我们将传世的诗词歌赋与现代华语流行音乐（Mandopop, Indie, Chillhop）完美交融。让传统的文字化作伴随你公路旅行、深夜冥想、缓解都市内耗的治愈旋律。
-      </p>
+<Layout title="跨越千年的声音 | Grandevity" lang="zh">
+  <main class="page-container">
+    <header class="page-header">
+      <h1>跨越千年的声音，<span class="text-gradient">治愈现代的灵魂</span></h1>
+      <p class="subtitle">本频道专注于中国古典文学的现代重构与谱新曲。我们将传世的诗词歌赋与现代华语流行音乐（Mandopop, Indie, Chillhop）完美交融。让传统的文字化作伴随你公路旅行、深夜冥想、缓解都市内耗的治愈旋律。</p>
     </header>
 
-    <div style="margin-bottom: 3rem;">
-      <h2 style="font-size: 1.5rem; color: #0f172a; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">最新视听企划</h2>
-      <div style="border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; background: #000; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);">
-        <iframe 
-          width="100%" 
-          height="100%" 
-          src="https://youtu.be/lkCpRb9tXEY" 
-          title="Grandevity 原创音乐" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-          allowfullscreen
-          loading="lazy"
-        ></iframe>
-      </div>
-      <div style="text-align: right; margin-top: 0.5rem;">
-        <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: none; font-weight: 500; font-size: 0.95rem;">
-          在 YouTube 上探索更多企划 ➔
-        </a>
-      </div>
-    </div>
+    <div class="page-content">
+      <section class="video-section">
+        <h2>最新视听企划</h2>
+        <div class="video-container">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/lkCpRb9tXEY?rel=0" 
+            title="Grandevity 原创音乐" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+        <div class="channel-link">
+          <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer">
+            在 YouTube 上探索更多企划 ➔
+          </a>
+        </div>
+      </section>
 
-    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem;">
-      <h2 style="font-size: 1.25rem; color: #0f172a; margin-top: 0; margin-bottom: 0.75rem;">商业合作与版权声明</h2>
-      <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
-        本页面所有原创音乐、编曲及视觉内容均由 <strong>Grandevity Limited</strong> 运营并持有合法商业版权。我们欢迎独立游戏、影视创作、Vlog 及商业广告采购非独家背景 BGM 授权。
-      </p>
-      <p style="margin: 0; font-size: 0.95rem;">
-        <strong style="color: #1e293b;">商业授权咨询邮箱：</strong> 
-        <a href="mailto:contact@grandevity.co.nz" style="color: #2563eb; text-decoration: none;">contact@grandevity.co.nz</a>
-      </p>
+      <section class="copyright-section">
+        <h2>商业合作与版权声明</h2>
+        <div class="details-box">
+          <p>本页面所有原创音乐、编曲及视觉内容均由 <strong>Grandevity Limited</strong> 运营并持有合法商业版权。我们欢迎独立游戏、影视创作、Vlog 及商业广告采购非独家背景 BGM 授权。</p>
+          <p><strong>商业授权咨询邮箱：</strong> <a href="mailto:contact@grandevity.co.nz">contact@grandevity.co.nz</a></p>
+        </div>
+      </section>
     </div>
   </main>
-</Layout>/你的频道链接
+</Layout>
+
+<style>
+  .page-container { 
+    padding: 4rem 5%; 
+    max-width: 1000px; 
+    margin: 0 auto; 
+    min-height: 70vh; 
+    color: #cbd5e1;
+  }
+  .page-header { 
+    text-align: center; 
+    margin-bottom: 4rem; 
+  }
+  .page-header h1 { 
+    font-size: 3.5rem; 
+    margin-bottom: 1rem; 
+    color: #f8fafc; 
+  }
+  .text-gradient { 
+    background-image: linear-gradient(45deg, #38bdf8, #818cf8); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  .subtitle { 
+    color: #94a3b8; 
+    font-size: 1.2rem; 
+    line-height: 1.7;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .page-content h2 { 
+    color: #f8fafc; 
+    font-size: 2rem; 
+    margin-bottom: 1.5rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+  }
+  
+  .video-section {
+    margin-bottom: 4rem;
+  }
+  .video-container {
+    border-radius: 12px; 
+    overflow: hidden; 
+    aspect-ratio: 16/9; 
+    background: #000;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .channel-link {
+    text-align: right; 
+    margin-top: 1rem;
+  }
+  .channel-link a {
+    color: #38bdf8; 
+    text-decoration: none; 
+    font-weight: 500; 
+    font-size: 1rem;
+    transition: color 0.2s;
+  }
+  .channel-link a:hover {
+    color: #818cf8;
+    text-decoration: underline;
+  }
+
+  .details-box {
+    background: #0f172a;
+    padding: 2rem;
+    border-radius: 8px;
+    border-left: 4px solid #38bdf8;
+  }
+  .details-box p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  .details-box p:last-child {
+    margin-bottom: 0;
+  }
+  .details-box strong {
+    color: #f8fafc;
+  }
+  .details-box a {
+    color: #38bdf8;
+    text-decoration: none;
+  }
+  .details-box a:hover {
+    text-decoration: underline;
+  }
+</style>

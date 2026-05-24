@@ -23,6 +23,7 @@ const switchText = lang === 'en' ? '中文' : 'EN';
         <img src="/logo.png" alt="Grandevity Logo" class="nav-logo" />
       </a>
       <div class="links">
+        <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音乐'}</a>
         <a href="/#games">{lang === 'en' ? 'Games' : '游戏'}</a>
         <a href="/#services">{lang === 'en' ? 'Services' : '服务'}</a>
         <!-- 下面这行是新加的博客入口 -->

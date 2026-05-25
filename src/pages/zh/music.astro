@@ -17,13 +17,41 @@ import Layout from '../../layouts/Layout.astro';
             width="100%" 
             height="100%" 
             src="https://www.youtube.com/embed/lkCpRb9tXEY?rel=0" 
-            title="Grandevity 原创音乐" 
+            title="《水调歌头·明月几时有》| 中国风现代流行乐 | 宋词新曲 | Mandopop Diva Style Song for Driving & Relaxation" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             allowfullscreen
             loading="lazy"
           ></iframe>
         </div>
+
+        <div class="video-grid">
+          <div class="video-container">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/dlxqKJ9Z6Kc?rel=0" 
+              title="《清辉作伴》惊艳！这才是李白《静夜思》最清冷高级的扩写与现代诠释" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          <div class="video-container">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/itS-VsL2aus?rel=0" 
+              title="《龙城铁角》——当王昌龄《出塞》被扩写成顶级丝滑【国风R&B】" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+
         <div class="channel-link">
           <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer">
             在 YouTube 上探索更多企划 ➔
@@ -91,9 +119,15 @@ import Layout from '../../layouts/Layout.astro';
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
   .channel-link {
     text-align: right; 
-    margin-top: 1rem;
+    margin-top: 1.5rem;
   }
   .channel-link a {
     color: #38bdf8; 

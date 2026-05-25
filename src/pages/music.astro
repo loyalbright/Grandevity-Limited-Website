@@ -24,6 +24,34 @@ import Layout from '../layouts/Layout.astro';
             loading="lazy"
           ></iframe>
         </div>
+
+        <div class="video-grid">
+          <div class="video-container">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/dlxqKJ9Z6Kc?rel=0" 
+              title="Grandevity Original Music 2" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+          <div class="video-container">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/itS-VsL2aus?rel=0" 
+              title="Grandevity Original Music 3" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+
         <div class="channel-link">
           <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer">
             Explore more on YouTube ➔
@@ -91,9 +119,15 @@ import Layout from '../layouts/Layout.astro';
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
   .channel-link {
     text-align: right; 
-    margin-top: 1rem;
+    margin-top: 1.5rem;
   }
   .channel-link a {
     color: #38bdf8; 

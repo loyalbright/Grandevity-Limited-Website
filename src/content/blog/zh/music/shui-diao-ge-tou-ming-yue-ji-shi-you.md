@@ -42,6 +42,36 @@ tags: ["音乐", "古典新编"]
   ></iframe>
 </div>
 
+### 《水调歌头·明月几时有》歌词全文
+
+<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.5rem; border-radius: 12px; margin: 2rem 0; font-size: 1.05rem; line-height: 2;">
+
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Verse 1]</span><br>
+明月几时有？把酒问青天。<br>
+不知天上宫阙，今夕是何年。<br><br>
+
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Verse 2]</span><br>
+我欲乘风归去，又恐琼楼玉宇，高处不胜寒。<br>
+起舞弄清影，何似在人间。<br><br>
+
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Bridge]</span><br>
+转朱阁，低绮户，照无眠。<br>
+不应有恨，何事长向别时圆？<br><br>
+
+<span style="color: #818cf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Chorus]</span><br>
+人有悲欢离合，月有阴晴圆缺，此事古难全。<br>
+但愿人长久，千里共婵娟。<br><br>
+
+<span style="color: #818cf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Chorus]</span><br>
+人有悲欢离合，月有阴晴圆缺，此事古难全。<br>
+但愿人长久，千里共婵娟。<br><br>
+
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Outro]</span><br>
+但愿人长久，<br>
+千里共婵娟。
+
+</div>
+
 ### 📖 传世之词，历久弥新
 
 > 人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。

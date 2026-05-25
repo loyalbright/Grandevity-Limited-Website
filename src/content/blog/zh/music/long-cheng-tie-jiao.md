@@ -81,37 +81,41 @@ tags: ["音乐", "古典新编", "原创"]
 
 ### 四、《龙城铁角》完整歌词
 
-**[Verse 1]** 
-秦时明月汉时关，万里长征人未还。  
-但使龙城飞将在，不教胡马度阴山。  
+<div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2.5rem; border-radius: 12px; margin: 2rem 0; font-size: 1.05rem; line-height: 2;">
 
-**[Verse 2]** 
-朔野寒云覆旧峦，枯旗残照隐孤川。  
-若闻铁角穿宵起，犹有征衣照雪寒。  
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Verse 1]</span><br>
+秦时明月汉时关，万里长征人未还。<br>
+但使龙城飞将在，不教胡马度阴山。<br><br>
 
-**[Chorus]** 
-听朔风，一夜吹白旧边土；  
-看孤灯，还亮在荒城深处。  
-我把此身，留给天明前的长路；  
-若有人，问我为何踏上不归途；  
-只因身后，还有万家灯火如初。  
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Verse 2]</span><br>
+朔野寒云覆旧峦，枯旗残照隐孤川。<br>
+若闻铁角穿宵起，犹有征衣照雪寒。<br><br>
 
-**[Bridge]** 
-塞上的寒霜，终会消无；  
-长河尽头，已见归途。  
-别哭，别哭。  
+<span style="color: #818cf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Chorus]</span><br>
+听朔风，一夜吹白旧边土；<br>
+看孤灯，还亮在荒城深处。<br>
+我把此身，留给天明前的长路；<br>
+若有人，问我为何踏上不归途；<br>
+只因身后，还有万家灯火如初。<br><br>
 
-**[Chorus]** 
-听朔风，一夜吹白旧边土；  
-看孤灯，还亮在荒城深处。  
-我把此身，留给天明前的长路；  
-若有人，问我为何踏上不归途；  
-只因身后，还有万家灯火如初。  
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Bridge]</span><br>
+塞上的寒霜，终会消无；<br>
+长河尽头，已见归途。<br>
+别哭，别哭。<br><br>
 
-**[Outro]** 
-风停了旧尘。  
-天边渐有微光。  
-有人，仍守北方……  
+<span style="color: #818cf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Chorus]</span><br>
+听朔风，一夜吹白旧边土；<br>
+看孤灯，还亮在荒城深处。<br>
+我把此身，留给天明前的长路；<br>
+若有人，问我为何踏上不归途；<br>
+只因身后，还有万家灯火如初。<br><br>
+
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Outro]</span><br>
+风停了旧尘。<br>
+天边渐有微光。<br>
+有人，仍守北方……
+
+</div>
 
 *这首歌词的结构并没有把古诗强行扩写成一段“剧情说明”。相反，它选择从原作的历史纵深出发，先写古意，再写边塞景象，最后落到现代人能够直接共情的情绪核心：守住边关，不是为了成为英雄，而是为了让身后的人间依旧安稳。*
 

@@ -1,6 +1,6 @@
 ---
 title: "跨越千年的治愈之声：当《水调歌头·明月几时有》遇见现代流行乐"
-pubDate: 2026-05-25
+date: 2026-05-25
 description: "Grandevity 首支古典新编单曲发布。我们将苏轼的旷世名篇融进现代华语流行编曲，为你带来一场沉浸式的精神理疗。"
 author: "Grandevity Limited"
 ---

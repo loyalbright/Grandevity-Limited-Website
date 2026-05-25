@@ -62,6 +62,10 @@ tags: ["音乐", "古典新编"]
 人有悲欢离合，月有阴晴圆缺，此事古难全。<br>
 但愿人长久，千里共婵娟。<br><br>
 
+<span style="color: #38bdf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Bridge]</span><br>
+转朱阁，低绮户，照无眠。<br>
+不应有恨，何事长向别时圆？<br><br>
+
 <span style="color: #818cf8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">[Chorus]</span><br>
 人有悲欢离合，月有阴晴圆缺，此事古难全。<br>
 但愿人长久，千里共婵娟。<br><br>

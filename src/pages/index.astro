@@ -2,11 +2,22 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-// 抓取英文博客，按日期从新到旧排序，并只截取最新的 2 篇
+// 抓取英文博客，并过滤掉未来发布的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
-const latestPosts = allPosts
+const today = new Date();
+const visiblePosts = allPosts.filter(post => new Date(post.data.date) <= today);
+
+// 提取音乐板块文章 (路径包含 'music/')
+const musicPosts = visiblePosts
+  .filter(post => post.id.includes('music/'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 2); 
+  .slice(0, 2);
+
+// 提取洞见板块文章 (排除音乐)
+const latestInsights = visiblePosts
+  .filter(post => !post.id.includes('music/'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
 ---
 
 <Layout title="Grandevity | Interactive Studio & Digital Solutions" lang="en">
@@ -15,6 +26,38 @@ const latestPosts = allPosts
       <h1>Engineering <span class="text-gradient">Digital Worlds</span></h1>
       <p>Grandevity is a multi-disciplinary studio building original interactive experiences and providing elite digital, financial, and strategic consulting for modern businesses.</p>
     </header>
+
+    <section id="music" class="section-container">
+      <h2>Original Music</h2>
+      <p class="section-subtitle">Modern pop arrangements for ancient traditional poetry. A contemporary renaissance.</p>
+      
+      <div class="card-grid">
+        {musicPosts.length === 0 ? (
+          <div class="card" style="grid-column: 1 / -1; text-align: center;">
+            <div class="card-content">
+              <p>New musical projects are currently in production. Stay tuned.</p>
+            </div>
+          </div>
+        ) : (
+          musicPosts.map((post) => (
+            <div class="card">
+              <div class="card-content">
+                <h3>{post.data.title}</h3>
+                <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: #c084fc;">🎵 Music Release</span>
+                <p>{post.data.description}</p>
+                <a href={`/blog/${post.id.replace('en/', '')}`} class="cta-button">View Project ➔</a>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="/music" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
+          Explore the Music Channel ➔
+        </a>
+      </div>
+    </section>
 
     <section id="games" class="section-container">
       <h2>Original Games</h2>
@@ -41,7 +84,7 @@ const latestPosts = allPosts
             <h3>Project: Pebble <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Working Title)</span></h3>
             <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">In Development</span>
             <p>Our next original title is currently in the early prototyping and core engineering phase. Exploring fresh interactive mechanics. More details will be revealed soon.</p>
-            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -51,11 +94,11 @@ const latestPosts = allPosts
       <p class="section-subtitle">Deep dives into history, systems, and digital architecture.</p>
       
       <div class="card-grid">
-        {latestPosts.map((post) => (
+        {latestInsights.map((post) => (
           <div class="card">
             <div class="card-content">
               <h3>{post.data.title}</h3>
-              <span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">{post.data.category}</span>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">{post.data.category || 'Insight'}</span>
               <p>{post.data.description}</p>
               <a href={`/blog/${post.id.replace('en/', '')}`} class="cta-button">Read Article ➔</a>
             </div>
@@ -111,15 +154,10 @@ const latestPosts = allPosts
   .text-gradient { background-image: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 400%; background-position: 0%; }
   .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin: 0 auto; line-height: 1.6; }
   
-  /* --- 修复重心偏移 --- */
-  /* 让区块的标题统一居中，与顶部 Hero 保持视觉连贯 */
   .section-container { padding: 4rem 0; text-align: center; }
   h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .section-subtitle { color: #94a3b8; margin-bottom: 3rem; }
   
-  /* --- 修复网格错位 --- */
-  /* 把 300px 改成 450px，强制在电脑端形成完美的 2x2 对称网格。
-     同时让卡片内部的文字依然保持靠左，方便阅读 */
   .card-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
@@ -127,24 +165,20 @@ const latestPosts = allPosts
     text-align: left; 
   }
   
-  /* 强制居中 Kiwi 游戏的单张卡片 */
   .card-grid.single { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
   
-  /* 卡片基础样式保持不变 */
-  .card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
+  .card { background: var(--card-bg, #1e293b); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
   .card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.5); }
-  .card-content { padding: 2rem; }
+  .card-content { padding: 2rem; display: flex; flex-direction: column; height: 100%; }
   .card h3 { margin: 0 0 1rem 0; font-size: 1.5rem; color: #f8fafc; }
-  .card p { color: #94a3b8; line-height: 1.5; margin: 0; }
+  .card p { color: #94a3b8; line-height: 1.5; margin: 0; flex-grow: 1; }
   .game-image-placeholder { width: 100%; aspect-ratio: 16 / 9; background: #0f172a; display: flex; align-items: center; justify-content: center; color: #475569; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .badge { display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+  .badge { align-self: flex-start; display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
 
-  /* 移动端适配：手机上自动变成单列排版 */
   @media (max-width: 768px) {
     .card-grid { grid-template-columns: 1fr; }
   }
 
-  /* --- 新增：行为召唤按钮样式 --- */
   .cta-button { 
     display: inline-block; 
     margin-top: 1.5rem; 
@@ -156,6 +190,7 @@ const latestPosts = allPosts
     font-weight: bold; 
     transition: all 0.2s ease;
     border: 1px solid #38bdf8;
+    align-self: flex-start;
   }
   .cta-button:hover { 
     background: #38bdf8; 

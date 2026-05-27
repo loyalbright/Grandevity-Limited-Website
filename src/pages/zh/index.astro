@@ -2,9 +2,20 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
-// （抓取中文博客来填充页面）
+// 抓取中文博客，并过滤掉未来发布的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
-const latestPosts = allPosts
+const today = new Date();
+const visiblePosts = allPosts.filter(post => new Date(post.data.date) <= today);
+
+// 提取音乐板块文章 (路径包含 'music/')
+const musicPosts = visiblePosts
+  .filter(post => post.id.includes('music/'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
+
+// 提取洞见板块文章 (排除音乐)
+const latestInsights = visiblePosts
+  .filter(post => !post.id.includes('music/'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);
 ---
@@ -16,11 +27,42 @@ const latestPosts = allPosts
       <p>Grandevity 是一家多领域混合型工作室，致力于打造原创互动体验，并为现代企业提供顶级的数字架构、财务合规与战略咨询服务。</p>
     </header>
 
+    <section id="music" class="section-container">
+      <h2>古典新编音乐</h2>
+      <p class="section-subtitle">用现代视听语言，重构跨越千年的古典诗词与精神坐标。</p>
+      
+      <div class="card-grid">
+        {musicPosts.length === 0 ? (
+          <div class="card" style="grid-column: 1 / -1; text-align: center;">
+            <div class="card-content">
+              <p>全新视听企划正在制作中，敬请期待。</p>
+            </div>
+          </div>
+        ) : (
+          musicPosts.map((post) => (
+            <div class="card">
+              <div class="card-content">
+                <h3>{post.data.title}</h3>
+                <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: #c084fc;">🎵 最新单曲释出</span>
+                <p>{post.data.description}</p>
+                <a href={`/zh/blog/${post.id.replace('zh/', '')}`} class="cta-button">了解企划详情 ➔</a>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="/zh/music" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
+          进入视听主页探索所有 MV ➔
+        </a>
+      </div>
+    </section>
+
     <section id="games" class="section-container">
       <h2>原创游戏</h2>
       
       <div class="card-grid">
-        
         <div class="card game-card">
           <a href="/play/kiwi-defenders/" style="text-decoration: none;">
             <div class="game-image-placeholder" style="background-image: url('/images/games/kiwi-defenders/landscape_cover_campaign_map.webp'); background-size: cover; background-position: center;">
@@ -45,7 +87,6 @@ const latestPosts = allPosts
             <p>我们的下一款原创作品目前正处于早期原型设计和核心工程阶段。探索全新的互动机制，更多细节即将公布。</p>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -54,20 +95,20 @@ const latestPosts = allPosts
       <p class="section-subtitle">深入探讨历史、系统设计与数字架构。</p>
       
       <div class="card-grid">
-        {latestPosts.map((post) => (
+        {latestInsights.map((post) => (
           <div class="card">
             <div class="card-content">
               <h3>{post.data.title}</h3>
-              <span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">{post.data.category}</span>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">{post.data.category || '洞察'}</span>
               <p>{post.data.description}</p>
-              <a href={`/blog/${post.id.replace('en/', '')}`} class="cta-button">阅读文章 ➔</a>
+              <a href={`/zh/blog/${post.id.replace('zh/', '')}`} class="cta-button">阅读文章 ➔</a>
             </div>
           </div>
         ))}
       </div>
 
       <div style="text-align: center; margin-top: 3rem;">
-        <a href="/blog" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
+        <a href="/zh/blog" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
           查看所有洞见 ➔
         </a>
       </div>
@@ -114,12 +155,10 @@ const latestPosts = allPosts
   .text-gradient { background-image: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 400%; background-position: 0%; }
   .hero p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; margin: 0 auto; line-height: 1.6; }
   
-  /* --- 居中标题区 --- */
   .section-container { padding: 4rem 0; text-align: center; }
   h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
   .section-subtitle { color: #94a3b8; margin-bottom: 3rem; }
   
-  /* --- 强制 2x2 对称网格 --- */
   .card-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
@@ -127,24 +166,22 @@ const latestPosts = allPosts
     text-align: left; 
   }
   
-  /* 强制居中 Kiwi 游戏的单张卡片 */
   .card-grid.single { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
   
-  /* 卡片基础样式 */
-  .card { background: var(--card-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
+  .card { background: var(--card-bg, #1e293b); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
   .card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.5); }
-  .card-content { padding: 2rem; }
+  .card-content { padding: 2rem; display: flex; flex-direction: column; height: 100%; }
   .card h3 { margin: 0 0 1rem 0; font-size: 1.5rem; color: #f8fafc; }
-  .card p { color: #94a3b8; line-height: 1.5; margin: 0; }
+  .card p { color: #94a3b8; line-height: 1.5; margin: 0; flex-grow: 1; }
   .game-image-placeholder { width: 100%; aspect-ratio: 16 / 9; background: #0f172a; display: flex; align-items: center; justify-content: center; color: #475569; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .badge { display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+  
+  /* 确保紫色的徽章也靠左对齐 */
+  .badge { align-self: flex-start; display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
 
-  /* 移动端适配 */
   @media (max-width: 768px) {
     .card-grid { grid-template-columns: 1fr; }
   }
 
-  /* --- 新增：行为召唤按钮样式 --- */
   .cta-button { 
     display: inline-block; 
     margin-top: 1.5rem; 
@@ -156,6 +193,7 @@ const latestPosts = allPosts
     font-weight: bold; 
     transition: all 0.2s ease;
     border: 1px solid #38bdf8;
+    align-self: flex-start;
   }
   .cta-button:hover { 
     background: #38bdf8; 

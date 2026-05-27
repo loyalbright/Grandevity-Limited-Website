@@ -12,44 +12,29 @@ import Layout from '../../layouts/Layout.astro';
     <div class="page-content">
       <section class="video-section">
         <h2>最新视听企划</h2>
-        <div class="video-container">
-          <iframe 
-            width="100%" 
-            height="100%" 
-            src="https://www.youtube.com/embed/lkCpRb9tXEY?rel=0" 
-            title="《水调歌头·明月几时有》| 中国风现代流行乐 | 宋词新曲 | Mandopop Diva Style Song for Driving & Relaxation" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen
-            loading="lazy"
-          ></iframe>
-        </div>
-
+        
         <div class="video-grid">
+          
           <div class="video-container">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/dlxqKJ9Z6Kc?rel=0" 
-              title="《清辉作伴》惊艳！这才是李白《静夜思》最清冷高级的扩写与现代诠释" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JeSsZAzJUI8?rel=0" title="《一蓑江雨》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
+
           <div class="video-container">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/itS-VsL2aus?rel=0" 
-              title="《龙城铁角》——当王昌龄《出塞》被扩写成顶级丝滑【国风R&B】" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/7_o0d-oyqzc?rel=0" title="《客怀独对》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
+
+          <div class="video-container">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/itS-VsL2aus?rel=0" title="《龙城铁角》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+          </div>
+
+          <div class="video-container">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dlxqKJ9Z6Kc?rel=0" title="《清辉作伴》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+          </div>
+
+          <div class="video-container">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/lkCpRb9tXEY?rel=0" title="《水调歌头·明月几时有》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+          </div>
+
         </div>
 
         <div class="channel-link">
@@ -73,7 +58,7 @@ import Layout from '../../layouts/Layout.astro';
 <style>
   .page-container { 
     padding: 4rem 5%; 
-    max-width: 1000px; 
+    max-width: 1200px; /* 稍微加宽以容纳更好的网格 */
     margin: 0 auto; 
     min-height: 70vh; 
     color: #cbd5e1;
@@ -103,7 +88,7 @@ import Layout from '../../layouts/Layout.astro';
   .page-content h2 { 
     color: #f8fafc; 
     font-size: 2rem; 
-    margin-bottom: 1.5rem; 
+    margin-bottom: 2rem; 
     border-bottom: 1px solid rgba(255,255,255,0.1);
     padding-bottom: 0.5rem;
   }
@@ -111,6 +96,14 @@ import Layout from '../../layouts/Layout.astro';
   .video-section {
     margin-bottom: 4rem;
   }
+  
+  /* 全新统一的网格布局 */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* 保证视频有足够的观看宽度 */
+    gap: 2.5rem;
+  }
+
   .video-container {
     border-radius: 12px; 
     overflow: hidden; 
@@ -118,22 +111,23 @@ import Layout from '../../layouts/Layout.astro';
     background: #000;
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease, border-color 0.3s ease;
   }
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+  
+  .video-container:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56, 189, 248, 0.4);
   }
+
   .channel-link {
     text-align: right; 
-    margin-top: 1.5rem;
+    margin-top: 2rem;
   }
   .channel-link a {
     color: #38bdf8; 
     text-decoration: none; 
     font-weight: 500; 
-    font-size: 1rem;
+    font-size: 1.1rem;
     transition: color 0.2s;
   }
   .channel-link a:hover {
@@ -164,5 +158,12 @@ import Layout from '../../layouts/Layout.astro';
   }
   .details-box a:hover {
     text-decoration: underline;
+  }
+  
+  /* 响应式调整：在小屏幕上让视频填满宽度 */
+  @media (max-width: 768px) {
+    .video-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

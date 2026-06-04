@@ -2,7 +2,7 @@
 title: "穿透千年风雨的当代回响：原创古典文学音乐新作《一蓑江雨》正式上线"
 date: 2026-05-28
 description: "Grandevity Studio 正式推出全新原创古典文学音乐作品《一蓑江雨》。以苏轼《定风波》为灵感，借古人风骨，安顿现代人灵魂。"
-author: "Grandevity Limited"
+author: "Grandevity Studio"
 category: "音乐"
 tags: ["音乐", "古典新编", "原创"]
 ---

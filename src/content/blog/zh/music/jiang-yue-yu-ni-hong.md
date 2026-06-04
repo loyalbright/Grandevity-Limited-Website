@@ -1,8 +1,8 @@
 ---
 title: "千古清辉，照入今宵灯火：新曲《江月与霓虹》正式上线"
-date: 2026-05-29
+date: 2026-05-30
 description: "Grandevity Studio 古典文学新曲企划重磅作品《江月与霓虹》上线。当宋词《念奴娇》遇上现代都市 R&B，完成一次古今的时空对望。"
-author: "Grandevity Limited"
+author: "Grandevity Studio"
 category: "音乐"
 tags: ["音乐", "古典新编", "原创"]
 ---

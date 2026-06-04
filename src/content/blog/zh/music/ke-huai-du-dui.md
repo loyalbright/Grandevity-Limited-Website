@@ -2,7 +2,7 @@
 title: "一夜茶香，一程清霜：新曲《客怀独对》发布"
 date: 2026-05-26
 description: "Grandevity Studio 全新古典文学新曲《客怀独对》正式上线。以现代国风 R&B，重写马致远《天净沙·秋思》的千古羁旅。"
-author: "Grandevity Limited"
+author: "Grandevity Studio"
 category: "音乐"
 tags: ["音乐", "古典新编", "原创"]
 ---

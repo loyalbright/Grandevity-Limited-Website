@@ -2,7 +2,7 @@
 title: "独立风雪，万家灯火：全新概念单曲《龙城铁角》正式发布"
 date: 2026-05-24
 description: "Grandevity Studio 正式发布全新古典文学重构单曲《龙城铁角》。以王昌龄《出塞》为蓝本，用都市 R&B 承载边塞孤寒，在风雪与灯火之间重建龙城。"
-author: "Grandevity Limited"
+author: "Grandevity Studio"
 category: "音乐"
 tags: ["音乐", "古典新编", "原创"]
 ---

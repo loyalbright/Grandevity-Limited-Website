@@ -1,8 +1,8 @@
 ---
 title: "【新作释出】《清辉作伴》：将李白的低头一念，谱成深夜的无声长卷"
 date: 2026-05-23
-description: "Grandevity 正式发布古典文学新曲计划首支作品《清辉作伴》。以李白《静夜思》为灵感，用现代旋律与东方视觉谱写深夜的长卷。"
-author: "Grandevity Limited"
+description: "Grandevity Studio 正式发布古典文学新曲计划首支作品《清辉作伴》。以李白《静夜思》为灵感，用现代旋律与东方视觉谱写深夜的长卷。"
+author: "Grandevity Studio"
 category: "音乐"
 tags: ["音乐", "古典新编", "原创"]
 ---

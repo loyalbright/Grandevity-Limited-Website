@@ -148,17 +148,25 @@ const switchText = lang === 'en' ? '中文' : 'EN';
 /* 底部 Footer 样式 */
 footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }
 
-/* --- 核心修改：改用 flex 布局让区块整体居中聚拢 --- */
+/* --- 核心修改区：缩小最大宽度，强制整体居中 --- */
 .footer-content { 
   display: flex; 
   flex-wrap: wrap; 
-  justify-content: center; /* 让三个区块在页面正中央对齐 */
-  gap: 6rem; /* 区块之间的间距，保持高级的呼吸感 */
-  max-width: 1200px; 
-  margin: 0 auto 3rem; 
+  justify-content: space-between; /* 在缩小的盒子里，让三个栏目均匀分布 */
+  max-width: 900px; /* 【关键】从 1200px 缩小到 900px，强行把两边往中间挤 */
+  margin: 0 auto 3rem; /* 保证这个 900px 的盒子绝对居中 */
+  gap: 2rem;
 }
-.footer-brand { max-width: 320px; } /* 限制左侧品牌文案的宽度，防止它过长破坏平衡 */
-/* ------------------------------------------------ */
+
+.footer-brand { 
+  flex: 1 1 350px; 
+  max-width: 400px; /* 限制左侧品牌介绍的宽度，防止它过长破坏平衡 */
+}
+
+.footer-contact, .footer-location { 
+  flex: 0 0 auto; /* 联系方式和地址栏自动根据文字撑开宽度 */
+}
+/* ------------------------------------------- */
 
 .footer-brand .logo-text { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
 .footer-brand .tagline { color: #f8fafc; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
@@ -166,14 +174,18 @@ footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(2
 .footer-contact h4, .footer-location h4 { margin: 0 0 1rem 0; font-size: 0.9rem; color: #f8fafc; text-transform: uppercase; letter-spacing: 1px; }
 .contact-links { display: flex; flex-direction: column; gap: 0.75rem; }
 .contact-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-.contact-links a:hover { color: var(--accent-glow); }
+.contact-links a:hover { color: #38bdf8; }
 .footer-location p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; }
 .footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; }
 .footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
 .nzbn-text {letter-spacing: 0.5px; }
 
-/* 手机端适配：缩小间距，保持视觉连贯 */
+/* 手机端适配：屏幕变窄时变成上下排列 */
 @media (max-width: 768px) { 
-  .footer-content { gap: 3rem; justify-content: flex-start; } 
+  .footer-content { 
+    flex-direction: column; 
+    gap: 3rem; 
+    max-width: 100%; 
+  } 
 }
 </style>

@@ -175,7 +175,7 @@ The original poem *Zhongnan Bieye* by Wang Wei is a public domain literary work.
 
 The modern expanded lyrics, song concept, music production, visual design, MV planning, promotional writing, and all related derivative creative materials for *Nanxi Wanggui* are original creative works and are protected by copyright.
 
-**© 2026 / Grandevity Limited. All Rights Reserved.**
+**© 2026 Grandevity Limited. All Rights Reserved.**
 
 *Unauthorized reproduction, redistribution, reposting, adaptation, editing, commercial use, re-uploading, or secondary publication of this work or its derivative materials is strictly prohibited without prior written permission. For licensing, collaboration, quotation, media use, or other enquiries, please contact the rights holder in advance.*
 

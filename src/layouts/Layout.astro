@@ -5,6 +5,9 @@ const { title, lang = 'en' } = Astro.props;
 // 判断当前语言，设定切换按钮的跳转目标和显示文字
 const switchUrl = lang === 'en' ? '/zh/' : '/';
 const switchText = lang === 'en' ? '中文' : 'EN';
+
+// 生成当前页面的 Canonical URL (解决 Google Search Console 重复页面报错)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -15,6 +18,10 @@ const switchText = lang === 'en' ? '中文' : 'EN';
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6297520668105698" crossorigin="anonymous"></script>
   </head>
   <body>

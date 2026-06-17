@@ -1,13 +1,46 @@
 ---
-// 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
+// 1. 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
 const { title, lang = 'en' } = Astro.props;
 
-// 判断当前语言，设定切换按钮的跳转目标和显示文字
+// 2. 判断当前语言，设定切换按钮的跳转目标和显示文字
 const switchUrl = lang === 'en' ? '/zh/' : '/';
 const switchText = lang === 'en' ? '中文' : 'EN';
 
-// 生成当前页面的 Canonical URL (解决 Google Search Console 重复页面报错)
+// 3. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// 4. 清理路径并生成多语言 SEO 链接 (Hreflang)
+let rawPath = Astro.url.pathname;
+if (rawPath.startsWith('/zh/')) {
+  rawPath = rawPath.replace('/zh/', '/');
+} else if (rawPath === '/zh') {
+  rawPath = '/';
+}
+const enUrl = new URL(rawPath, Astro.site); // 英文链接
+const zhPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
+const zhUrl = new URL(zhPath, Astro.site); // 中文链接
+
+// 5. 注入 JSON-LD 结构化数据：定义公司、品牌工作室与音乐项目的关系
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "Corporation",
+  "name": "Grandevity Limited",
+  "legalName": "Grandevity Limited",
+  "url": "https://grandevity.co.nz",
+  "logo": "https://grandevity.co.nz/logo.png",
+  "brand": {
+    "@type": "Brand",
+    "name": "Grandevity Studio",
+    "alternateName": "Grandevity Studio"
+  },
+  "department": [
+    {
+      "@type": "Organization",
+      "name": "Grandevity Music",
+      "description": "The primary classical reimagined music single series and modern Mandopop R&B creative project of Grandevity Studio."
+    }
+  ]
+};
 ---
 
 <!doctype html>
@@ -17,10 +50,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
     
-    <!-- Canonical URL -->
+    <title>{title === 'Grandevity' ? title : `${title} | Grandevity Limited`}</title>
+    
     <link rel="canonical" href={canonicalURL} />
+
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="zh-TW" href={zhUrl} />
+    <link rel="alternate" hreflang="zh" href={zhUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6297520668105698" crossorigin="anonymous"></script>
   </head>
@@ -33,14 +73,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音乐'}</a>
         <a href="/#games">{lang === 'en' ? 'Games' : '游戏'}</a>
         <a href="/#services">{lang === 'en' ? 'Services' : '服务'}</a>
-        <!-- 下面这行是新加的博客入口 -->
         <a href={lang === 'en' ? '/blog' : '/zh/blog'}>{lang === 'en' ? 'Insights' : '洞察'}</a>
   
         <div class="nav-divider"></div>
         <a href={switchUrl} class="lang-switch">{switchText}</a>
       </div>
     </nav>
+    
     <slot />
+    
     <footer>
       <div class="footer-content">
         <div class="footer-brand">
@@ -159,19 +200,19 @@ footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(2
 .footer-content { 
   display: flex; 
   flex-wrap: wrap; 
-  justify-content: space-between; /* 在缩小的盒子里，让三个栏目均匀分布 */
-  max-width: 900px; /* 【关键】从 1200px 缩小到 900px，强行把两边往中间挤 */
-  margin: 0 auto 3rem; /* 保证这个 900px 的盒子绝对居中 */
+  justify-content: space-between;
+  max-width: 900px; 
+  margin: 0 auto 3rem; 
   gap: 2rem;
 }
 
 .footer-brand { 
   flex: 1 1 350px; 
-  max-width: 400px; /* 限制左侧品牌介绍的宽度，防止它过长破坏平衡 */
+  max-width: 400px;
 }
 
 .footer-contact, .footer-location { 
-  flex: 0 0 auto; /* 联系方式和地址栏自动根据文字撑开宽度 */
+  flex: 0 0 auto; 
 }
 /* ------------------------------------------- */
 
@@ -187,7 +228,7 @@ footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(2
 .footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
 .nzbn-text {letter-spacing: 0.5px; }
 
-/* 手机端适配：屏幕变窄时变成上下排列 */
+/* 手机端适配 */
 @media (max-width: 768px) { 
   .footer-content { 
     flex-direction: column; 

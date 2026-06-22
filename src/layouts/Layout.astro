@@ -116,15 +116,15 @@ const schemaData = {
         <p class="nzbn-text">NZBN: 9429053472120</p>
       
         <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
-          <a href="/about" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+          <a href={lang === 'en' ? '/about' : '/zh/about'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'About Us' : '關於我們'}
           </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href="/privacy-policy" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+          <a href={lang === 'en' ? '/privacy-policy' : '/zh/privacy-policy'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'Privacy Policy' : '隱私權政策'}
           </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href="/terms-of-service" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+          <a href={lang === 'en' ? '/terms-of-service' : '/zh/terms-of-service'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'Terms of Service' : '服務條款'}
           </a>
         </div>

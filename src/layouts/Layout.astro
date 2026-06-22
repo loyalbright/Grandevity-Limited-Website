@@ -1,26 +1,26 @@
 ---
-// 1. 接收 title 和 lang（語言）作為參數，預設語言設為 'en'
+// 1. 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
 const { title, lang = 'en' } = Astro.props;
 
-// 2. 生成當前頁面的 Canonical URL (解決 Google 重複頁面報錯)
+// 2. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-// 3. 清理路徑並生成多語言 SEO 連結 (Hreflang)
+// 3. 清理路径并生成多语言 SEO 链接 (Hreflang)
 let rawPath = Astro.url.pathname;
 if (rawPath.startsWith('/zh/')) {
   rawPath = rawPath.replace('/zh/', '/');
 } else if (rawPath === '/zh') {
   rawPath = '/';
 }
-const enUrl = new URL(rawPath, Astro.site); // 英文連結
+const enUrl = new URL(rawPath, Astro.site); // 英文链接
 const zhPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
-const zhUrl = new URL(zhPath, Astro.site); // 中文連結
+const zhUrl = new URL(zhPath, Astro.site); // 中文链接
 
-// 4. 判斷當前語言，設定切換按鈕的「當前頁面原地等價跳轉」目標與顯示文字
+// 4. 判断当前语言，设定切换按钮的「当前页面原地等价跳转」目标与显示文字
 const switchUrl = lang === 'en' ? zhUrl.pathname : enUrl.pathname;
 const switchText = lang === 'en' ? '中文' : 'EN';
 
-// 5. 注入 JSON-LD 結構化數據：定義公司、品牌工作室與音樂項目的關係
+// 5. 注入 JSON-LD 结构化数据：定义公司、品牌工作室与音乐项目的关系
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "Corporation",
@@ -71,7 +71,7 @@ const schemaData = {
       </a>
       <div class="links">
         <a href={lang === 'en' ? '/' : '/zh/'}>{lang === 'en' ? 'Home' : '首頁'}</a>
-        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>{lang === 'en' ? 'Original Games' : '遊戲'}</a>
+        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>{lang === 'en' ? 'Games' : '遊戲'}</a>
         <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音樂'}</a>
         <a href={lang === 'en' ? '/blog' : '/zh/blog'}>{lang === 'en' ? 'Insights' : '洞察'}</a>
   
@@ -116,11 +116,15 @@ const schemaData = {
         <p class="nzbn-text">NZBN: 9429053472120</p>
       
         <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
-          <a href={lang === 'en' ? '/privacy-policy' : '/zh/privacy-policy'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+          <a href="/about" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {lang === 'en' ? 'About Us' : '關於我們'}
+          </a>
+          <span style="color: #475569; font-size: 0.9rem;">|</span>
+          <a href="/privacy-policy" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'Privacy Policy' : '隱私權政策'}
           </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href={lang === 'en' ? '/terms-of-service' : '/zh/terms-of-service'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+          <a href="/terms-of-service" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'Terms of Service' : '服務條款'}
           </a>
         </div>
@@ -130,7 +134,7 @@ const schemaData = {
 </html>
 
 <style is:global>
-  /* 基礎 CSS 保持不變 */
+  /* 基础 CSS 保持不变 */
   :root {
     --bg-dark: #0f172a;
     --text-light: #f8fafc;
@@ -177,12 +181,12 @@ const schemaData = {
   .links { display: flex; align-items: center; }
   .links a {
     color: var(--text-light); text-decoration: none;
-    margin-left: 2rem; /* 項目減少後，恢復為更舒展的 2rem */
+    margin-left: 2rem;
     font-size: 0.9rem; transition: color 0.2s;
   }
   .links a:hover { color: var(--accent-glow); }
 
-  /* 新增語言切換按鈕樣式 */
+  /* 语言切换按钮样式 */
   .nav-divider {
     width: 1px; height: 16px; background: rgba(255,255,255,0.2);
     margin-left: 2rem;
@@ -196,10 +200,10 @@ const schemaData = {
   }
   .lang-switch:hover { background: rgba(56, 189, 248, 0.2); }
 
-  /* 底部 Footer 樣式 */
+  /* 底部 Footer 样式 */
   footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }
 
-  /* --- 核心修改區：縮小最大寬度，強制整體居中 --- */
+  /* 核心修改区：缩小最大宽度，强制整体居中 */
   .footer-content { 
     display: flex; 
     flex-wrap: wrap; 
@@ -217,7 +221,6 @@ const schemaData = {
   .footer-contact, .footer-location { 
     flex: 0 0 auto; 
   }
-  /* ------------------------------------------- */
 
   .footer-brand .logo-text { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
   .footer-brand .tagline { color: #f8fafc; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
@@ -231,7 +234,7 @@ const schemaData = {
   .footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
   .nzbn-text {letter-spacing: 0.5px; }
 
-  /* 手機端適配 */
+  /* 手机端适配 */
   @media (max-width: 768px) { 
     .footer-content { 
       flex-direction: column; 

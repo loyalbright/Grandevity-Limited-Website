@@ -1,13 +1,11 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { isPublished } from '../../../utils/publishing';
 
 // 只抓取中文博客目录下的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
-
-// 核心改动：获取当前时间，并过滤掉发布日期大于当前时间的文章
-const today = new Date();
-const visiblePosts = allPosts.filter(post => new Date(post.data.date) <= today);
+const visiblePosts = allPosts.filter(post => isPublished(post.data.date));
 
 // 使用过滤后的文章进行排序
 const sortedPosts = visiblePosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());

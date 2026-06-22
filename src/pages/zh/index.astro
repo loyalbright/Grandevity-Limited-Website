@@ -1,11 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { isPublished } from '../../utils/publishing';
 
 // 抓取中文博客，并过滤掉未来发布的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
-const today = new Date();
-const visiblePosts = allPosts.filter(post => new Date(post.data.date) <= today);
+const visiblePosts = allPosts.filter(post => isPublished(post.data.date));
 
 // 提取音乐板块文章 (路径包含 'music/')
 const musicPosts = visiblePosts

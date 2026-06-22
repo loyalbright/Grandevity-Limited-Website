@@ -1,13 +1,14 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import { isPublished } from '../../../utils/publishing';
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection('blog', ({ id }) => {
     return id.startsWith('zh/');
   });
   
-  return blogEntries.map(entry => ({
+  return blogEntries.filter(entry => isPublished(entry.data.date)).map(entry => ({
     params: { slug: entry.id.replace('zh/', '') }, 
     props: { entry },
   }));

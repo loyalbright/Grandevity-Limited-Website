@@ -1,5 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { isReleasePublished } from '../../utils/publishing';
+
+const releases = (await getCollection('releases'))
+  .filter(({ data }) => isReleasePublished(data))
+  .sort((a, b) => b.data.releaseDate.valueOf() - a.data.releaseDate.valueOf());
 ---
 
 <Layout title="跨越千年的声音 | Grandevity" lang="zh">
@@ -14,63 +20,20 @@ import Layout from '../../layouts/Layout.astro';
         <h2>最新视听企划</h2>
         
         <div class="video-grid">
-          
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/tgcUkjyrQlU?rel=0" title="《月色过街》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/PnUhVeixP6s?rel=0" title="《一灯入水》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/SAVMF2Z-490?rel=0" title="《人境见山》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQEhiLTvrEI?rel=0" title="《意未收场》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/3uEIW0idqhg?rel=0" title="《旧巷声声慢》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/R_R9kiQSDcA?rel=0" title="《一声关关》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/tKL4SzkRBlU?rel=0" title="《檐雨小桥秋》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/UPbxzrGFWdE?rel=0" title="《南溪忘归》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/deIFlMUReX0?rel=0" title="《江月与霓虹》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/JeSsZAzJUI8?rel=0" title="《一蓑江雨》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/7_o0d-oyqzc?rel=0" title="《客怀独对》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/itS-VsL2aus?rel=0" title="《龙城铁角》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dlxqKJ9Z6Kc?rel=0" title="《清辉作伴》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
-          <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/lkCpRb9tXEY?rel=0" title="《水调歌头·明月几时有》" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-          </div>
-
+          {releases.map(({ data }) => (
+            <div class="video-container">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${data.youtubeId}?rel=0`}
+                title={`《${data.title.zhHant}》`}
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+          ))}
         </div>
 
         <div class="channel-link">

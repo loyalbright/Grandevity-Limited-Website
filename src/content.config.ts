@@ -14,6 +14,30 @@ const blogCollection = defineCollection({
   }),
 });
 
+const releasesCollection = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/data/releases" }),
+  schema: z.object({
+    title: z.object({
+      en: z.string(),
+      zhHant: z.string(),
+      zhHans: z.string(),
+    }),
+    releaseDate: z.coerce.date(),
+    youtubeId: z.string(),
+    articleSlug: z.string(),
+    status: z.enum(['draft', 'scheduled', 'published']).default('published'),
+    classicalSource: z.string().optional(),
+    hyperfollow: z.string().url().optional(),
+    platforms: z.object({
+      spotify: z.string().url().optional(),
+      appleMusic: z.string().url().optional(),
+      youtubeMusic: z.string().url().optional(),
+      tidal: z.string().url().optional(),
+    }).optional(),
+  }),
+});
+
 export const collections = {
   'blog': blogCollection,
+  'releases': releasesCollection,
 };

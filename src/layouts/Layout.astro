@@ -71,12 +71,9 @@ const schemaData = {
       </a>
       <div class="links">
         <a href={lang === 'en' ? '/' : '/zh/'}>{lang === 'en' ? 'Home' : '首頁'}</a>
-        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>Original Games</a>
+        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>{lang === 'en' ? 'Original Games' : '原創遊戲'}</a>
         <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音樂'}</a>
         <a href={lang === 'en' ? '/blog' : '/zh/blog'}>{lang === 'en' ? 'Insights' : '洞察'}</a>
-        <a href={lang === 'en' ? '/#services' : '/zh/#services'}>{lang === 'en' ? 'Services' : '服務'}</a>
-        <a href={lang === 'en' ? '/pricing' : '/zh/pricing'}>{lang === 'en' ? 'Pricing' : '價格'}</a>
-        <a href={lang === 'en' ? '/faq' : '/zh/faq'}>{lang === 'en' ? 'FAQ' : '常見問題'}</a>
   
         <div class="nav-divider"></div>
         <a href={switchUrl} class="lang-switch">{switchText}</a>
@@ -180,7 +177,7 @@ const schemaData = {
   .links { display: flex; align-items: center; }
   .links a {
     color: var(--text-light); text-decoration: none;
-    margin-left: 1.5rem;
+    margin-left: 2rem; /* 項目減少後，恢復為更舒展的 2rem */
     font-size: 0.9rem; transition: color 0.2s;
   }
   .links a:hover { color: var(--accent-glow); }
@@ -188,7 +185,7 @@ const schemaData = {
   /* 新增語言切換按鈕樣式 */
   .nav-divider {
     width: 1px; height: 16px; background: rgba(255,255,255,0.2);
-    margin-left: 1.5rem;
+    margin-left: 2rem;
   }
   .lang-switch {
     background: rgba(255,255,255,0.1);

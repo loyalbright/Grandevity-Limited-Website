@@ -1,26 +1,26 @@
 ---
-// 1. 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
+// 1. 接收 title 和 lang（語言）作為參數，預設語言設為 'en'
 const { title, lang = 'en' } = Astro.props;
 
-// 2. 判断当前语言，设定切换按钮的跳转目标和显示文字
-const switchUrl = lang === 'en' ? '/zh/' : '/';
-const switchText = lang === 'en' ? '中文' : 'EN';
-
-// 3. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
+// 2. 生成當前頁面的 Canonical URL (解決 Google 重複頁面報錯)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-// 4. 清理路径并生成多语言 SEO 链接 (Hreflang)
+// 3. 清理路徑並生成多語言 SEO 連結 (Hreflang)
 let rawPath = Astro.url.pathname;
 if (rawPath.startsWith('/zh/')) {
   rawPath = rawPath.replace('/zh/', '/');
 } else if (rawPath === '/zh') {
   rawPath = '/';
 }
-const enUrl = new URL(rawPath, Astro.site); // 英文链接
+const enUrl = new URL(rawPath, Astro.site); // 英文連結
 const zhPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
-const zhUrl = new URL(zhPath, Astro.site); // 中文链接
+const zhUrl = new URL(zhPath, Astro.site); // 中文連結
 
-// 5. 注入 JSON-LD 结构化数据：定义公司、品牌工作室与音乐项目的关系
+// 4. 判斷當前語言，設定切換按鈕的「當前頁面原地等價跳轉」目標與顯示文字
+const switchUrl = lang === 'en' ? zhUrl.pathname : enUrl.pathname;
+const switchText = lang === 'en' ? '中文' : 'EN';
+
+// 5. 注入 JSON-LD 結構化數據：定義公司、品牌工作室與音樂項目的關係
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "Corporation",
@@ -70,10 +70,14 @@ const schemaData = {
         <img src="/logo.png" alt="Grandevity Logo" class="nav-logo" />
       </a>
       <div class="links">
-        <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音乐'}</a>
-        <a href="/#games">{lang === 'en' ? 'Games' : '游戏'}</a>
-        <a href="/#services">{lang === 'en' ? 'Services' : '服务'}</a>
+        <a href={lang === 'en' ? '/' : '/zh/'}>{lang === 'en' ? 'Home' : '首頁'}</a>
+        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>Original Games</a>
+        <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音樂'}</a>
         <a href={lang === 'en' ? '/blog' : '/zh/blog'}>{lang === 'en' ? 'Insights' : '洞察'}</a>
+        <a href={lang === 'en' ? '/#services' : '/zh/#services'}>{lang === 'en' ? 'Services' : '服務'}</a>
+        <a href={lang === 'en' ? '/pricing' : '/zh/pricing'}>{lang === 'en' ? 'Pricing' : '價格'}</a>
+        <a href={lang === 'en' ? '/faq' : '/zh/faq'}>{lang === 'en' ? 'FAQ' : '常見問題'}</a>
+        <a href={lang === 'en' ? '/about' : '/zh/about'}>{lang === 'en' ? 'About' : '關於'}</a>
   
         <div class="nav-divider"></div>
         <a href={switchUrl} class="lang-switch">{switchText}</a>
@@ -86,16 +90,16 @@ const schemaData = {
       <div class="footer-content">
         <div class="footer-brand">
           <span class="logo-text">Grandevity</span>
-          <p class="tagline">{lang === 'en' ? 'Engineering Digital Worlds.' : '构建数字世界。'}</p>
+          <p class="tagline">{lang === 'en' ? 'Engineering Digital Worlds.' : '構建數位世界。'}</p>
           <div class="philosophy">
             {lang === 'en' 
               ? '"The majestic serenity arising from immense strength and established wisdom."'
-              : '“松椿万丈，狐兔不惊。”'}
+              : '「松椿萬丈，狐兔不驚。」'}
           </div>
         </div>
         
         <div class="footer-contact">
-          <h4>{lang === 'en' ? 'Get in Touch' : '联系我们'}</h4>
+          <h4>{lang === 'en' ? 'Get in Touch' : '聯絡我們'}</h4>
           <div class="contact-links">
             <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a>
             <a href="tel:+642040064937">+64 20 4006 4937</a>
@@ -103,7 +107,7 @@ const schemaData = {
         </div>
 
         <div class="footer-location">
-          <h4>{lang === 'en' ? 'Registered Office' : '注册办公室'}</h4>
+          <h4>{lang === 'en' ? 'Registered Office' : '註冊辦公室'}</h4>
           <p>9 Huron Street<br />
              Takapuna<br />
              Auckland 0622<br />
@@ -112,15 +116,21 @@ const schemaData = {
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '于新西兰注册成立。'}</p>
+        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '於紐西蘭註冊成立。'}</p>
         <p class="nzbn-text">NZBN: 9429053472120</p>
       
         <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
-          <a href="/about" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">About Us</a>
+          <a href={lang === 'en' ? '/about' : '/zh/about'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {lang === 'en' ? 'About Us' : '關於我們'}
+          </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href="/privacy-policy" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Privacy Policy</a>
+          <a href={lang === 'en' ? '/privacy-policy' : '/zh/privacy-policy'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {lang === 'en' ? 'Privacy Policy' : '隱私權政策'}
+          </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href="/terms-of-service" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">Terms of Service</a>
+          <a href={lang === 'en' ? '/terms-of-service' : '/zh/terms-of-service'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {lang === 'en' ? 'Terms of Service' : '服務條款'}
+          </a>
         </div>
       </div>
     </footer>
@@ -128,7 +138,7 @@ const schemaData = {
 </html>
 
 <style is:global>
-  /* 基础 CSS 保持不变 */
+  /* 基礎 CSS 保持不變 */
   :root {
     --bg-dark: #0f172a;
     --text-light: #f8fafc;
@@ -175,14 +185,15 @@ const schemaData = {
   .links { display: flex; align-items: center; }
   .links a {
     color: var(--text-light); text-decoration: none;
-    margin-left: 2rem; font-size: 0.9rem; transition: color 0.2s;
+    margin-left: 1.5rem; /* 微調為 1.5rem 以完美容納擴編後的 8 個選項 */
+    font-size: 0.9rem; transition: color 0.2s;
   }
   .links a:hover { color: var(--accent-glow); }
 
-  /* 新增语言切换按钮样式 */
+  /* 新增語言切換按鈕樣式 */
   .nav-divider {
     width: 1px; height: 16px; background: rgba(255,255,255,0.2);
-    margin-left: 2rem;
+    margin-left: 1.5rem;
   }
   .lang-switch {
     background: rgba(255,255,255,0.1);
@@ -193,47 +204,47 @@ const schemaData = {
   }
   .lang-switch:hover { background: rgba(56, 189, 248, 0.2); }
 
-/* 底部 Footer 样式 */
-footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }
+  /* 底部 Footer 樣式 */
+  footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }
 
-/* --- 核心修改区：缩小最大宽度，强制整体居中 --- */
-.footer-content { 
-  display: flex; 
-  flex-wrap: wrap; 
-  justify-content: space-between;
-  max-width: 900px; 
-  margin: 0 auto 3rem; 
-  gap: 2rem;
-}
-
-.footer-brand { 
-  flex: 1 1 350px; 
-  max-width: 400px;
-}
-
-.footer-contact, .footer-location { 
-  flex: 0 0 auto; 
-}
-/* ------------------------------------------- */
-
-.footer-brand .logo-text { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
-.footer-brand .tagline { color: #f8fafc; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
-.footer-brand .philosophy { font-style: italic; color: #94a3b8; font-size: 0.85rem; line-height: 1.5; padding-left: 1rem; border-left: 2px solid rgba(56, 189, 248, 0.5); }
-.footer-contact h4, .footer-location h4 { margin: 0 0 1rem 0; font-size: 0.9rem; color: #f8fafc; text-transform: uppercase; letter-spacing: 1px; }
-.contact-links { display: flex; flex-direction: column; gap: 0.75rem; }
-.contact-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-.contact-links a:hover { color: #38bdf8; }
-.footer-location p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; }
-.footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; }
-.footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
-.nzbn-text {letter-spacing: 0.5px; }
-
-/* 手机端适配 */
-@media (max-width: 768px) { 
+  /* --- 核心修改區：縮小最大寬度，強制整體居中 --- */
   .footer-content { 
-    flex-direction: column; 
-    gap: 3rem; 
-    max-width: 100%; 
-  } 
-}
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: space-between;
+    max-width: 900px; 
+    margin: 0 auto 3rem; 
+    gap: 2rem;
+  }
+
+  .footer-brand { 
+    flex: 1 1 350px; 
+    max-width: 400px;
+  }
+
+  .footer-contact, .footer-location { 
+    flex: 0 0 auto; 
+  }
+  /* ------------------------------------------- */
+
+  .footer-brand .logo-text { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
+  .footer-brand .tagline { color: #f8fafc; font-size: 0.95rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+  .footer-brand .philosophy { font-style: italic; color: #94a3b8; font-size: 0.85rem; line-height: 1.5; padding-left: 1rem; border-left: 2px solid rgba(56, 189, 248, 0.5); }
+  .footer-contact h4, .footer-location h4 { margin: 0 0 1rem 0; font-size: 0.9rem; color: #f8fafc; text-transform: uppercase; letter-spacing: 1px; }
+  .contact-links { display: flex; flex-direction: column; gap: 0.75rem; }
+  .contact-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  .contact-links a:hover { color: #38bdf8; }
+  .footer-location p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .footer-bottom p { margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #64748b; }
+  .nzbn-text {letter-spacing: 0.5px; }
+
+  /* 手機端適配 */
+  @media (max-width: 768px) { 
+    .footer-content { 
+      flex-direction: column; 
+      gap: 3rem; 
+      max-width: 100%; 
+    } 
+  }
 </style>

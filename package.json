@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run check:releases && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check:releases": "node scripts/check-releases.mjs",
+    "new-release": "node scripts/new-release.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",

@@ -77,7 +77,6 @@ const schemaData = {
         <a href={lang === 'en' ? '/#services' : '/zh/#services'}>{lang === 'en' ? 'Services' : '服務'}</a>
         <a href={lang === 'en' ? '/pricing' : '/zh/pricing'}>{lang === 'en' ? 'Pricing' : '價格'}</a>
         <a href={lang === 'en' ? '/faq' : '/zh/faq'}>{lang === 'en' ? 'FAQ' : '常見問題'}</a>
-        <a href={lang === 'en' ? '/about' : '/zh/about'}>{lang === 'en' ? 'About' : '關於'}</a>
   
         <div class="nav-divider"></div>
         <a href={switchUrl} class="lang-switch">{switchText}</a>
@@ -120,10 +119,6 @@ const schemaData = {
         <p class="nzbn-text">NZBN: 9429053472120</p>
       
         <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
-          <a href={lang === 'en' ? '/about' : '/zh/about'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
-            {lang === 'en' ? 'About Us' : '關於我們'}
-          </a>
-          <span style="color: #475569; font-size: 0.9rem;">|</span>
           <a href={lang === 'en' ? '/privacy-policy' : '/zh/privacy-policy'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
             {lang === 'en' ? 'Privacy Policy' : '隱私權政策'}
           </a>
@@ -185,7 +180,7 @@ const schemaData = {
   .links { display: flex; align-items: center; }
   .links a {
     color: var(--text-light); text-decoration: none;
-    margin-left: 1.5rem; /* 微調為 1.5rem 以完美容納擴編後的 8 個選項 */
+    margin-left: 1.5rem;
     font-size: 0.9rem; transition: color 0.2s;
   }
   .links a:hover { color: var(--accent-glow); }

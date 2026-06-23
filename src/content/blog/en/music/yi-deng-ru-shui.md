@@ -1,6 +1,6 @@
 ---
 title: "A Lantern Enters the Water: Sending Old Dreams Downstream Toward a City of Lights"
-date: 2026-06-26
+date: 2026-06-23
 description: "Grandevity Limited presents A Lantern Enters the Water, a soulful Mandopop R&B reinterpretation inspired by Xin Qiji’s Southern Song lyric poem Written on the Wall at Zaokou."
 author: "Grandevity Limited"
 category: "Music"

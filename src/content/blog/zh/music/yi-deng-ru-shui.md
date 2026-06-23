@@ -1,6 +1,6 @@
 ---
 title: "《一燈入水》：把舊夢寄給長灘，向萬家燈火走去"
-date: 2026-06-26
+date: 2026-06-23
 description: "Grandevity Limited 古典文學新曲企劃《一燈入水》。以辛棄疾《菩薩蠻・書江西造口壁》為起點，從南宋山河之愁走入現代河城燈火的華語男聲 R&B 國風作品。"
 author: "Grandevity Limited"
 category: "音樂"

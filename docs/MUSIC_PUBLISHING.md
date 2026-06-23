@@ -46,3 +46,11 @@ npm run build
 ```
 
 The build checks release data and paired articles before Astro generates the site. Push the working branch and review its Cloudflare Preview URL before merging.
+
+## Scheduled publishing
+
+This is a static Astro site, so date-gated releases become public only after a new build.
+
+The repository includes a daily GitHub Actions workflow that calls a Cloudflare Deploy Hook for the `main` branch. Store the hook URL as a GitHub Actions repository secret named `CLOUDFLARE_DEPLOY_HOOK`.
+
+The workflow also supports manual runs from the GitHub Actions tab.

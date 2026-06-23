@@ -1,6 +1,6 @@
 ---
 // 1. 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
-const { title, lang = 'en' } = Astro.props;
+const { title, lang = 'en', description, schema } = Astro.props;
 
 // 2. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -52,6 +52,7 @@ const schemaData = {
     <meta name="generator" content={Astro.generator} />
     
     <title>{title === 'Grandevity' ? title : `${title} | Grandevity Limited`}</title>
+    {description && <meta name="description" content={description} />}
     
     <link rel="canonical" href={canonicalURL} />
 
@@ -61,6 +62,7 @@ const schemaData = {
     <link rel="alternate" hreflang="x-default" href={enUrl} />
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6297520668105698" crossorigin="anonymous"></script>
   </head>

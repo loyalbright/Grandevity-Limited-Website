@@ -20,19 +20,29 @@ const releases = (await getCollection('releases'))
         <h2>最新视听企划</h2>
         
         <div class="video-grid">
-          {releases.map(({ data }) => (
-            <div class="video-container">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${data.youtubeId}?rel=0`}
-                title={`《${data.title.zhHant}》`}
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-                loading="lazy"
-              ></iframe>
-            </div>
+          {releases.map(({ id, data }) => (
+            <article class="release-card">
+              <div class="video-container">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${data.youtubeId}?rel=0`}
+                  title={`《${data.title.zhHant}》`}
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <div class="release-body">
+                <h3>《{data.title.zhHant}》</h3>
+                <p>
+                  {data.releaseDate.toLocaleDateString('zh-Hant', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  {data.classicalSource && <> · 取材自 {data.classicalSource}</>}
+                </p>
+                <a class="release-link" href={`/zh/music/${id}/`}>打開單曲頁</a>
+              </div>
+            </article>
           ))}
         </div>
 
@@ -116,6 +126,38 @@ const releases = (await getCollection('releases'))
   .video-container:hover {
     transform: translateY(-5px);
     border-color: rgba(56, 189, 248, 0.4);
+  }
+
+  .release-card {
+    min-width: 0;
+  }
+
+  .release-body {
+    padding-top: 1rem;
+  }
+
+  .release-body h3 {
+    margin: 0 0 0.35rem;
+    color: #f8fafc;
+    font-size: 1.15rem;
+    line-height: 1.35;
+  }
+
+  .release-body p {
+    margin: 0 0 0.75rem;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .release-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .release-link:hover {
+    text-decoration: underline;
   }
 
   .channel-link {

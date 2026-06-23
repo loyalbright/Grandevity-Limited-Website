@@ -54,3 +54,14 @@ This is a static Astro site, so date-gated releases become public only after a n
 The repository includes a daily GitHub Actions workflow that calls a Cloudflare Deploy Hook for the `main` branch. Store the hook URL as a GitHub Actions repository secret named `CLOUDFLARE_DEPLOY_HOOK`.
 
 The workflow also supports manual runs from the GitHub Actions tab.
+
+## Public release pages
+
+Published releases automatically generate music landing pages:
+
+```text
+/music/song-slug/
+/zh/music/song-slug/
+```
+
+Use these pages as the stable links in YouTube descriptions, social posts, artist profiles and music platform bios.

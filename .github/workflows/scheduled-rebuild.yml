@@ -1,0 +1,31 @@
+name: Scheduled rebuild
+
+on:
+  schedule:
+    # Rebuild after the UTC date has changed, so date-gated Astro content can publish.
+    # 00:17 UTC is 08:17 in Taiwan/Hong Kong/Singapore and 10:17 in Melbourne winter time.
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduled-rebuild
+  cancel-in-progress: false
+
+jobs:
+  trigger-cloudflare-build:
+    name: Trigger Cloudflare build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cloudflare deploy hook
+        env:
+          CLOUDFLARE_DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$CLOUDFLARE_DEPLOY_HOOK" ]; then
+            echo "CLOUDFLARE_DEPLOY_HOOK secret is not set."
+            exit 1
+          fi
+
+          curl --fail --show-error --silent --request POST "$CLOUDFLARE_DEPLOY_HOOK"

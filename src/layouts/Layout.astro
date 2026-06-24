@@ -5,20 +5,50 @@ const { title, lang = 'en', description, schema } = Astro.props;
 // 2. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-// 3. 清理路径并生成多语言 SEO 链接 (Hreflang)
+// 3. 清理路径并生成三语言 SEO 链接 (Hreflang)
 let rawPath = Astro.url.pathname;
-if (rawPath.startsWith('/zh/')) {
+if (rawPath.startsWith('/zh-hans/')) {
+  rawPath = rawPath.replace('/zh-hans/', '/');
+} else if (rawPath === '/zh-hans') {
+  rawPath = '/';
+} else if (rawPath.startsWith('/zh/')) {
   rawPath = rawPath.replace('/zh/', '/');
 } else if (rawPath === '/zh') {
   rawPath = '/';
 }
-const enUrl = new URL(rawPath, Astro.site); // 英文链接
-const zhPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
-const zhUrl = new URL(zhPath, Astro.site); // 中文链接
 
-// 4. 判断当前语言，设定切换按钮的「当前页面原地等价跳转」目标与显示文字
-const switchUrl = lang === 'en' ? zhUrl.pathname : enUrl.pathname;
-const switchText = lang === 'en' ? '中文' : 'EN';
+const enUrl = new URL(rawPath, Astro.site);
+const zhHantPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
+const zhHansPath = rawPath === '/' ? '/zh-hans/' : `/zh-hans${rawPath}`;
+const zhHantUrl = new URL(zhHantPath, Astro.site);
+const zhHansUrl = new URL(zhHansPath, Astro.site);
+
+// 4. 三语言导航路径
+const langPrefix = lang === 'en' ? '' : lang === 'zh-Hans' ? '/zh-hans' : '/zh';
+const homePath = lang === 'en' ? '/' : `${langPrefix}/`;
+const gamesPath = lang === 'en' ? '/#games' : `${langPrefix}/#games`;
+const musicPath = lang === 'en' ? '/music' : `${langPrefix}/music`;
+const blogPath = lang === 'en' ? '/blog' : `${langPrefix}/blog`;
+const aboutPath = lang === 'en' ? '/about' : `${langPrefix}/about`;
+const privacyPath = lang === 'en' ? '/privacy-policy' : `${langPrefix}/privacy-policy`;
+const termsPath = lang === 'en' ? '/terms-of-service' : `${langPrefix}/terms-of-service`;
+
+const labels = {
+  home: lang === 'en' ? 'Home' : lang === 'zh-Hans' ? '首页' : '首頁',
+  games: lang === 'en' ? 'Games' : lang === 'zh-Hans' ? '游戏' : '遊戲',
+  music: lang === 'en' ? 'Music' : lang === 'zh-Hans' ? '音乐' : '音樂',
+  insights: lang === 'en' ? 'Insights' : lang === 'zh-Hans' ? '洞察' : '洞察',
+  tagline: lang === 'en' ? 'Engineering Digital Worlds.' : lang === 'zh-Hans' ? '构建数字世界。' : '構建數位世界。',
+  philosophy: lang === 'en'
+    ? '"The majestic serenity arising from immense strength and established wisdom."'
+    : '「松椿萬丈，狐兔不驚。」',
+  contact: lang === 'en' ? 'Get in Touch' : lang === 'zh-Hans' ? '联系我们' : '聯絡我們',
+  office: lang === 'en' ? 'Registered Office' : lang === 'zh-Hans' ? '注册地址' : '註冊辦公室',
+  incorporated: lang === 'en' ? 'Proudly incorporated in New Zealand.' : lang === 'zh-Hans' ? '于新西兰注册成立。' : '於紐西蘭註冊成立。',
+  about: lang === 'en' ? 'About Us' : lang === 'zh-Hans' ? '关于我们' : '關於我們',
+  privacy: lang === 'en' ? 'Privacy Policy' : lang === 'zh-Hans' ? '隐私政策' : '隱私權政策',
+  terms: lang === 'en' ? 'Terms of Service' : lang === 'zh-Hans' ? '服务条款' : '服務條款',
+};
 
 // 5. 注入 JSON-LD 结构化数据：定义公司、品牌工作室与音乐项目的关系
 const schemaData = {
@@ -57,8 +87,8 @@ const schemaData = {
     <link rel="canonical" href={canonicalURL} />
 
     <link rel="alternate" hreflang="en" href={enUrl} />
-    <link rel="alternate" hreflang="zh-TW" href={zhUrl} />
-    <link rel="alternate" hreflang="zh" href={zhUrl} />
+    <link rel="alternate" hreflang="zh-Hant" href={zhHantUrl} />
+    <link rel="alternate" hreflang="zh-Hans" href={zhHansUrl} />
     <link rel="alternate" hreflang="x-default" href={enUrl} />
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
@@ -68,17 +98,19 @@ const schemaData = {
   </head>
   <body>
     <nav>
-      <a href={lang === 'en' ? '/' : '/zh/'} class="logo-link">
+      <a href={homePath} class="logo-link">
         <img src="/logo.png" alt="Grandevity Logo" class="nav-logo" />
       </a>
       <div class="links">
-        <a href={lang === 'en' ? '/' : '/zh/'}>{lang === 'en' ? 'Home' : '首頁'}</a>
-        <a href={lang === 'en' ? '/#games' : '/zh/#games'}>{lang === 'en' ? 'Games' : '遊戲'}</a>
-        <a href={lang === 'en' ? '/music' : '/zh/music'}>{lang === 'en' ? 'Music' : '音樂'}</a>
-        <a href={lang === 'en' ? '/blog' : '/zh/blog'}>{lang === 'en' ? 'Insights' : '洞察'}</a>
+        <a href={homePath}>{labels.home}</a>
+        <a href={gamesPath}>{labels.games}</a>
+        <a href={musicPath}>{labels.music}</a>
+        <a href={blogPath}>{labels.insights}</a>
   
         <div class="nav-divider"></div>
-        <a href={switchUrl} class="lang-switch">{switchText}</a>
+        <a href={enUrl.pathname} class:list={['lang-switch', { active: lang === 'en' }]}>EN</a>
+        <a href={zhHantUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hant' || lang === 'zh' }]}>繁</a>
+        <a href={zhHansUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hans' }]}>简</a>
       </div>
     </nav>
     
@@ -88,16 +120,14 @@ const schemaData = {
       <div class="footer-content">
         <div class="footer-brand">
           <span class="logo-text">Grandevity</span>
-          <p class="tagline">{lang === 'en' ? 'Engineering Digital Worlds.' : '構建數位世界。'}</p>
+          <p class="tagline">{labels.tagline}</p>
           <div class="philosophy">
-            {lang === 'en' 
-              ? '"The majestic serenity arising from immense strength and established wisdom."'
-              : '「松椿萬丈，狐兔不驚。」'}
+            {labels.philosophy}
           </div>
         </div>
         
         <div class="footer-contact">
-          <h4>{lang === 'en' ? 'Get in Touch' : '聯絡我們'}</h4>
+          <h4>{labels.contact}</h4>
           <div class="contact-links">
             <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a>
             <a href="tel:+642040064937">+64 20 4006 4937</a>
@@ -105,7 +135,7 @@ const schemaData = {
         </div>
 
         <div class="footer-location">
-          <h4>{lang === 'en' ? 'Registered Office' : '註冊辦公室'}</h4>
+          <h4>{labels.office}</h4>
           <p>9 Huron Street<br />
              Takapuna<br />
              Auckland 0622<br />
@@ -114,20 +144,20 @@ const schemaData = {
       </div>
       
       <div class="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {lang === 'en' ? 'Proudly incorporated in New Zealand.' : '於紐西蘭註冊成立。'}</p>
+        <p>&copy; {new Date().getFullYear()} Grandevity Limited. {labels.incorporated}</p>
         <p class="nzbn-text">NZBN: 9429053472120</p>
       
         <div style="margin-top: 1rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
-          <a href={lang === 'en' ? '/about' : '/zh/about'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
-            {lang === 'en' ? 'About Us' : '關於我們'}
+          <a href={aboutPath} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {labels.about}
           </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href={lang === 'en' ? '/privacy-policy' : '/zh/privacy-policy'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
-            {lang === 'en' ? 'Privacy Policy' : '隱私權政策'}
+          <a href={privacyPath} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {labels.privacy}
           </a>
           <span style="color: #475569; font-size: 0.9rem;">|</span>
-          <a href={lang === 'en' ? '/terms-of-service' : '/zh/terms-of-service'} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
-            {lang === 'en' ? 'Terms of Service' : '服務條款'}
+          <a href={termsPath} style="color: #64748b; text-decoration: none; font-size: 0.9rem;">
+            {labels.terms}
           </a>
         </div>
       </div>
@@ -200,7 +230,7 @@ const schemaData = {
     font-weight: 600;
     letter-spacing: 1px;
   }
-  .lang-switch:hover { background: rgba(56, 189, 248, 0.2); }
+  .lang-switch:hover, .lang-switch.active { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
 
   /* 底部 Footer 样式 */
   footer { margin-top: auto; padding: 4rem 5% 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0, 0, 0, 0.2); }

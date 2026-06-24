@@ -27,9 +27,9 @@ for (const file of readdirSync(releasesDirectory).filter((name) => name.endsWith
 
   if (release.classicalSource !== undefined) {
     if (typeof release.classicalSource !== 'object' || release.classicalSource === null || Array.isArray(release.classicalSource)) {
-      errors.push(`${path}: classicalSource must be an object with en and zhHant values`);
-    } else if (!release.classicalSource.en || !release.classicalSource.zhHant) {
-      errors.push(`${path}: classicalSource.en and classicalSource.zhHant are required when classicalSource is provided`);
+      errors.push(`${path}: classicalSource must be an object with en, zhHant and zhHans values`);
+    } else if (!release.classicalSource.en || !release.classicalSource.zhHant || !release.classicalSource.zhHans) {
+      errors.push(`${path}: classicalSource.en, classicalSource.zhHant and classicalSource.zhHans are required when classicalSource is provided`);
     }
   }
 
@@ -45,7 +45,7 @@ for (const file of readdirSync(releasesDirectory).filter((name) => name.endsWith
     youtubeIds.set(release.youtubeId, path);
   }
 
-  for (const language of ['en', 'zh']) {
+  for (const language of ['zh', 'en', 'zh-hans']) {
     const article = join('src', 'content', 'blog', language, 'music', `${release.articleSlug}.md`);
     if (!existsSync(article)) {
       errors.push(`${path}: missing paired article ${article}`);

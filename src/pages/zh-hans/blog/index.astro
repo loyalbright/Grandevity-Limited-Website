@@ -1,0 +1,128 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { isPublished } from '../../../utils/publishing';
+
+// 只抓取中文部落格目录下的文章
+const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh-hans/'));
+const visiblePosts = allPosts.filter(post => isPublished(post.data.date));
+
+// 使用过滤后的文章进行排序
+const sortedPosts = visiblePosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// 自动提取所有文章中不重复的分类，并在最前面加上 '全部'
+const categories = ['全部', ...new Set(sortedPosts.map(post => post.data.category))];
+---
+
+<Layout title="洞察 | Grandevity" lang="zh-Hans">
+  <main class="blog-container">
+    <header class="blog-header">
+      <h1>Grandevity <span class="text-gradient">洞察</span></h1>
+      <p>关于商业架构、AI 解决方案、游戏开发与人文地理的深度思考。</p>
+    </header>
+
+    {categories.length > 1 && (
+      <div class="category-tabs">
+        {categories.map((cat, index) => (
+          <button class={`tab-btn ${index === 0 ? 'active' : ''}`} data-target={cat}>
+            {cat}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <div class="articles-grid">
+      {sortedPosts.length === 0 ? (
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 4rem 0;">暂无文章发布，敬请期待。</div>
+      ) : (
+        sortedPosts.map((post) => (
+          /* 确保连结指向中文部落格路由 */
+          <a href={`/zh-hans/blog/${post.id.replace('zh-hans/', '')}`} class="article-card" data-category={post.data.category}>
+            <span class="category-badge">{post.data.category}</span>
+            <h2>{post.data.title}</h2>
+            <p class="description">{post.data.description}</p>
+            <div class="meta">
+              <time>{post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+            </div>
+          </a>
+        ))
+      )}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .blog-container { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; min-height: 70vh; }
+  .blog-header { text-align: center; margin-bottom: 3rem; }
+  .blog-header h1 { font-size: 3.5rem; margin-bottom: 1rem; color: #f8fafc; }
+  .text-gradient { background-image: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 400%; background-position: 0%; }
+  .blog-header p { color: #94a3b8; font-size: 1.2rem; }
+  
+  .category-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .tab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+  }
+  .tab-btn.active {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: #38bdf8;
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+  }
+
+  /* 核心修复：使用了 auto-fill 保证卡片宽度始终一致 */
+  .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+  
+  .article-card { display: flex; flex-direction: column; background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s, opacity 0.3s ease; }
+  .article-card:hover { transform: translateY(-5px); border-color: rgba(56, 189, 248, 0.5); }
+  .category-badge { align-self: flex-start; background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+  .article-card h2 { font-size: 1.4rem; margin: 0 0 1rem 0; color: #f8fafc; line-height: 1.4; }
+  .description { color: #94a3b8; margin: 0 0 1.5rem 0; line-height: 1.6; flex-grow: 1; }
+  .meta { font-size: 0.85rem; color: #64748b; margin-top: auto; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const cards = document.querySelectorAll('.article-card');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const targetCategory = tab.getAttribute('data-target');
+
+        cards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          
+          // 逻辑更新：这里将 'All' 改为了 '全部'
+          if (targetCategory === '全部' || targetCategory === cardCategory) {
+            card.style.display = 'flex';
+            setTimeout(() => { card.style.opacity = '1'; }, 10);
+          } else {
+            card.style.opacity = '0';
+            setTimeout(() => { card.style.display = 'none'; }, 300);
+          }
+        });
+      });
+    });
+  });
+</script>

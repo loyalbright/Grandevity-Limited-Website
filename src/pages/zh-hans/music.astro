@@ -1,0 +1,210 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { isReleasePublished } from '../../utils/publishing';
+
+const releases = (await getCollection('releases'))
+  .filter(({ data }) => isReleasePublished(data))
+  .sort((a, b) => b.data.releaseDate.valueOf() - a.data.releaseDate.valueOf());
+---
+
+<Layout title="跨越千年的声音 | Grandevity" lang="zh-Hans">
+  <main class="page-container">
+    <header class="page-header">
+      <h1>跨越千年的声音，<span class="text-gradient">疗愈现代的灵魂</span></h1>
+      <p class="subtitle">本频道专注于中国古典文学的现代重构与谱新曲。我们将传世的诗词歌赋与现代华语流行音乐（Mandopop, Indie, Chillhop）交融。让传统的文字化作伴随你公路旅行、深夜冥想、缓解都市内耗的疗愈旋律。</p>
+    </header>
+
+    <div class="page-content">
+      <section class="video-section">
+        <h2>最新视听企划</h2>
+        
+        <div class="video-grid">
+          {releases.map(({ id, data }) => (
+            <article class="release-card">
+              <div class="video-container">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${data.youtubeId}?rel=0`}
+                  title={`《${data.title.zhHans}》`}
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              </div>
+              <div class="release-body">
+                <h3>《{data.title.zhHans}》</h3>
+                <p>
+                  {data.releaseDate.toLocaleDateString('zh-Hans', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  {data.classicalSource && <> · 取材自 {data.classicalSource.zhHans}</>}
+                </p>
+                <a class="release-link" href={`/zh-hans/music/${id}/`}>打开单曲页</a>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div class="channel-link">
+          <a href="https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ" target="_blank" rel="noopener noreferrer">
+            在 YouTube 上探索更多企划 ➔
+          </a>
+        </div>
+      </section>
+
+      <section class="copyright-section">
+        <h2>商业合作与版权声明</h2>
+        <div class="details-box">
+          <p>本页面所有原创音乐、编曲及视觉内容均由 <strong>Grandevity Limited</strong> 营运并持有合法商业版权。我们欢迎独立游戏、影视创作、Vlog 及商业广告采购非独家背景 BGM 授权。</p>
+          <p><strong>商业授权咨询信箱：</strong> <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a></p>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .page-container { 
+    padding: 4rem 5%; 
+    max-width: 1200px; /* 稍微加宽以容纳更好的网格 */
+    margin: 0 auto; 
+    min-height: 70vh; 
+    color: #cbd5e1;
+  }
+  .page-header { 
+    text-align: center; 
+    margin-bottom: 4rem; 
+  }
+  .page-header h1 { 
+    font-size: 3.5rem; 
+    margin-bottom: 1rem; 
+    color: #f8fafc; 
+  }
+  .text-gradient { 
+    background-image: linear-gradient(45deg, #38bdf8, #818cf8); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  .subtitle { 
+    color: #94a3b8; 
+    font-size: 1.2rem; 
+    line-height: 1.7;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .page-content h2 { 
+    color: #f8fafc; 
+    font-size: 2rem; 
+    margin-bottom: 2rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+  }
+  
+  .video-section {
+    margin-bottom: 4rem;
+  }
+  
+  /* 全新统一的网格布局 */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* 保证视频有足够的观看宽度 */
+    gap: 2.5rem;
+  }
+
+  .video-container {
+    border-radius: 12px; 
+    overflow: hidden; 
+    aspect-ratio: 16/9; 
+    background: #000;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .video-container:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56, 189, 248, 0.4);
+  }
+
+  .release-card {
+    min-width: 0;
+  }
+
+  .release-body {
+    padding-top: 1rem;
+  }
+
+  .release-body h3 {
+    margin: 0 0 0.35rem;
+    color: #f8fafc;
+    font-size: 1.15rem;
+    line-height: 1.35;
+  }
+
+  .release-body p {
+    margin: 0 0 0.75rem;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .release-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .release-link:hover {
+    text-decoration: underline;
+  }
+
+  .channel-link {
+    text-align: right; 
+    margin-top: 2rem;
+  }
+  .channel-link a {
+    color: #38bdf8; 
+    text-decoration: none; 
+    font-weight: 500; 
+    font-size: 1.1rem;
+    transition: color 0.2s;
+  }
+  .channel-link a:hover {
+    color: #818cf8;
+    text-decoration: underline;
+  }
+
+  .details-box {
+    background: #0f172a;
+    padding: 2rem;
+    border-radius: 8px;
+    border-left: 4px solid #38bdf8;
+  }
+  .details-box p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  .details-box p:last-child {
+    margin-bottom: 0;
+  }
+  .details-box strong {
+    color: #f8fafc;
+  }
+  .details-box a {
+    color: #38bdf8;
+    text-decoration: none;
+  }
+  .details-box a:hover {
+    text-decoration: underline;
+  }
+  
+  /* 响应式调整：在小屏幕上让视频填满宽度 */
+  @media (max-width: 768px) {
+    .video-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

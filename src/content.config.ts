@@ -29,6 +29,7 @@ const releasesCollection = defineCollection({
     classicalSource: z.object({
       en: z.string(),
       zhHant: z.string(),
+      zhHans: z.string(),
     }).optional(),
     hyperfollow: z.string().url().optional(),
     platforms: z.object({

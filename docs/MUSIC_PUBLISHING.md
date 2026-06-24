@@ -11,9 +11,10 @@ npm run new-release -- song-slug
 Use lowercase ASCII words separated by hyphens. The command creates:
 
 ```text
-src/data/releases/song-slug.json
-src/content/blog/en/music/song-slug.md
 src/content/blog/zh/music/song-slug.md
+src/content/blog/en/music/song-slug.md
+src/content/blog/zh-hans/music/song-slug.md
+src/data/releases/song-slug.json
 ```
 
 ## Complete the release data
@@ -29,14 +30,19 @@ Edit the generated JSON file:
 - `status`: Use `draft`, `scheduled`, or `published`.
 - `classicalSource.en`: Optional English classical author and work.
 - `classicalSource.zhHant`: Optional Traditional Chinese classical author and work.
+- `classicalSource.zhHans`: Optional Simplified Chinese classical author and work.
 - `hyperfollow`: Optional DistroKid HyperFollow URL.
 - `platforms`: Optional direct streaming links.
 
 Draft releases never appear publicly. Scheduled and published releases appear only when their release date has arrived.
 
-## Write both articles
+## Write all language articles
 
-Complete the English and Traditional Chinese Markdown files. Simplified Chinese support will be added separately.
+Use this publishing order:
+
+1. Complete the Traditional Chinese article first.
+2. Write the English article for international discovery.
+3. Generate or adapt the Simplified Chinese article from the Traditional Chinese version, then review it manually.
 
 ## Validate and preview
 

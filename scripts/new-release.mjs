@@ -9,9 +9,10 @@ if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
 }
 
 const files = {
-  release: join('src', 'data', 'releases', `${slug}.json`),
-  en: join('src', 'content', 'blog', 'en', 'music', `${slug}.md`),
   zh: join('src', 'content', 'blog', 'zh', 'music', `${slug}.md`),
+  en: join('src', 'content', 'blog', 'en', 'music', `${slug}.md`),
+  zhHans: join('src', 'content', 'blog', 'zh-hans', 'music', `${slug}.md`),
+  release: join('src', 'data', 'releases', `${slug}.json`),
 };
 
 const existing = Object.values(files).filter(existsSync);
@@ -33,25 +34,36 @@ const release = {
   status: 'draft',
 };
 
-const frontmatter = (language) => `---
-title: "${language === 'en' ? 'English article title' : '繁體中文文章標題'}"
+const frontmatter = (language) => {
+  const isEnglish = language === 'en';
+  const isSimplified = language === 'zhHans';
+
+  return `---
+title: "${isEnglish ? 'English article title' : isSimplified ? '简体中文文章标题' : '繁體中文文章標題'}"
 date: ${today}
-description: "${language === 'en' ? 'English SEO description.' : '繁體中文 SEO 描述。'}"
+description: "${isEnglish ? 'English SEO description.' : isSimplified ? '简体中文 SEO 描述。' : '繁體中文 SEO 描述。'}"
 author: "Grandevity Studio"
-category: "${language === 'en' ? 'Music' : '音樂'}"
-tags: ["${language === 'en' ? 'Music' : '音樂'}", "${language === 'en' ? 'Original Music' : '原創音樂'}"]
+category: "${isEnglish ? 'Music' : isSimplified ? '音乐' : '音樂'}"
+tags: ["${isEnglish ? 'Music' : isSimplified ? '音乐' : '音樂'}", "${isEnglish ? 'Original Music' : isSimplified ? '原创音乐' : '原創音樂'}"]
 ---
 
-${language === 'en' ? 'Write the English release story here.' : '在此撰寫繁體中文作品文宣。'}
+${isEnglish ? 'Write the English release story here.' : isSimplified ? '在此撰写简体中文作品文宣。' : '在此撰寫繁體中文作品文宣。'}
 `;
+};
 
 for (const path of Object.values(files)) {
   mkdirSync(dirname(path), { recursive: true });
 }
 
-writeFileSync(files.release, `${JSON.stringify(release, null, 2)}\n`);
-writeFileSync(files.en, frontmatter('en'));
 writeFileSync(files.zh, frontmatter('zh'));
+writeFileSync(files.en, frontmatter('en'));
+writeFileSync(files.zhHans, frontmatter('zhHans'));
+writeFileSync(files.release, `${JSON.stringify(release, null, 2)}\n`);
 
 console.log(`Created release scaffold for "${slug}":`);
-console.log(Object.values(files).join('\n'));
+console.log([
+  files.zh,
+  files.en,
+  files.zhHans,
+  files.release,
+].join('\n'));

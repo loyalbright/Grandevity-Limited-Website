@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="关于我们 | Grandevity" lang="zh-Hans">
+  <main class="about-container">
+    <header class="about-header">
+      <h1>关于 <span class="text-gradient">Grandevity</span></h1>
+      <p class="subtitle">以精准与愿景，构建数位世界。</p>
+    </header>
+
+    <div class="about-content">
+      <section class="mission-section">
+        <h2>我们的基因</h2>
+        <p>Grandevity Limited 是一间于纽西兰注册成立的数位工作室。我们在强健的系统架构与互动娱乐的独特交汇处运行。</p>
+        <p>我们的哲学很简单：无论是设计复杂的网路应用程式、分析数位合规架构，还是开发 60 FPS 的 HTML5 塔防游戏，底层的原则始终如一——都需要结构的完整性、效能的最佳化，以及对终端使用者体验的深切尊重。</p>
+      </section>
+
+      <section class="what-we-do-section">
+        <h2>我们构建什么</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="icon">🎮</div>
+            <h3>原创游戏</h3>
+            <p>我们开发轻量级、高度优化的 HTML5 游戏（如《Kiwi Defenders》）。透过使用原生网路技术 (Vanilla web technologies)，我们无需依赖笨重的商业游戏引擎，即可提供即时、跨平台的互动体验。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">🎵</div>
+            <h3>古典文学新编</h3>
+            <p>我们致力于古典文学的现代音乐转译。将流传千年的诗词融进现代华语流行与 R&B 编曲，用当代视听语言重新唤醒古人的精神座标，为现代人提供一场沉浸式的精神疗愈。</p>
+          </div>
+          <div class="feature-card">
+            <div class="icon">💡</div>
+            <h3>技术洞察</h3>
+            <p>透过我们的「洞察」专栏，我们分享持续进行的研发日志。探讨的主题涵盖游戏中的人工智慧行为、效能优化、跨网域发行，乃至人文与历史系统的设计。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="company-details">
+        <h2>公司资讯</h2>
+        <div class="details-box">
+          <p><strong>法定名称：</strong> Grandevity Limited</p>
+          <p><strong>注册司法管辖区：</strong> 纽西兰 (New Zealand)</p>
+          <p><strong>纽西兰统一商业编号 (NZBN)：</strong> 9429053472120</p>
+          <p><strong>业务重心：</strong> 数位产品开发、互动媒体、音乐制作与技术咨询</p>
+          <p><strong>联络我们：</strong> <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a></p>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-container { 
+    padding: 4rem 5%; 
+    max-width: 1000px; 
+    margin: 0 auto; 
+    min-height: 70vh; 
+    color: #cbd5e1;
+  }
+  .about-header { 
+    text-align: center; 
+    margin-bottom: 4rem; 
+  }
+  .about-header h1 { 
+    font-size: 3.5rem; 
+    margin-bottom: 1rem; 
+    color: #f8fafc; 
+  }
+  .text-gradient { 
+    background-image: linear-gradient(45deg, #38bdf8, #818cf8); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  .subtitle { 
+    color: #94a3b8; 
+    font-size: 1.2rem; 
+  }
+  
+  .about-content h2 { 
+    color: #f8fafc; 
+    font-size: 2rem; 
+    margin-bottom: 1.5rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+  }
+  .about-content p { 
+    line-height: 1.8; 
+    margin-bottom: 1.5rem; 
+    font-size: 1.1rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+  }
+  .feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 12px;
+    transition: transform 0.2s;
+  }
+  .feature-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  .feature-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .feature-card h3 {
+    color: #38bdf8;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  .feature-card p {
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+
+  .company-details {
+    margin-top: 4rem;
+  }
+  .details-box {
+    background: #0f172a;
+    padding: 2rem;
+    border-radius: 8px;
+    border-left: 4px solid #38bdf8;
+  }
+  .details-box p {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+  }
+  .details-box a {
+    color: #38bdf8;
+    text-decoration: none;
+  }
+  .details-box a:hover {
+    text-decoration: underline;
+  }
+</style>

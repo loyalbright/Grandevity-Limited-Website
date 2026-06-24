@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check:releases": "node scripts/check-releases.mjs",
-    "new-release": "node scripts/new-release.mjs"
+    "new-release": "node scripts/new-release.mjs",
+    "qa:releases": "node scripts/qa-releases.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",

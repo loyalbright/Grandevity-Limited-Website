@@ -245,4 +245,21 @@ const schema = {
       grid-template-columns: 1fr;
     }
   }
+
+  :global(main :has(> iframe[src*="youtube.com/embed"])) {
+    width: min(100%, 1024px) !important;
+    max-width: 1024px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    aspect-ratio: 16 / 9 !important;
+  }
+
+  :global(main iframe[src*="youtube.com/embed"]) {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    border: 0;
+  }
+
 </style>

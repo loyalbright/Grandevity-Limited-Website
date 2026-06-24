@@ -12,7 +12,7 @@ export async function getStaticPaths() {
   return releases
     .filter(({ data }) => isReleasePublished(data))
     .map((release) => {
-      const article = blogEntries.find((entry) => entry.id === `zh/music/${release.data.articleSlug}`);
+      const article = blogEntries.find((entry) => entry.id === `zh-hans/music/${release.data.articleSlug}`);
 
       return {
         params: { slug: release.id },

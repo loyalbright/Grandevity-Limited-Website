@@ -8,16 +8,16 @@ const releases = (await getCollection('releases'))
   .sort((a, b) => b.data.releaseDate.valueOf() - a.data.releaseDate.valueOf());
 ---
 
-<Layout title="跨越千年的声音 | Grandevity" lang="zh">
+<Layout title="跨越千年的聲音 | Grandevity" lang="zh-Hant">
   <main class="page-container">
     <header class="page-header">
-      <h1>跨越千年的声音，<span class="text-gradient">治愈现代的灵魂</span></h1>
-      <p class="subtitle">本频道专注于中国古典文学的现代重构与谱新曲。我们将传世的诗词歌赋与现代华语流行音乐（Mandopop, Indie, Chillhop）完美交融。让传统的文字化作伴随你公路旅行、深夜冥想、缓解都市内耗的治愈旋律。</p>
+      <h1>跨越千年的聲音，<span class="text-gradient">療癒現代的灵魂</span></h1>
+      <p class="subtitle">本頻道專注於中國古典文學的現代重構與譜新曲。我們將傳世的詩詞歌賦与現代華語流行音樂（Mandopop, Indie, Chillhop）交融。讓傳統的文字化作伴隨你公路旅行、深夜冥想、緩解都市內耗的療癒旋律。</p>
     </header>
 
     <div class="page-content">
       <section class="video-section">
-        <h2>最新视听企划</h2>
+        <h2>最新視聽企划</h2>
         
         <div class="video-grid">
           {releases.map(({ id, data }) => (
@@ -54,10 +54,10 @@ const releases = (await getCollection('releases'))
       </section>
 
       <section class="copyright-section">
-        <h2>商业合作与版权声明</h2>
+        <h2>商業合作與版權聲明</h2>
         <div class="details-box">
-          <p>本页面所有原创音乐、编曲及视觉内容均由 <strong>Grandevity Limited</strong> 运营并持有合法商业版权。我们欢迎独立游戏、影视创作、Vlog 及商业广告采购非独家背景 BGM 授权。</p>
-          <p><strong>商业授权咨询邮箱：</strong> <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a></p>
+          <p>本頁面所有原創音樂、編曲及視覺內容均由 <strong>Grandevity Limited</strong> 營運並持有合法商業版權。我們歡迎獨立遊戲、影視創作、Vlog 及商業廣告採購非獨家背景 BGM 授權。</p>
+          <p><strong>商業授權諮詢信箱：</strong> <a href="mailto:info@grandevity.co.nz">info@grandevity.co.nz</a></p>
         </div>
       </section>
     </div>

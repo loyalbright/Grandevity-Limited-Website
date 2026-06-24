@@ -3,39 +3,39 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { isPublished } from '../../utils/publishing';
 
-// 抓取中文博客，并过滤掉未来发布的文章
+// 抓取中文部落格，並過濾掉未來發布的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
 const visiblePosts = allPosts.filter(post => isPublished(post.data.date));
 
-// 提取音乐板块文章 (路径包含 'music/')
+// 提取音樂板块文章 (路径包含 'music/')
 const musicPosts = visiblePosts
   .filter(post => post.id.includes('music/'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);
 
-// 提取洞见板块文章 (排除音乐)
+// 提取洞见板块文章 (排除音樂)
 const latestInsights = visiblePosts
   .filter(post => !post.id.includes('music/'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 2);
 ---
 
-<Layout title="Grandevity | 互动工作室与数字解决方案" lang="zh">
+<Layout title="Grandevity | 互動工作室與數位解決方案" lang="zh-Hant">
   <main>
     <header class="hero">
-      <h1>构建 <span class="text-gradient">数字世界</span></h1>
-      <p>Grandevity 是一家多领域混合型工作室，致力于打造原创互动体验，并为现代企业提供顶级的数字架构、财务合规与战略咨询服务。</p>
+      <h1>构建 <span class="text-gradient">數位世界</span></h1>
+      <p>Grandevity 是一家多領域混合型工作室，致力於打造原創互動體驗，並為現代企業提供頂級的數位架構、財務合規與策略諮詢服務。</p>
     </header>
 
     <section id="music" class="section-container">
-      <h2>古典新编音乐</h2>
-      <p class="section-subtitle">用现代视听语言，重构跨越千年的古典诗词与精神坐标。</p>
+      <h2>古典新編音樂</h2>
+      <p class="section-subtitle">用現代視聽語言，重構跨越千年的古典詩詞与精神坐标。</p>
       
       <div class="card-grid">
         {musicPosts.length === 0 ? (
           <div class="card" style="grid-column: 1 / -1; text-align: center;">
             <div class="card-content">
-              <p>全新视听企划正在制作中，敬请期待。</p>
+              <p>全新視聽企划正在製作中，敬请期待。</p>
             </div>
           </div>
         ) : (
@@ -54,13 +54,13 @@ const latestInsights = visiblePosts
 
       <div style="text-align: center; margin-top: 3rem;">
         <a href="/zh/music" style="color: #94a3b8; text-decoration: none; border-bottom: 1px solid #475569; padding-bottom: 2px; transition: color 0.2s;">
-          进入视听主页探索所有 MV ➔
+          進入視聽主页探索所有 MV ➔
         </a>
       </div>
     </section>
 
     <section id="games" class="section-container">
-      <h2>原创游戏</h2>
+      <h2>原創遊戲</h2>
       
       <div class="card-grid">
         <div class="card game-card">
@@ -72,7 +72,7 @@ const latestInsights = visiblePosts
           <div class="card-content">
             <h3>Kiwi Defenders</h3>
             <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">试玩版上线</span>
-            <p>一款极具策略性的 HTML5 塔防游戏。在独特的几维鸟主题战役地图上指挥你的防线。直接在浏览器中体验纯净的无 SDK 独立版本。</p>
+            <p>一款極具策略性的 HTML5 塔防遊戲。在獨特的奇異鳥主題戰役地圖上指揮你的防線。直接在瀏覽器中體驗純淨的無 SDK 獨立版本。</p>
             <a href="/play/kiwi-defenders/" class="cta-button" style="display: inline-block;">立即游玩 ➔</a>
           </div>
         </div>
@@ -82,9 +82,9 @@ const latestInsights = visiblePosts
             <span style="color: #475569; font-weight: 800; font-size: 1.5rem; letter-spacing: 4px;">[ 机密档案 ]</span>
           </div>
           <div class="card-content">
-            <h3>代号：Pebble <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(开发代号)</span></h3>
+            <h3>代號：Pebble <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(開發代號)</span></h3>
             <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">研发中</span>
-            <p>我们的下一款原创作品目前正处于早期原型设计和核心工程阶段。探索全新的互动机制，更多细节即将公布。</p>
+            <p>我們的下一款原創作品目前正處於早期原型設計和核心工程階段。探索全新的互動機制，更多細節即將公布。</p>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@ const latestInsights = visiblePosts
 
     <section id="insights" class="section-container">
       <h2>最新洞见</h2>
-      <p class="section-subtitle">深入探讨历史、系统设计与数字架构。</p>
+      <p class="section-subtitle">深入探討歷史、系統设计与數位架構。</p>
       
       <div class="card-grid">
         {latestInsights.map((post) => (
@@ -115,32 +115,32 @@ const latestInsights = visiblePosts
     </section>
 
     <section id="services" class="section-container">
-      <h2>工作室服务</h2>
-      <p class="section-subtitle">通过高水平的 B2B 企业合作，为我们的创新引擎提供动力。</p>
+      <h2>工作室服務</h2>
+      <p class="section-subtitle">透過高水平的 B2B 企業合作，為我們的創新引擎提供動力。</p>
       
       <div class="card-grid">
         <div class="card">
           <div class="card-content">
-            <h3>数字与网络服务</h3>
-            <p>开发、维护和托管高性能的数字店面、网络工具与内容平台，确保架构的可扩展性。</p>
+            <h3>數位与網路服務</h3>
+            <p>開發、維護和託管高性能的數位店面、網路工具與內容平台，確保架構的可擴展性。</p>
           </div>
         </div>
         <div class="card">
           <div class="card-content">
-            <h3>商业咨询</h3>
-            <p>为独立企业和初创公司提供战略性运营指导与流程优化咨询，提升运营效率。</p>
+            <h3>商業諮詢</h3>
+            <p>為獨立企業和新創公司提供策略性營運指導與流程優化諮詢，提升營運效率。</p>
           </div>
         </div>
         <div class="card">
           <div class="card-content">
-            <h3>财务与记账</h3>
-            <p>编制财务记录和总账对账，确保绝对的精确度与合规性，为您的业务增长最大化资金跑道。</p>
+            <h3>財務與記帳</h3>
+            <p>編製財務記錄和總帳對帳，確保絕對的精確度與合規性，為您的業務成長最大化資金跑道。</p>
           </div>
         </div>
         <div class="card">
           <div class="card-content">
-            <h3>系统与 ERP 架构</h3>
-            <p>定制 ERP 解决方案设计与实施，跨越财务数据与企业运营技术之间的鸿沟。</p>
+            <h3>系統与 ERP 架構</h3>
+            <p>客製化 ERP 解決方案設計與實施，跨越財務資料與企業營運技術之間的鴻溝。</p>
           </div>
         </div>
       </div>

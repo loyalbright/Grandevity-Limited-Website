@@ -8,5 +8,8 @@
   "youtubeId": "SAVMF2Z-490",
   "articleSlug": "ren-jing-jian-shan",
   "status": "published",
-  "classicalSource": "陶淵明《飲酒・其五》"
+  "classicalSource": {
+    "en": "Tao Yuanming, Drinking Wine, No. 5",
+    "zhHant": "陶淵明《飲酒・其五》"
+  }
 }

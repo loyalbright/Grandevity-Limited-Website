@@ -38,7 +38,7 @@ const releases = (await getCollection('releases'))
                 <h3>{data.title.en}</h3>
                 <p>
                   {data.releaseDate.toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  {data.classicalSource && <> · Inspired by {data.classicalSource}</>}
+                  {data.classicalSource && <> · Inspired by {data.classicalSource.en}</>}
                 </p>
                 <a class="release-link" href={`/music/${id}/`}>Open release page</a>
               </div>

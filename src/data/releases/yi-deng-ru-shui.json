@@ -8,5 +8,8 @@
   "youtubeId": "PnUhVeixP6s",
   "articleSlug": "yi-deng-ru-shui",
   "status": "published",
-  "classicalSource": "辛棄疾《菩薩蠻・書江西造口壁》"
+  "classicalSource": {
+    "en": "Xin Qiji, Pusa Man: Written on the Wall at Zaokou",
+    "zhHant": "辛棄疾《菩薩蠻・書江西造口壁》"
+  }
 }

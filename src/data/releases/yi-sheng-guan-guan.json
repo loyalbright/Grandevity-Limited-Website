@@ -8,5 +8,8 @@
   "youtubeId": "R_R9kiQSDcA",
   "articleSlug": "yi-sheng-guan-guan",
   "status": "published",
-  "classicalSource": "《詩經・關雎》"
+  "classicalSource": {
+    "en": "The Book of Songs, Guan Ju",
+    "zhHant": "《詩經・關雎》"
+  }
 }

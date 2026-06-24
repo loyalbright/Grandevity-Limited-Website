@@ -8,5 +8,8 @@
   "youtubeId": "tKL4SzkRBlU",
   "articleSlug": "yan-yu-xiao-qiao-qiu",
   "status": "published",
-  "classicalSource": "李煜《虞美人》"
+  "classicalSource": {
+    "en": "Li Yu, Yu Meiren",
+    "zhHant": "李煜《虞美人》"
+  }
 }

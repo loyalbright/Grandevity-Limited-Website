@@ -8,5 +8,8 @@
   "youtubeId": "dlxqKJ9Z6Kc",
   "articleSlug": "qing-hui-zuo-ban",
   "status": "published",
-  "classicalSource": "李白《靜夜思》"
+  "classicalSource": {
+    "en": "Li Bai, Quiet Night Thoughts",
+    "zhHant": "李白《靜夜思》"
+  }
 }

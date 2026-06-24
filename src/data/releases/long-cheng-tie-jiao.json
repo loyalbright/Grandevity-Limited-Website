@@ -8,5 +8,8 @@
   "youtubeId": "itS-VsL2aus",
   "articleSlug": "long-cheng-tie-jiao",
   "status": "published",
-  "classicalSource": "王昌齡《出塞》"
+  "classicalSource": {
+    "en": "Wang Changling, Out of the Frontier",
+    "zhHant": "王昌齡《出塞》"
+  }
 }

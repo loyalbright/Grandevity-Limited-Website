@@ -8,5 +8,8 @@
   "youtubeId": "dQEhiLTvrEI",
   "articleSlug": "yi-wei-shou-chang",
   "status": "published",
-  "classicalSource": "曹操《龜雖壽》"
+  "classicalSource": {
+    "en": "Cao Cao, Though the Tortoise Lives Long",
+    "zhHant": "曹操《龜雖壽》"
+  }
 }

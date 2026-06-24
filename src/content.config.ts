@@ -26,7 +26,10 @@ const releasesCollection = defineCollection({
     youtubeId: z.string(),
     articleSlug: z.string(),
     status: z.enum(['draft', 'scheduled', 'published']).default('published'),
-    classicalSource: z.string().optional(),
+    classicalSource: z.object({
+      en: z.string(),
+      zhHant: z.string(),
+    }).optional(),
     hyperfollow: z.string().url().optional(),
     platforms: z.object({
       spotify: z.string().url().optional(),

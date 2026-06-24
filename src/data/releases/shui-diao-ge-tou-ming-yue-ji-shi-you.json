@@ -8,5 +8,8 @@
   "youtubeId": "lkCpRb9tXEY",
   "articleSlug": "shui-diao-ge-tou-ming-yue-ji-shi-you",
   "status": "published",
-  "classicalSource": "蘇軾《水調歌頭・明月幾時有》"
+  "classicalSource": {
+    "en": "Su Shi, Shuidiao Getou: When Will the Bright Moon Appear?",
+    "zhHant": "蘇軾《水調歌頭・明月幾時有》"
+  }
 }

@@ -38,7 +38,7 @@ const releases = (await getCollection('releases'))
                 <h3>《{data.title.zhHant}》</h3>
                 <p>
                   {data.releaseDate.toLocaleDateString('zh-Hant', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  {data.classicalSource && <> · 取材自 {data.classicalSource}</>}
+                  {data.classicalSource && <> · 取材自 {data.classicalSource.zhHant}</>}
                 </p>
                 <a class="release-link" href={`/zh/music/${id}/`}>打開單曲頁</a>
               </div>

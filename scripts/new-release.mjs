@@ -13,6 +13,7 @@ Publishing order:
   2. English article
   3. Simplified Chinese article
   4. Release JSON
+  5. Publishing kit
 `;
 
 if (args.includes('--help') || args.includes('-h')) {
@@ -75,6 +76,9 @@ const files = {
   en: join('src', 'content', 'blog', 'en', 'music', `${slug}.md`),
   zhHans: join('src', 'content', 'blog', 'zh-hans', 'music', `${slug}.md`),
   release: join('src', 'data', 'releases', `${slug}.json`),
+  checklist: join('docs', 'releases', slug, 'checklist.md'),
+  youtubeDescription: join('docs', 'releases', slug, 'youtube-description.md'),
+  socialPosts: join('docs', 'releases', slug, 'social-posts.md'),
 };
 
 const existing = Object.values(files).filter(existsSync);
@@ -149,6 +153,97 @@ TODO: YouTube / streaming platform call to action.
   },
 };
 
+const releaseUrl = `https://grandevity.co.nz/music/${slug}/`;
+const zhReleaseUrl = `https://grandevity.co.nz/zh/music/${slug}/`;
+const zhHansReleaseUrl = `https://grandevity.co.nz/zh-hans/music/${slug}/`;
+
+const publishingChecklist = `# Release Checklist: ${slug}
+
+## Core Data
+
+- [ ] Confirm final English title.
+- [ ] Confirm final Traditional Chinese title.
+- [ ] Confirm final Simplified Chinese title.
+- [ ] Confirm release date: ${options.date}
+- [ ] Confirm DistroKid submission.
+- [ ] Add HyperFollow URL when available.
+- [ ] Add direct platform links when available.
+- [ ] Add final YouTube video ID.
+
+## Articles
+
+- [ ] Complete Traditional Chinese article.
+- [ ] Complete English article.
+- [ ] Complete Simplified Chinese article.
+- [ ] Remove all TODO / 待補 / 待补 placeholders.
+- [ ] Confirm article dates match releaseDate.
+
+## Website QA
+
+- [ ] Run npm run check:releases.
+- [ ] Run npm run build.
+- [ ] Check English release page: ${releaseUrl}
+- [ ] Check Traditional Chinese release page: ${zhReleaseUrl}
+- [ ] Check Simplified Chinese release page: ${zhHansReleaseUrl}
+- [ ] Confirm YouTube embed loads.
+- [ ] Confirm article links work.
+- [ ] Confirm language switch works.
+
+## Production
+
+- [ ] Merge PR.
+- [ ] Wait for Cloudflare production deployment.
+- [ ] Check production release pages.
+- [ ] Add release page link to YouTube description.
+- [ ] Publish social posts.
+`;
+
+const youtubeDescription = `# YouTube Description: ${slug}
+
+TODO: Replace this section with the final YouTube description.
+
+Listen / Read more:
+${releaseUrl}
+
+繁體中文：
+${zhReleaseUrl}
+
+简体中文：
+${zhHansReleaseUrl}
+
+Official site:
+https://grandevity.co.nz/music/
+
+Contact:
+info@grandevity.co.nz
+
+#GrandevityMusic #Mandopop #OriginalMusic
+`;
+
+const socialPosts = `# Social Posts: ${slug}
+
+## English
+
+TODO: Write English announcement.
+
+Listen / watch:
+${releaseUrl}
+
+## 繁體中文
+
+待補：撰寫繁體中文發布文案。
+
+收聽 / 觀看：
+${zhReleaseUrl}
+
+## 简体中文
+
+待补：撰写简体中文发布文案。
+
+收听 / 观看：
+${zhHansReleaseUrl}
+`;
+
 const frontmatter = (template) => `---
 title: "${template.title}"
 date: ${options.date}
@@ -168,6 +263,9 @@ writeFileSync(files.zh, frontmatter(templates.zh));
 writeFileSync(files.en, frontmatter(templates.en));
 writeFileSync(files.zhHans, frontmatter(templates.zhHans));
 writeFileSync(files.release, `${JSON.stringify(release, null, 2)}\n`);
+writeFileSync(files.checklist, publishingChecklist);
+writeFileSync(files.youtubeDescription, youtubeDescription);
+writeFileSync(files.socialPosts, socialPosts);
 
 console.log(`Created release scaffold for "${slug}":`);
 console.log([
@@ -175,6 +273,9 @@ console.log([
   `2. ${files.en}`,
   `3. ${files.zhHans}`,
   `4. ${files.release}`,
+  `5. ${files.checklist}`,
+  `6. ${files.youtubeDescription}`,
+  `7. ${files.socialPosts}`,
 ].join('\n'));
 
 console.log(`
@@ -183,6 +284,7 @@ Next steps:
 - Translate/adapt the English article second.
 - Convert and proofread the Simplified Chinese article third.
 - Replace release JSON title values and youtubeId.
+- Complete docs/releases/${slug}/ publishing materials.
 - Set status to scheduled or published only when all placeholders are removed.
 - Run npm run check:releases before committing.
 `);

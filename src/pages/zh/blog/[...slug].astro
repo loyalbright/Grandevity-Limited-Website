@@ -18,7 +18,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry); 
 ---
 
-<Layout title={`${entry.data.title} | Grandevity`} lang="zh">
+<Layout title={`${entry.data.title} | Grandevity`} lang="zh-Hant">
   <main class="article-container">
     <article>
       <header class="article-header">
@@ -63,11 +63,11 @@ const { Content } = await render(entry);
   /* --- 控制文章内的图片排版 --- */
   .markdown-content img {
     max-width: 100%;       /* 绝对不超过文章容器的宽度 */
-    height: auto;          /* 自动按比例缩放高度，防止变形 */
-    display: block;        /* 独立占一行 */
+    height: auto;          /* 自動按比例縮放高度，防止變形 */
+    display: block;        /* 獨立占一行 */
     margin: 2.5rem auto;   /* 上下留出优雅的空白，左右居中 */
     border-radius: 8px;    /* 加上微微的圆角，更有高级感 */
-    border: 1px solid rgba(255,255,255,0.05); /* 加一层极淡的边框融入暗黑主题 */
+    border: 1px solid rgba(255,255,255,0.05); /* 加一層極淡的邊框融入暗黑主題 */
   }
   /* --- Precise Image Caption Styling --- */
   .markdown-content p img {
@@ -82,10 +82,10 @@ const { Content } = await render(entry);
     line-height: 1.5;
     margin-bottom: 2.5rem; /* Push the next paragraph down */
   }
-  /* --- 独立的图片来源 (Source) 排版 --- */
+  /* --- 獨立的图片来源 (Source) 排版 --- */
   .markdown-content .image-source {
     text-align: center;
-    font-size: 0.85rem;      /* 比 caption 再稍微小一丁点，建立完美的视觉层级 */
+    font-size: 0.85rem;      /* 比 caption 再稍微小一丁点，建立完美的視覺层级 */
     color: #64748b;          /* 颜色再稍微深沉一点，不抢夺正文注意力 */
     margin-top: -2rem;       /* 核心魔法：用负边距把它强行往上拉，紧紧贴在 Caption 下面 */
     margin-bottom: 2.5rem;   /* 和下一段正文保持距离 */

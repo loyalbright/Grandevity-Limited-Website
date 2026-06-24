@@ -3,22 +3,22 @@ import Layout from '../../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { isPublished } from '../../../utils/publishing';
 
-// 只抓取中文博客目录下的文章
+// 只抓取中文部落格目錄下的文章
 const allPosts = await getCollection('blog', ({ id }) => id.startsWith('zh/'));
 const visiblePosts = allPosts.filter(post => isPublished(post.data.date));
 
-// 使用过滤后的文章进行排序
+// 使用過濾後的文章進行排序
 const sortedPosts = visiblePosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// 自动提取所有文章中不重复的分类，并在最前面加上 '全部'
+// 自動提取所有文章中不重複的分類，並在最前面加上 '全部'
 const categories = ['全部', ...new Set(sortedPosts.map(post => post.data.category))];
 ---
 
-<Layout title="洞察 | Grandevity" lang="zh">
+<Layout title="洞察 | Grandevity" lang="zh-Hant">
   <main class="blog-container">
     <header class="blog-header">
       <h1>Grandevity <span class="text-gradient">洞察</span></h1>
-      <p>关于商业架构、AI 解决方案、游戏开发与人文地理的深度思考。</p>
+      <p>關於商業架構、AI 解決方案、遊戲開發與人文地理的深度思考。</p>
     </header>
 
     {categories.length > 1 && (
@@ -33,10 +33,10 @@ const categories = ['全部', ...new Set(sortedPosts.map(post => post.data.categ
 
     <div class="articles-grid">
       {sortedPosts.length === 0 ? (
-        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 4rem 0;">暂无文章发布，敬请期待。</div>
+        <div class="empty-state" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 4rem 0;">暫無文章發布，敬请期待。</div>
       ) : (
         sortedPosts.map((post) => (
-          /* 确保链接指向中文博客路由 */
+          /* 確保連結指向中文部落格路由 */
           <a href={`/zh/blog/${post.id.replace('zh/', '')}`} class="article-card" data-category={post.data.category}>
             <span class="category-badge">{post.data.category}</span>
             <h2>{post.data.title}</h2>
@@ -113,7 +113,7 @@ const categories = ['全部', ...new Set(sortedPosts.map(post => post.data.categ
         cards.forEach(card => {
           const cardCategory = card.getAttribute('data-category');
           
-          // 逻辑更新：这里将 'All' 改为了 '全部'
+          // 邏輯更新：這裡將 'All' 改為了 '全部'
           if (targetCategory === '全部' || targetCategory === cardCategory) {
             card.style.display = 'flex';
             setTimeout(() => { card.style.opacity = '1'; }, 10);

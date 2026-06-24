@@ -76,6 +76,7 @@ const schema = {
 
     <section class="video-panel" aria-label={`《${data.title.zhHans}》官方 MV`}>
       <iframe
+        class="video-frame"
         width="100%"
         height="100%"
         src={embedUrl}
@@ -169,8 +170,10 @@ const schema = {
   }
 
   .video-panel {
-    width: min(100%, 1024px);
-    max-width: 1024px;
+    display: block;
+    width: 1024px;
+    max-width: 100%;
+    height: auto;
     margin: 3rem auto;
     aspect-ratio: 16 / 9;
     overflow: hidden;
@@ -262,6 +265,14 @@ const schema = {
     width: 100% !important;
     height: 100% !important;
     aspect-ratio: 16 / 9 !important;
+    border: 0;
+  }
+
+
+  .video-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
     border: 0;
   }
 

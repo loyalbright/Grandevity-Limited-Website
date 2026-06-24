@@ -41,23 +41,32 @@ const platformLinks: { label: string; href: string }[] = [
   ...(data.platforms?.tidal ? [{ label: 'TIDAL', href: data.platforms.tidal }] : []),
   { label: 'YouTube', href: youtubeUrl },
 ];
+const sameAs = platformLinks.map((link) => link.href);
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'MusicRecording',
   name: data.title.zhHant,
   alternateName: data.title.en,
+  description,
   url: new URL(Astro.url.pathname, Astro.site).toString(),
   datePublished: isoReleaseDate,
   inLanguage: 'zh-Hant',
+  genre: ['Mandopop', 'R&B', 'Classical Crossover'],
+  isAccessibleForFree: true,
   byArtist: {
     '@type': 'MusicGroup',
-    name: 'Grandevity Studio',
+    name: 'Grandevity Music',
+    url: 'https://grandevity.co.nz/music/',
   },
-  video: {
+  sameAs,
+  subjectOf: {
     '@type': 'VideoObject',
     name: `《${data.title.zhHant}》Official Music Video`,
+    description,
     embedUrl: `https://www.youtube.com/embed/${data.youtubeId}`,
+    url: youtubeUrl,
     uploadDate: isoReleaseDate,
+    isAccessibleForFree: true,
   },
 };
 ---

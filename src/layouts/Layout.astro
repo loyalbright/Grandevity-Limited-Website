@@ -4,8 +4,15 @@ const { title, lang = 'en', description, schema, image, type = 'website' } = Ast
 
 // 2. 生成当前页面的 Canonical URL (解决 Google 重复页面报错)
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const pageTitle = title === 'Grandevity' ? title : `${title} | Grandevity Limited`;
-const pageDescription = description ?? 'Grandevity Limited creates original music, interactive experiences and digital infrastructure from New Zealand.';
+const siteUrl = new URL('/', Astro.site).toString();
+const pageTitle = title.includes('Grandevity') ? title : `${title} | Grandevity Limited`;
+const pageDescription = description ?? (
+  lang === 'en'
+    ? 'Grandevity Limited is a New Zealand digital studio and music project creating original interactive experiences, HTML5 games, and modern Mandopop reimaginings of classical Chinese poetry.'
+    : lang === 'zh-Hans'
+      ? 'Grandevity Limited 是新西兰注册的数字工作室与音乐企划，打造原创互动体验、HTML5 游戏，以及以古典诗词为灵感的现代华语音乐。'
+      : 'Grandevity Limited 是紐西蘭註冊的數位工作室與音樂企劃，打造原創互動體驗、HTML5 遊戲，以及以古典詩詞為靈感的現代華語音樂。'
+);
 const socialImage = new URL(image ?? '/logo.png', Astro.site);
 
 // 3. 清理路径并生成三语言 SEO 链接 (Hreflang)
@@ -56,21 +63,61 @@ const labels = {
 // 5. 注入 JSON-LD 结构化数据：定义公司、品牌工作室与音乐项目的关系
 const schemaData = {
   "@context": "https://schema.org",
-  "@type": "Corporation",
-  "name": "Grandevity Limited",
-  "legalName": "Grandevity Limited",
-  "url": "https://grandevity.co.nz",
-  "logo": "https://grandevity.co.nz/logo.png",
-  "brand": {
-    "@type": "Brand",
-    "name": "Grandevity Studio",
-    "alternateName": "Grandevity Studio"
-  },
-  "department": [
+  "@graph": [
     {
       "@type": "Organization",
-      "name": "Grandevity Music",
-      "description": "The primary classical reimagined music single series and modern Mandopop R&B creative project of Grandevity Studio."
+      "@id": "https://grandevity.co.nz/#organization",
+      "name": "Grandevity Limited",
+      "alternateName": ["Grandevity", "Grandevity Studio", "Grandevity Music"],
+      "legalName": "Grandevity Limited",
+      "url": siteUrl,
+      "logo": "https://grandevity.co.nz/logo.png",
+      "description": "Grandevity Limited is a New Zealand digital studio creating original interactive experiences, HTML5 games, and modern music releases.",
+      "identifier": {
+        "@type": "PropertyValue",
+        "propertyID": "NZBN",
+        "value": "9429053472120"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "9 Huron Street",
+        "addressLocality": "Takapuna",
+        "addressRegion": "Auckland",
+        "postalCode": "0622",
+        "addressCountry": "NZ"
+      },
+      "sameAs": [
+        "https://www.youtube.com/@GrandevityMusic",
+        "https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ"
+      ],
+      "brand": {
+        "@type": "Brand",
+        "name": "Grandevity Studio",
+        "alternateName": "Grandevity Music"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://grandevity.co.nz/#website",
+      "name": "Grandevity",
+      "alternateName": "Grandevity Limited",
+      "url": siteUrl,
+      "publisher": {
+        "@id": "https://grandevity.co.nz/#organization"
+      },
+      "inLanguage": ["en", "zh-Hant", "zh-Hans"]
+    },
+    {
+      "@type": "MusicGroup",
+      "@id": "https://grandevity.co.nz/#music",
+      "name": "Grandevity",
+      "alternateName": ["Grandevity Music", "Grandevity Studio"],
+      "url": "https://grandevity.co.nz/music/",
+      "description": "Grandevity Music is the classical literature reimagined music series and modern Mandopop R&B creative project of Grandevity Studio.",
+      "sameAs": [
+        "https://www.youtube.com/@GrandevityMusic",
+        "https://www.youtube.com/channel/UC8Uch86j4-V7pm7RorRI3GQ"
+      ]
     }
   ]
 };

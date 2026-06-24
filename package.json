@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run check:releases && astro build",
+    "build": "npm run check:releases && astro build && npm run qa:releases",
     "preview": "astro preview",
     "astro": "astro",
     "check:releases": "node scripts/check-releases.mjs",

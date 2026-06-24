@@ -27,7 +27,8 @@ Edit the generated JSON file:
 - `youtubeId`: The value after `watch?v=` in the YouTube URL.
 - `articleSlug`: Keep this identical to the filename.
 - `status`: Use `draft`, `scheduled`, or `published`.
-- `classicalSource`: Optional classical author and work.
+- `classicalSource.en`: Optional English classical author and work.
+- `classicalSource.zhHant`: Optional Traditional Chinese classical author and work.
 - `hyperfollow`: Optional DistroKid HyperFollow URL.
 - `platforms`: Optional direct streaming links.
 

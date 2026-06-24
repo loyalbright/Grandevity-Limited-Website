@@ -25,6 +25,14 @@ for (const file of readdirSync(releasesDirectory).filter((name) => name.endsWith
     errors.push(`${path}: en, zhHant and zhHans titles are required`);
   }
 
+  if (release.classicalSource !== undefined) {
+    if (typeof release.classicalSource !== 'object' || release.classicalSource === null || Array.isArray(release.classicalSource)) {
+      errors.push(`${path}: classicalSource must be an object with en and zhHant values`);
+    } else if (!release.classicalSource.en || !release.classicalSource.zhHant) {
+      errors.push(`${path}: classicalSource.en and classicalSource.zhHant are required when classicalSource is provided`);
+    }
+  }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(release.releaseDate ?? '')) {
     errors.push(`${path}: releaseDate must use YYYY-MM-DD`);
   }

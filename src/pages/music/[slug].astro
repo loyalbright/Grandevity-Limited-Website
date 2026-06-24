@@ -69,7 +69,7 @@ const schema = {
       <p class="eyebrow">Grandevity Studio Original Music</p>
       <h1>{data.title.en}</h1>
       <p class="subtitle">
-        A modern Mandopop release from Grandevity Studio{data.classicalSource && <> inspired by {data.classicalSource}</>}.
+        A modern Mandopop release from Grandevity Studio{data.classicalSource && <> inspired by {data.classicalSource.en}</>}.
       </p>
     </header>
 
@@ -96,7 +96,7 @@ const schema = {
           {data.classicalSource && (
             <div>
               <dt>Classical source</dt>
-              <dd>{data.classicalSource}</dd>
+              <dd>{data.classicalSource.en}</dd>
             </div>
           )}
           <div>

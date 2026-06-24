@@ -31,7 +31,6 @@ const release = {
   youtubeId: 'YOUTUBE_VIDEO_ID',
   articleSlug: slug,
   status: 'draft',
-  classicalSource: '',
 };
 
 const frontmatter = (language) => `---

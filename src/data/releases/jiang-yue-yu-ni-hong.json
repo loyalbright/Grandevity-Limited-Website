@@ -8,5 +8,8 @@
   "youtubeId": "deIFlMUReX0",
   "articleSlug": "jiang-yue-yu-ni-hong",
   "status": "published",
-  "classicalSource": "蘇軾《念奴嬌・赤壁懷古》"
+  "classicalSource": {
+    "en": "Su Shi, Nian Nu Jiao: Reminiscence at Red Cliff",
+    "zhHant": "蘇軾《念奴嬌・赤壁懷古》"
+  }
 }

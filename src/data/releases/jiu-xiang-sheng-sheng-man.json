@@ -8,5 +8,8 @@
   "youtubeId": "3uEIW0idqhg",
   "articleSlug": "jiu-xiang-sheng-sheng-man",
   "status": "published",
-  "classicalSource": "李清照《聲聲慢》"
+  "classicalSource": {
+    "en": "Li Qingzhao, Sheng Sheng Man",
+    "zhHant": "李清照《聲聲慢》"
+  }
 }

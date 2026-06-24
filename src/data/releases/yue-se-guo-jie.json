@@ -8,5 +8,8 @@
   "youtubeId": "tgcUkjyrQlU",
   "articleSlug": "yue-se-guo-jie",
   "status": "scheduled",
-  "classicalSource": "辛棄疾《青玉案・元夕》"
+  "classicalSource": {
+    "en": "Xin Qiji, Qingyu An: Lantern Festival Eve",
+    "zhHant": "辛棄疾《青玉案・元夕》"
+  }
 }

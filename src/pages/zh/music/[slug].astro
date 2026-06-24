@@ -70,7 +70,7 @@ const schema = {
       <p class="eyebrow">Grandevity Studio 原創音樂</p>
       <h1>《{data.title.zhHant}》</h1>
       <p class="subtitle">
-        Grandevity Studio 古典文學新曲企劃{data.classicalSource && <>，取材自 {data.classicalSource}</>}。
+        Grandevity Studio 古典文學新曲企劃{data.classicalSource && <>，取材自 {data.classicalSource.zhHant}</>}。
       </p>
     </header>
 
@@ -97,7 +97,7 @@ const schema = {
           {data.classicalSource && (
             <div>
               <dt>古典來源</dt>
-              <dd>{data.classicalSource}</dd>
+              <dd>{data.classicalSource.zhHant}</dd>
             </div>
           )}
           <div>

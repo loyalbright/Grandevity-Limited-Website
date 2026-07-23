@@ -1,6 +1,6 @@
 ---
 title: "《月色過街》：直到月光照見，那顆未肯放下的心"
-date: 2026-07-03
+date: 2026-06-26
 description: "Grandevity Studio 古典文學新曲企劃《月色過街》。以辛棄疾《青玉案・元夕》為起點，從南宋元夕燈市走入現代城市月夜，化為一首關於執念、自我寬恕與釋懷的華語男聲 R&B 國風作品。"
 author: "Grandevity Studio"
 category: "音樂"

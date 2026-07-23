@@ -1,6 +1,6 @@
 ---
 title: "Moonlight Across the Street: When Moonlight Reveals the Heart That Still Cannot Let Go"
-date: 2026-07-03
+date: 2026-06-26
 description: "Grandevity Studio presents Moonlight Across the Street, a new work in its Classical Literature Reimagined series. Inspired by Xin Qiji’s Qingyu’an: Lantern Festival Night, the song carries the lanterns of the Southern Song into a modern city night through melancholic Mandopop R&B."
 author: "Grandevity Studio"
 category: "Music"

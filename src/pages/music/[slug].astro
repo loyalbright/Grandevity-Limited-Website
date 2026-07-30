@@ -29,6 +29,50 @@ const releaseDate = data.releaseDate.toLocaleDateString('en-NZ', {
   year: 'numeric',
 });
 const isoReleaseDate = data.releaseDate.toISOString().slice(0, 10);
+
+function getAucklandUtcOffset(dateString) {
+  // 04:00 UTC 对应新西兰下午时段，可准确取得当天 16:00 所适用的
+  // NZST (+12:00) 或 NZDT (+13:00) 偏移量。
+  const probe = new Date(`${dateString}T04:00:00Z`);
+
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Pacific/Auckland",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(probe)
+      .filter(({ type }) => type !== "literal")
+      .map(({ type, value }) => [type, value])
+  );
+
+  const localTimeAsUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  );
+
+  const offsetMinutes = Math.round(
+    (localTimeAsUtc - probe.getTime()) / 60000
+  );
+
+  const sign = offsetMinutes >= 0 ? "+" : "-";
+  const absoluteMinutes = Math.abs(offsetMinutes);
+  const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, "0");
+  const minutes = String(absoluteMinutes % 60).padStart(2, "0");
+
+  return `${sign}${hours}:${minutes}`;
+}
+
+const videoUploadDate = `${isoReleaseDate}T16:00:00${getAucklandUtcOffset(isoReleaseDate)}`;
 const pageTitle = `${data.title.en} | Original Music`;
 const description = `${data.title.en} by Grandevity Studio. Watch the official music video and find streaming links.`;
 const youtubeUrl = `https://www.youtube.com/watch?v=${data.youtubeId}`;
@@ -62,9 +106,10 @@ const schema = {
     '@type': 'VideoObject',
     name: `${data.title.en} Official Music Video`,
     description,
+    thumbnailUrl: `https://i.ytimg.com/vi/${data.youtubeId}/hqdefault.jpg`,
     embedUrl: `https://www.youtube.com/embed/${data.youtubeId}`,
     url: youtubeUrl,
-    uploadDate: isoReleaseDate,
+    uploadDate: videoUploadDate,
     isAccessibleForFree: true,
   },
 };

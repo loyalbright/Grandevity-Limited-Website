@@ -416,7 +416,7 @@ It gives audible space to snow, water, darkness, fire and pause.
 
 * **Song Title:** Watching Snow at the Lake Pavilion
 * **Chinese Title:** 湖心亭看雪
-* **Classical Source:** Zhang Dai, *Tao’an Mengyi*, “Huxinting Kan Xue”
+* **Classical Source:** Zhang Dai, *Tao'an Mengyi*, “Huxinting Kan Xue”
 * **Narrative Period:** The twelfth month of the fifth year of Chongzhen, late Ming dynasty
 * **Narrative Location:** West Lake and the Lake Pavilion, Hangzhou
 * **Original Text / Lyrics:** Zhang Dai

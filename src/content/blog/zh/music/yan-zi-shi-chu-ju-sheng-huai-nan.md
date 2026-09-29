@@ -3,7 +3,7 @@ title: "《晏子使楚·橘生淮南》：一枚橘子，如何翻轉一場外�
 date: 2026-09-29
 description: "Grandevity Studio 古典文學新曲企劃《晏子使楚·橘生淮南》。100%使用《晏子春秋》原文譜曲，無現代擴寫、無新增副歌、不改變原文敘事順序；以 Cinematic Mandarin Narrative R&B、古琴、琵琶、簫、低沉弦樂、Rhodes、Neo-Soul Bass 與克制鼓組，從楚王設局羞辱齊使，一路走到「橘生淮南則為橘」與「得無楚之水土使民善盜耶」的從容反擊。"
 author: "Grandevity Studio"
-category: "Classical Literature Reimagined in Music"
+category: "音樂"
 tags: ["晏子使楚", "橘生淮南", "晏子春秋", "晏嬰", "古文譜曲", "文言文", "國風音樂", "華語R&B", "春秋", "楚文化"]
 ---
 

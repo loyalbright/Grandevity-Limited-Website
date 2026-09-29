@@ -3,7 +3,7 @@ title: "Yanzi’s Mission to Chu: How One Orange Turned a Diplomatic Humiliation
 date: 2026-09-29
 description: "Grandevity Studio presents a complete musical setting of the Classical Chinese episode Yanzi’s Mission to Chu from Yanzi Chunqiu. Using the project-established original text with no modern lyrical expansion or added chorus, the work turns the celebrated exchange about oranges south of the Huai into cinematic Mandarin narrative R&B, Chinese chamber textures and historical storytelling."
 author: "Grandevity Studio"
-category: "Classical Literature Reimagined in Music"
+category: "Music"
 tags: ["Yanzi Chunqiu", "Yan Ying", "Yanzi Mission to Chu", "Classical Chinese", "Chinese Literature", "Chinese History", "Mandarin R&B", "Chinese Fusion", "Spring and Autumn Period", "Chu Culture"]
 ---
 

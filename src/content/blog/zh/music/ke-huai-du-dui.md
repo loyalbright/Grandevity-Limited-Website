@@ -32,7 +32,7 @@ Grandevity Studio 全新古典文學新曲《客懷獨對》，正是從這一�
   <iframe 
     width="100%" 
     height="100%" 
-    src="https://www.youtube.com/embed/7_o0d-oyqzc?rel=0" 
+    src="https://www.youtube.com/embed/d_L_r_O1RkA?rel=0" 
     title="借馬致遠《天淨沙・秋思》擴寫，前奏一響以為周杰倫出新歌了！【客懷獨對 KE HUAI DU DUI】Official MV" 
     frameborder="0" 
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

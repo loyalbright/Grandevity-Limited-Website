@@ -1,7 +1,7 @@
 ---
 title: "Zhuangzi and Huizi on the Hao Bridge: How Do You Know the Fish Are Happy?"
 date: 2026-10-20
-description: "Grandevity Studio transforms the complete classical Chinese dialogue between Zhuangzi and Huizi from Zhuangzi's Autumn Floods into a bright, 96 BPM, two-voice City Pop song. Discover the famous question 'You are not a fish—how do you know its happiness?' through a cinematic Warring States bridge, swimming fish, philosophical debate and a 2:02 official music video."
+description: "Grandevity Studio transforms the complete classical Chinese dialogue between Zhuangzi and Huizi from Zhuangzi's Autumn Floods into a bright, 96 BPM, City Pop song. Discover the famous question 'You are not a fish—how do you know its happiness?' through a cinematic Warring States bridge, swimming fish, philosophical debate and a 2:02 official music video."
 author: "Grandevity Studio"
 category: "Music"
 tags: ["Zhuangzi", "Huizi", "Hao Bridge", "Happiness of Fish", "Zhuangzi and Huizi", "Autumn Floods", "Chinese Philosophy", "Warring States", "Chinese City Pop", "Classical Chinese Literature", "Grandevity Studio"]
@@ -50,8 +50,6 @@ The style is deliberately bright and playful:
 **Chinese-inspired City Pop.**
 
 **96 BPM.**
-
-**Two alternating male voices.**
 
 **2 minutes and 2 seconds.**
 

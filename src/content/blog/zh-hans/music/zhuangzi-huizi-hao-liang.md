@@ -1,7 +1,7 @@
 ---
-title: "《庄子与惠子游于濠梁之上》：子非鱼，安知鱼之乐？｜双男声国风 City Pop"
+title: "《庄子与惠子游于濠梁之上》：子非鱼，安知鱼之乐？｜国风 City Pop"
 date: 2026-10-20
-description: "Grandevity Studio将《庄子·秋水》经典“濠梁之辩”100%原文谱成双男声国风City Pop。96 BPM、2分02秒，从“鲦鱼出游从容”到“子非鱼”“子非我”，再到“我知之濠上也”，以明亮节奏、战国木桥与水下游鱼，重新探索知识、感受与逍遥的哲学对话。"
+description: "Grandevity Studio将《庄子·秋水》经典“濠梁之辩”100%原文谱成国风City Pop。96 BPM、2分02秒，从“鲦鱼出游从容”到“子非鱼”“子非我”，再到“我知之濠上也”，以明亮节奏、战国木桥与水下游鱼，重新探索知识、感受与逍遥的哲学对话。"
 author: "Grandevity Studio"
 category: "音乐"
 tags: ["庄子与惠子游于濠梁之上", "庄子", "惠子", "濠梁之辩", "鱼之乐", "子非鱼", "秋水", "道家哲学", "古文谱曲", "国风CityPop", "Grandevity Studio"]
@@ -42,8 +42,6 @@ tags: ["庄子与惠子游于濠梁之上", "庄子", "惠子", "濠梁之辩", 
 Grandevity Studio 将整段古典哲学对话完整谱成一首明亮、轻快的国风 City Pop。
 
 96 BPM。
-
-双男声对答。
 
 全长2分02秒。
 
@@ -511,7 +509,7 @@ MV 不使用现代风景桥、后世亭阁、玻璃灯具或不符合战国时�
 - **歌词形式：** 100%本企划定稿原文，无扩写、改词、新增歌词或额外重复
 - **音乐风格：** Bright Chinese-inspired City Pop
 - **速度：** 96 BPM
-- **演唱形式：** AI 辅助生成双男声对答
+- **演唱形式：** AI 辅助生成
 - **作曲／编曲：** Suno AI（AI-assisted）
 - **音乐制作：** Grandevity Limited / Grandevity Studio
 - **AI 辅助视觉：** ChatGPT Images

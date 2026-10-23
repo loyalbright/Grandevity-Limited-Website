@@ -1,4 +1,3 @@
-
 ---
 title: "A Letter to Zhu Yuansi: Wu Jun's Fuchun River in Music"
 date: 2026-10-23

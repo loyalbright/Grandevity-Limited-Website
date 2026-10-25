@@ -1,4 +1,3 @@
-
 ---
 title: "Wang Wei's Letter to Pei Di: From a Winter Night to a Springtime Invitation"
 date: 2026-10-25

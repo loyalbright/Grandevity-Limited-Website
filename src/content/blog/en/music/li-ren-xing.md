@@ -1,4 +1,3 @@
-
 ---
 title: "Li Ren Xing by Du Fu: Beauty, Luxury and Power in Tang Chang'an"
 date: 2026-11-01

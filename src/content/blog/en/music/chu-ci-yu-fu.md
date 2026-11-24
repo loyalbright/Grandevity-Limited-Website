@@ -1,6 +1,6 @@
 ---
 title: "Chu Ci: Yu Fu (The Fisherman) — Qu Yuan, Integrity, and the Wisdom of Letting Go"
-date: "2026-11-24"
+date: 2026-11-24
 description: "Discover Yu Fu (The Fisherman), a classical Chu Ci dialogue traditionally attributed to Qu Yuan, set to a new 5:14 cinematic orchestral Mandopop composition using only the original text."
 author: "Grandevity Studio"
 category: "Music"

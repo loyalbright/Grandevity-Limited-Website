@@ -1,4 +1,7 @@
 ---
+import { getCollection } from 'astro:content';
+import { isPublished } from '../utils/publishing';
+
 // 1. 接收 title 和 lang（语言）作为参数，默认语言设为 'en'
 const { title, lang = 'en', description, schema, image, type = 'website' } = Astro.props;
 
@@ -32,6 +35,40 @@ const zhHantPath = rawPath === '/' ? '/zh/' : `/zh${rawPath}`;
 const zhHansPath = rawPath === '/' ? '/zh-hans/' : `/zh-hans${rawPath}`;
 const zhHantUrl = new URL(zhHantPath, Astro.site);
 const zhHansUrl = new URL(zhHansPath, Astro.site);
+
+// Detect actual published translations for blog articles.
+// Keep existing language behaviour for non-article pages.
+const articleSlug = rawPath.startsWith('/blog/')
+  ? Astro.params.slug
+  : undefined;
+
+const publishedArticleIds =
+  typeof articleSlug === 'string'
+    ? new Set(
+        (await getCollection('blog', ({ id, data }) =>
+          (
+            id === `en/${articleSlug}` ||
+            id === `zh/${articleSlug}` ||
+            id === `zh-hans/${articleSlug}`
+          ) && isPublished(data.date)
+        )).map(entry => entry.id)
+      )
+    : null;
+
+const hasEn =
+  publishedArticleIds === null ||
+  publishedArticleIds.has(`en/${articleSlug}`);
+
+const hasZhHant =
+  publishedArticleIds === null ||
+  publishedArticleIds.has(`zh/${articleSlug}`);
+
+const hasZhHans =
+  publishedArticleIds === null ||
+  publishedArticleIds.has(`zh-hans/${articleSlug}`);
+
+const showHreflang =
+  [hasEn, hasZhHant, hasZhHans].filter(Boolean).length > 1;
 
 // 4. 三语言导航路径
 const langPrefix = lang === 'en' ? '' : lang === 'zh-Hans' ? '/zh-hans' : '/zh';
@@ -149,10 +186,10 @@ const schemaData = {
     
     <link rel="canonical" href={canonicalURL} />
 
-    <link rel="alternate" hreflang="en" href={enUrl} />
-    <link rel="alternate" hreflang="zh-Hant" href={zhHantUrl} />
-    <link rel="alternate" hreflang="zh-Hans" href={zhHansUrl} />
-    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    {showHreflang && hasEn && <link rel="alternate" hreflang="en" href={enUrl} />}
+    {showHreflang && hasZhHant && <link rel="alternate" hreflang="zh-Hant" href={zhHantUrl} />}
+    {showHreflang && hasZhHans && <link rel="alternate" hreflang="zh-Hans" href={zhHansUrl} />}
+    {showHreflang && hasEn && <link rel="alternate" hreflang="x-default" href={enUrl} />}
 
     <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
     {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
@@ -171,9 +208,9 @@ const schemaData = {
         <a href={blogPath}>{labels.insights}</a>
   
         <div class="nav-divider"></div>
-        <a href={enUrl.pathname} class:list={['lang-switch', { active: lang === 'en' }]}>EN</a>
-        <a href={zhHantUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hant' || lang === 'zh' }]}>繁</a>
-        <a href={zhHansUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hans' }]}>简</a>
+        {hasEn && <a href={enUrl.pathname} class:list={['lang-switch', { active: lang === 'en' }]}>EN</a>}
+        {hasZhHant && <a href={zhHantUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hant' || lang === 'zh' }]}>繁</a>}
+        {hasZhHans && <a href={zhHansUrl.pathname} class:list={['lang-switch', { active: lang === 'zh-Hans' }]}>简</a>}
       </div>
     </nav>
     
